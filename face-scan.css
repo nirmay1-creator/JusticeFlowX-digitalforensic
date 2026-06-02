@@ -1,0 +1,154 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0b0b0b;
+    color: #eaeaea;
+}
+
+.navbar {
+    background: #111;
+    padding: 15px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.center {
+    text-align: center;
+    margin-top: 60px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}
+
+.scan-box {
+    width: 180px;
+    height: 180px;
+    border: 2px solid #00ffcc;
+    position: relative;
+    margin: auto;
+    overflow: hidden;
+}
+
+.fingerprint-icon {
+    font-size: 90px;
+    color: #00ffcc;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.scan-line {
+    position: absolute;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(to right, transparent, #00ffcc, transparent);
+    top: 0;
+    animation: scan 2s linear infinite;
+    display: none;
+}
+
+@keyframes scan {
+    from { top: 0; }
+    to { top: 100%; }
+}
+
+.btn {
+    margin-top: 20px;
+    padding: 10px 25px;
+    background: #00ffcc;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#scannedFace {
+    width: 220px;
+    margin-top: 20px;
+    border-radius: 10px;
+    filter: blur(12px);
+    opacity: 0;
+    transition: filter 1.2s ease, opacity 1.2s ease;
+}
+
+#scannedFace.reveal {
+    filter: blur(0);
+    opacity: 1;
+}
+
+.status {
+    margin-top: 15px;
+    opacity: 0;
+    animation: fadeIn 1s forwards;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+.back-link {
+    color: #00ffcc;
+    text-decoration: none;
+}
+.wanted {
+    margin-top: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    color: red;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.4; }
+    100% { opacity: 1; }
+}
+
+.confidence {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #00ffcc;
+}
+
+.biometrics {
+    margin-top: 15px;
+    width: 260px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.bar {
+    margin: 8px 0;
+    font-size: 12px;
+    text-align: left;
+}
+
+.bar span {
+    display: block;
+    height: 6px;
+    width: 0;
+    background: #00ffcc;
+    margin-bottom: 3px;
+    transition: width 1.5s ease;
+}
+.face-icon {
+    font-size: 90px;
+    color: #00ffcc;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.face-frame {
+    justify-content: center;
+    margin-bottom: 2000px;
+
+    
+}
+
+#scannedFace {
+    width: 100%;
+    height: 100%;
+  
+}

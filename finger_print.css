@@ -1,0 +1,120 @@
+body {
+    font-family: 'Orbitron', sans-serif;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    color: #00ffea;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.scanner-container {
+    text-align: center;
+    background: rgba(0,0,0,0.6);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 0 50px #00ffea;
+    width: 400px;
+}
+
+h1 {
+    font-size: 28px;
+    margin-bottom: 30px;
+    text-shadow: 0 0 10px #00ffea, 0 0 20px #00ffea;
+}
+
+.scanner {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 20px auto;
+    border: 3px solid #00ffea;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 30px #00ffea inset, 0 0 30px #00ffea;
+}
+
+.fingerprint {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at center, rgba(0,255,234,0.3), transparent 70%);
+    position: relative;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+.scan-line {
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    background: #00ffea;
+    top: -4px;
+    animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+    0% { top: -4px; }
+    50% { top: 100%; }
+    100% { top: -4px; }
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 20px #00ffea; }
+    50% { box-shadow: 0 0 40px #00ffea; }
+}
+
+input {
+    padding: 10px;
+    width: 80%;
+    border-radius: 5px;
+    border: 1px solid #00ffea;
+    margin-bottom: 20px;
+    background: rgba(0,0,0,0.3);
+    color: #00ffea;
+    font-size: 16px;
+    text-align: center;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background: #00ffea;
+    color: #000;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #00b8a9;
+    transform: scale(1.1);
+}
+
+.progress-container {
+    width: 80%;
+    height: 20px;
+    background: rgba(0,255,234,0.2);
+    margin: 20px auto;
+    border-radius: 10px;
+    display: none;
+    overflow: hidden;
+    box-shadow: 0 0 10px #00ffea inset;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0;
+    background: #00ffea;
+    border-radius: 10px;
+    transition: width 0.3s;
+}
+
+.result {
+    margin-top: 20px;
+    text-align: left;
+    font-size: 16px;
+    line-height: 1.5;
+}

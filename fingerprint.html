@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fingerprint Scan</title>
+
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="fingerprint.css">
+</head>
+
+<body>
+
+    <div class="navbar">🧬 Fingerprint Scanner</div>
+
+    <div class="center">
+        <div class="scan-box">
+            <i class='bx bx-fingerprint fingerprint-icon'></i>
+        </div>
+
+        <button class="btn" onclick="scan()">Start Scan</button>
+
+        <p id="status"></p>
+
+        
+        <div id="crimecheck" class="status" style="display:none;">
+            ✅ Identity Verified — No Criminal Record Found
+        </div>
+
+        <br><br>
+        <a href="index.html" class="back-link">⬅ Rescan</a>
+    </div>
+
+    <script>
+        function scan() {
+            const status = document.getElementById("status");
+            const crimecheck = document.getElementById("crimecheck");
+
+            
+            crimecheck.style.display = "none";
+
+            status.innerHTML = "🔍 Scanning fingerprint...";
+
+            setTimeout(() => {
+                status.innerHTML = "✔ Match Found: ID BD-449901 ";
+
+                setTimeout(() => {
+                    crimecheck.style.display = "block";
+                }, 1000);
+
+            }, 2000);
+        }
+    </script>
+
+</body>
+</html>
+

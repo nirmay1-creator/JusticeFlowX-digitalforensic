@@ -1,0 +1,85 @@
+body {
+    font-family: 'Orbitron', sans-serif;
+    background: #0f0f0f;
+    color: #00ffcc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.scanner-container {
+    text-align: center;
+    background: #111;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 0 50px #00ffcc;
+}
+
+input, button {
+    margin: 10px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+}
+
+button {
+    background: #00ffcc;
+    color: #000;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #00ffaa;
+}
+
+.progress-container {
+    width: 100%;
+    background: #222;
+    border-radius: 10px;
+    margin-top: 20px;
+    display: none;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 15px;
+    background: #00ffcc;
+    border-radius: 10px;
+    transition: width 0.3s;
+}
+
+.result {
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+/* Fingerprint scan animation */
+.scanner {
+    margin: 20px auto;
+    width: 100px;
+    height: 100px;
+    border: 3px solid #00ffcc;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+}
+
+.scan-line {
+    width: 100%;
+    height: 4px;
+    background: #00ffcc;
+    position: absolute;
+    top: -4px;
+    animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+    0% { top: -4px; }
+    50% { top: 100%; }
+    100% { top: -4px; }
+}

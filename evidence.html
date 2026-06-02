@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>JusticeFlowX | Evidence Vault</title>
+
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+<link rel="stylesheet" href="evidence.css">
+</head>
+<body>
+
+<header class="topbar">
+  🧾 Evidence Management Vault
+ 
+</header>
+
+<section class="scene">
+
+  <!-- UPLOAD -->
+  <div class="card upload">
+    <h2>🔐 Upload Evidence</h2>
+    <input id="evName" placeholder="Evidence Name">
+    <select id="evType">
+      <option>Image</option>
+      <option>Video</option>
+      <option>Audio</option>
+      <option>Document</option>
+    </select>
+    <input type="file" id="evFile">
+    <select id="roleSelect">
+      <option>Investigator</option>
+      <option>Supervisor</option>
+    </select>
+    <button onclick="uploadEvidence()">Secure Upload</button>
+  </div>
+
+  <!-- VAULT -->
+  <div class="card vault">
+    <h2>📦 Evidence Vault</h2>
+    <div id="vaultList" class="vault-grid"></div>
+  </div>
+
+  <!-- AI -->
+  <div class="card ai">
+    <h2>🧠 AI Integrity Scan</h2>
+    <div id="aiStatus">Awaiting Evidence…</div>
+    <div class="ai-bar">
+      <div id="aiMeter"></div>
+    </div>
+    <button onclick="runAI()">Run Scan</button>
+  </div>
+
+</section>
+
+<!-- PREVIEW MODAL -->
+<div id="previewModal" class="modal">
+  <span class="close" onclick="closePreview()">&times;</span>
+  <div id="previewContent"></div>
+</div>
+
+<script src="evidence.js"></script><div class="bottom-nav">
+    <div>
+  <button class="back-btn" onclick="goDashboard()">⬅ Back to Dashboard</button>
+</div>
+</body>
+</html>

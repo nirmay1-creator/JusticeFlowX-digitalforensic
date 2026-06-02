@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JusticeFlowX — Location History Contradiction</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="justice.css">
+  <link rel="stylesheet" href="forensic.css">
+  <link rel="stylesheet" href="network.css">
+</head>
+<body>
+<div class="scanline-overlay"></div>
+<div class="noise-overlay"></div>
+<canvas id="hexCanvas"></canvas>
+<div class="data-streams" id="dataStreams"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="logo-wrapper"><div class="logo-text-badge">JFX</div><div class="logo-ping"></div></div>
+    <div class="brand-block">
+      <span class="brand">JusticeFlowX</span><span class="brand-sub">Verification System v2.4</span>
+    </div>
+  </div>
+  <div class="nav-center">
+    <a href="index.html" class="nav-link"><i class='bx bx-grid-alt'></i><span>Dashboard</span></a>
+    <a href="network.html" class="nav-link"><i class='bx bx-network-chart'></i><span>Network</span></a>
+    <a href="network-social.html" class="nav-link"><i class='bx bx-group'></i><span>Social Graph</span></a>
+    <a href="network-location.html" class="nav-link active"><i class='bx bx-map-alt'></i><span>Location</span></a>
+    <a href="network-perfect.html" class="nav-link"><i class='bx bx-badge-check'></i><span>Wear Check</span></a>
+  </div>
+  <div class="nav-right">
+    <div class="status-cluster"><div class="status-dot"></div><span class="system-status">SYSTEMS ONLINE</span></div>
+    <div class="clock-display" id="clockDisplay">00:00:00</div>
+  </div>
+</nav>
+
+<div class="module-page-header">
+  <a href="network.html" class="back-btn"><i class='bx bx-left-arrow-alt'></i> Back to Network</a>
+  <div class="mph-badge purple-badge"><i class='bx bx-map-alt'></i> MODULE 11 — LOCATION HISTORY CONTRADICTION</div>
+  <h1 class="mph-title">LOCATION <span class="accent-purple">CONTRADICTION</span></h1>
+  <p class="mph-sub">Cross-match claimed residence with phone tower data, IP geolocation history, border crossing records, and CCTV timestamps to expose impossible or fabricated location claims</p>
+</div>
+
+<div class="loc-workspace">
+  <!-- INPUT -->
+  <div class="loc-input-panel">
+    <div class="loc-ip-header"><i class='bx bx-map-pin'></i> CLAIMED LOCATIONS</div>
+    <div class="loc-ip-body">
+      <div class="sg-field">
+        <label>Subject Name / ID</label>
+        <input type="text" id="locSubject" class="forensic-input" placeholder="Name or ID number">
+      </div>
+      <div class="sg-field">
+        <label>Claimed Home City (ID card)</label>
+        <input type="text" id="locClaimedCity" class="forensic-input" placeholder="e.g. New Delhi">
+      </div>
+      <div class="sg-field">
+        <label>Claimed Residence Since</label>
+        <input type="number" id="locSince" class="forensic-input" placeholder="Year, e.g. 2010" min="1990" max="2026">
+      </div>
+      <div class="sg-field">
+        <label>Phone / IMEI (optional)</label>
+        <input type="text" id="locPhone" class="forensic-input" placeholder="e.g. +91 98765 43210">
+      </div>
+      <div class="sg-field">
+        <label>Last Known IP Region</label>
+        <select id="locIpRegion" class="forensic-select">
+          <option value="">Unknown / Not provided</option>
+          <option value="Mumbai">Mumbai, Maharashtra</option>
+          <option value="Delhi">New Delhi</option>
+          <option value="Bangalore">Bangalore, Karnataka</option>
+          <option value="Chennai">Chennai, Tamil Nadu</option>
+          <option value="Kolkata">Kolkata, West Bengal</option>
+          <option value="Hyderabad">Hyderabad, Telangana</option>
+          <option value="Dubai">Dubai, UAE</option>
+          <option value="London">London, UK</option>
+          <option value="New York">New York, USA</option>
+        </select>
+      </div>
+      <div class="sg-field">
+        <label>Passport Border Crossings (last 5 yrs)</label>
+        <input type="number" id="locBorderCross" class="forensic-input" placeholder="e.g. 3" min="0" max="100">
+      </div>
+      <button class="sg-analyze-btn" id="locAnalyzeBtn" style="background:rgba(123,47,255,0.12);border-color:rgba(123,47,255,0.5);color:#b18fff">
+        <i class='bx bx-map-alt'></i> ANALYZE LOCATION HISTORY
+        <div class="btn-shine"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAP PANEL -->
+  <div class="loc-map-panel">
+    <div class="lmp-header"><i class='bx bx-map'></i> GEOLOCATION CONTRADICTION MAP</div>
+    <canvas id="locMapCanvas" width="680" height="420"></canvas>
+    <div class="loc-map-overlay" id="locMapOverlay">
+      <i class='bx bx-map-alt'></i>
+      <p>Enter subject details to generate contradiction map</p>
+    </div>
+    <!-- Timeline -->
+    <div class="loc-timeline" id="locTimeline" style="display:none">
+      <div class="lt-header"><i class='bx bx-time-five'></i> LOCATION TIMELINE</div>
+      <div class="lt-track" id="ltTrack"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTRADICTION RESULTS -->
+<div class="loc-results-section" id="locResultsSection" style="display:none">
+  <div class="loc-contradiction-list" id="locContradictionList"></div>
+  <div class="loc-data-sources" id="locDataSources"></div>
+  <div class="loc-verdict" id="locVerdict"></div>
+</div>
+
+<div class="status-bar">
+  <div class="status-bar-item"><i class='bx bx-cpu'></i> CPU: <span id="cpuVal">34%</span></div>
+  <div class="status-bar-item"><i class='bx bx-data'></i> DB Sync: <span class="ok">LIVE</span></div>
+  <div class="status-bar-item marquee-wrap"><span class="marquee-text">⬢ GEOLOCATION MODULE ACTIVE — CELL TOWER MATRIX: 2.8B PINGS — IP REGISTRY: 4.1B RECORDS — BORDER CONTROL FEED: LIVE — CCTV TIMESTAMP INDEX ACTIVE</span></div>
+</div>
+
+<script src="justice.js"></script>
+<script src="network-location.js"></script>
+</body>
+</html>

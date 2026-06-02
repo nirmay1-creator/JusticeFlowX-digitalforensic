@@ -1,0 +1,89 @@
+[
+  { "crime": "theft", "severity": 3, "convicted": true, "failure": "Weak defense" },
+  { "crime": "theft", "severity": 4, "convicted": true, "failure": "Late appeal" },
+  { "crime": "theft", "severity": 5, "convicted": false, "failure": "Witness contradiction" },
+
+  { "crime": "robbery", "severity": 6, "convicted": true, "failure": "Minor procedural delay" },
+  { "crime": "robbery", "severity": 7, "convicted": true, "failure": "Poor alibi" },
+  { "crime": "robbery", "severity": 8, "convicted": false, "failure": "Weapon not recovered" },
+
+  { "crime": "burglary", "severity": 5, "convicted": true, "failure": "Late FIR" },
+  { "crime": "burglary", "severity": 6, "convicted": false, "failure": "No forensic match" },
+
+  { "crime": "assault", "severity": 4, "convicted": true, "failure": "Medical evidence strong" },
+  { "crime": "assault", "severity": 5, "convicted": false, "failure": "Witness turned hostile" },
+
+  { "crime": "grievous hurt", "severity": 7, "convicted": true, "failure": "Defense inconsistency" },
+
+  { "crime": "murder", "severity": 9, "convicted": true, "failure": "Circumstantial evidence only" },
+  { "crime": "murder", "severity": 10, "convicted": false, "failure": "Chain of custody broken" },
+
+  { "crime": "attempt murder", "severity": 8, "convicted": true, "failure": "Intent clearly proven" },
+
+  { "crime": "kidnapping", "severity": 7, "convicted": true, "failure": "Victim testimony strong" },
+  { "crime": "kidnapping", "severity": 6, "convicted": false, "failure": "Victim identification error" },
+
+  { "crime": "abduction", "severity": 6, "convicted": true, "failure": "GPS evidence strong" },
+
+  { "crime": "rape", "severity": 9, "convicted": true, "failure": "Forensic delay" },
+  { "crime": "rape", "severity": 8, "convicted": false, "failure": "DNA contamination" },
+
+  { "crime": "sexual assault", "severity": 7, "convicted": true, "failure": "Victim testimony credible" },
+
+  { "crime": "domestic violence", "severity": 5, "convicted": false, "failure": "Out-of-court settlement" },
+
+  { "crime": "dowry harassment", "severity": 6, "convicted": true, "failure": "Family witness bias" },
+
+  { "crime": "cyber fraud", "severity": 6, "convicted": true, "failure": "Digital trail incomplete" },
+  { "crime": "cyber fraud", "severity": 7, "convicted": false, "failure": "Jurisdiction conflict" },
+
+  { "crime": "identity theft", "severity": 6, "convicted": true, "failure": "IP trace partial" },
+
+  { "crime": "hacking", "severity": 7, "convicted": false, "failure": "Logs tampered" },
+
+  { "crime": "forgery", "severity": 5, "convicted": true, "failure": "Handwriting expert mismatch" },
+  { "crime": "document forgery", "severity": 6, "convicted": false, "failure": "Original document missing" },
+
+  { "crime": "criminal breach trust", "severity": 6, "convicted": true, "failure": "Accounting records altered" },
+
+  { "crime": "extortion", "severity": 7, "convicted": true, "failure": "Call recordings partial" },
+
+  { "crime": "rioting", "severity": 5, "convicted": false, "failure": "Individual role unclear" },
+
+  { "crime": "arson", "severity": 8, "convicted": true, "failure": "Accelerant not recovered" },
+
+  { "crime": "trafficking", "severity": 9, "convicted": true, "failure": "Victim relocation delay" },
+
+  { "crime": "terrorism", "severity": 10, "convicted": true, "failure": "Encrypted communication delay" },
+
+  { "crime": "bribery", "severity": 5, "convicted": false, "failure": "Trap procedure flawed" },
+
+  { "crime": "corruption", "severity": 7, "convicted": true, "failure": "Asset valuation dispute" },
+
+  { "crime": "theft", "severity": 2, "convicted": true, "failure": "Confession recorded" },
+  { "crime": "theft", "severity": 4, "convicted": false, "failure": "No CCTV footage" },
+
+  { "crime": "cyber fraud", "severity": 8, "convicted": true, "failure": "International cooperation delay" },
+
+  { "crime": "identity theft", "severity": 5, "convicted": false, "failure": "SIM ownership unclear" },
+
+  { "crime": "assault", "severity": 6, "convicted": true, "failure": "Medical timeline mismatch" },
+
+  { "crime": "robbery", "severity": 9, "convicted": true, "failure": "Gang leader absconding" },
+
+  { "crime": "murder", "severity": 8, "convicted": true, "failure": "Weapon recovered late" },
+
+  { "crime": "hacking", "severity": 6, "convicted": true, "failure": "Digital forensics delayed" },
+
+  { "crime": "forgery", "severity": 4, "convicted": false, "failure": "Signature inconclusive" },
+
+  { "crime": "criminal breach trust", "severity": 7, "convicted": false, "failure": "Intent not established" },
+
+  { "crime": "extortion", "severity": 6, "convicted": true, "failure": "Threat message deleted" },
+
+  { "crime": "arson", "severity": 9, "convicted": false, "failure": "Fire origin disputed" },
+
+  { "crime": "terrorism", "severity": 9, "convicted": true, "failure": "Funding trail partial" },
+
+  { "crime": "corruption", "severity": 8, "convicted": true, "failure": "Benami asset delay" }
+]

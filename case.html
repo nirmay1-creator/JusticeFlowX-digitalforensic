@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JusticeFlowX — Case & Evidence Control</title>
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===========================
+   CSS VARIABLES (match index)
+   =========================== */
+:root {
+  --cyan: #00f5ff;
+  --cyan-dim: rgba(0, 245, 255, 0.12);
+  --cyan-mid: rgba(0, 245, 255, 0.5);
+  --purple: #7b2fff;
+  --purple-dim: rgba(123, 47, 255, 0.18);
+  --green: #00ff88;
+  --red: #ff2b5e;
+  --warn: #ffb800;
+  --orange: #ff6b35;
+  --bg-deep: #020810;
+  --bg-card: rgba(5, 20, 40, 0.88);
+  --border: rgba(0, 245, 255, 0.18);
+  --border-bright: rgba(0, 245, 255, 0.55);
+  --text-main: #cdeeff;
+  --text-dim: rgba(180, 220, 240, 0.52);
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-head: 'Rajdhani', sans-serif;
+  --font-body: 'Exo 2', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg-deep);
+  color: var(--text-main);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ===== BACKGROUNDS ===== */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 15%, rgba(0,100,180,0.16) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 70% at 85% 85%, rgba(123,47,255,0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 100% 100% at 50% 50%, rgba(0,20,50,0.9) 0%, #020810 100%);
+  pointer-events: none; z-index: 0;
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,245,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,245,255,0.035) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: gridDrift 30s linear infinite;
+  pointer-events: none; z-index: 0;
+}
+@keyframes gridDrift { from{background-position:0 0;} to{background-position:50px 50px;} }
+
+.scanline-overlay {
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(to bottom, transparent 0px, transparent 3px, rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px);
+  pointer-events: none; z-index: 9998;
+  animation: scanPulse 8s ease-in-out infinite;
+}
+@keyframes scanPulse { 0%,100%{opacity:0.4;} 50%{opacity:0.15;} }
+
+canvas#bgCanvas { position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:1; opacity:0.2; }
+
+/* ===== NAVBAR ===== */
+.navbar {
+  position: relative; z-index: 1000;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 30px;
+  background: rgba(2, 8, 16, 0.94);
+  border-bottom: 1px solid var(--border-bright);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 0 40px rgba(0,245,255,0.1);
+}
+.nav-left { display: flex; align-items: center; gap: 14px; }
+.brand { font-family: var(--font-head); font-size: 17px; font-weight: 700; letter-spacing: 2px; color: var(--cyan); text-transform: uppercase; }
+.brand-sub { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); letter-spacing: 1.5px; }
+.nav-center { display: flex; gap: 4px; }
+.nav-link {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 14px; border-radius: 6px;
+  color: var(--text-dim); text-decoration: none;
+  font-family: var(--font-head); font-size: 13px; font-weight: 500; letter-spacing: 0.5px;
+  border: 1px solid transparent;
+  transition: all 0.25s;
+}
+.nav-link:hover, .nav-link.active { color: var(--cyan); background: var(--cyan-dim); border-color: var(--border); }
+.nav-link i { font-size: 16px; }
+.nav-right { display: flex; align-items: center; gap: 18px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: statusBlink 2s ease-in-out infinite; }
+@keyframes statusBlink { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+.system-status { font-family: var(--font-mono); font-size: 11px; color: var(--green); letter-spacing: 1.5px; }
+#clockDisplay { font-family: var(--font-mono); font-size: 13px; color: var(--cyan-mid); letter-spacing: 2px; padding: 4px 10px; border: 1px solid var(--border); border-radius: 4px; background: rgba(0,245,255,0.04); }
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+  position: relative; z-index: 2;
+  padding: 40px 60px 20px;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  flex-wrap: wrap; gap: 20px;
+}
+.page-header-left .badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px;
+  color: var(--cyan-mid); border: 1px solid var(--border); padding: 4px 12px;
+  border-radius: 3px; background: rgba(0,245,255,0.04); margin-bottom: 10px;
+}
+.page-title { font-family: var(--font-head); font-size: 46px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; line-height: 1; }
+.page-title .accent { color: var(--cyan); text-shadow: 0 0 30px rgba(0,245,255,0.4); }
+.page-sub { font-size: 13px; color: var(--text-dim); margin-top: 8px; letter-spacing: 0.4px; line-height: 1.6; }
+.header-stats { display: flex; gap: 16px; flex-wrap: wrap; }
+.hstat {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 14px 22px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 10px; backdrop-filter: blur(10px);
+  min-width: 100px;
+}
+.hstat-val { font-family: var(--font-head); font-size: 28px; font-weight: 700; color: var(--cyan); text-shadow: 0 0 16px rgba(0,245,255,0.4); }
+.hstat-label { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); letter-spacing: 1.5px; margin-top: 2px; }
+
+/* ===== MAIN GRID ===== */
+.main-grid {
+  position: relative; z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto;
+  gap: 22px;
+  padding: 10px 60px 40px;
+}
+
+/* ===== PANEL ===== */
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  position: relative; overflow: hidden;
+  backdrop-filter: blur(20px);
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+.panel::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan-mid), transparent);
+  opacity: 0.5;
+}
+.panel:hover {
+  border-color: rgba(0,245,255,0.35);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(0,245,255,0.1);
+  transform: translateY(-3px);
+}
+.panel.span-2 { grid-column: span 2; }
+.panel.span-3 { grid-column: span 3; }
+.panel.span-1-2 { grid-column: 1 / 3; }
+
+/* Corner decorations */
+.panel .c-tl, .panel .c-tr, .panel .c-bl, .panel .c-br {
+  position: absolute; width: 12px; height: 12px;
+  border-color: rgba(0,245,255,0.3); border-style: solid;
+}
+.panel .c-tl { top:8px; left:8px; border-width: 1px 0 0 1px; }
+.panel .c-tr { top:8px; right:8px; border-width: 1px 1px 0 0; }
+.panel .c-bl { bottom:8px; left:8px; border-width: 0 0 1px 1px; }
+.panel .c-br { bottom:8px; right:8px; border-width: 0 1px 1px 0; }
+
+/* Scan sweep on panels */
+.panel-sweep {
+  position: absolute; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,245,255,0.4), transparent);
+  animation: panelSweep 4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes panelSweep { 0%{top:-1px;opacity:0;} 15%{opacity:1;} 85%{opacity:0.3;} 100%{top:102%;opacity:0;} }
+
+/* ===== PANEL HEADERS ===== */
+.panel-head {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 20px; padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.panel-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: var(--cyan-dim); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: var(--cyan);
+  box-shadow: 0 0 14px rgba(0,245,255,0.2);
+}
+.panel-icon.purple { background: var(--purple-dim); border-color: rgba(123,47,255,0.3); color: #b18fff; box-shadow: 0 0 14px rgba(123,47,255,0.2); }
+.panel-icon.green { background: rgba(0,255,136,0.1); border-color: rgba(0,255,136,0.3); color: var(--green); }
+.panel-icon.red { background: rgba(255,43,94,0.1); border-color: rgba(255,43,94,0.3); color: var(--red); }
+.panel-icon.warn { background: rgba(255,184,0,0.1); border-color: rgba(255,184,0,0.3); color: var(--warn); }
+.panel-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--text-main); }
+.panel-title-sub { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); letter-spacing: 1.5px; margin-top: 2px; }
+.panel-badge {
+  margin-left: auto;
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 2px;
+  padding: 3px 10px; border-radius: 3px;
+  background: var(--cyan-dim); border: 1px solid var(--border); color: var(--cyan-mid);
+}
+
+/* ===== FORM ELEMENTS ===== */
+.form-row { display: flex; gap: 12px; margin-bottom: 12px; }
+.form-group { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); letter-spacing: 1.5px; text-transform: uppercase; }
+input[type=text], input[type=date], input[type=file], select, textarea {
+  width: 100%; padding: 10px 12px;
+  background: rgba(0,10,30,0.8);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  color: var(--text-main);
+  font-family: var(--font-body); font-size: 13px;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  outline: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--cyan-mid);
+  box-shadow: 0 0 16px rgba(0,245,255,0.15), inset 0 0 8px rgba(0,245,255,0.05);
+}
+select option { background: #020810; }
+textarea { resize: vertical; min-height: 80px; }
+input[type=file] { cursor: pointer; }
+
+/* File drop zone */
+.file-drop {
+  border: 2px dashed var(--border);
+  border-radius: 10px; padding: 24px 16px;
+  text-align: center; cursor: pointer;
+  transition: all 0.3s; background: rgba(0,245,255,0.02);
+}
+.file-drop:hover, .file-drop.drag-over {
+  border-color: var(--cyan);
+  background: var(--cyan-dim);
+  box-shadow: 0 0 20px rgba(0,245,255,0.15);
+}
+.file-drop i { font-size: 32px; color: var(--cyan-mid); margin-bottom: 8px; display: block; }
+.file-drop p { font-size: 12px; color: var(--text-dim); }
+.file-drop span { font-family: var(--font-mono); font-size: 10px; color: var(--cyan-mid); }
+#fileInput { display: none; }
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 11px 22px; border-radius: 8px;
+  font-family: var(--font-head); font-size: 14px; font-weight: 600; letter-spacing: 1.5px;
+  text-transform: uppercase; cursor: pointer; border: none;
+  transition: all 0.3s; position: relative; overflow: hidden;
+}
+.btn::after { content:''; position:absolute; inset:0; background:rgba(255,255,255,0.05); opacity:0; transition:opacity 0.3s; }
+.btn:hover::after { opacity:1; }
+.btn-primary {
+  background: linear-gradient(135deg, rgba(0,245,255,0.15), rgba(0,245,255,0.06));
+  border: 1px solid var(--cyan); color: var(--cyan);
+  box-shadow: 0 0 20px rgba(0,245,255,0.2);
+}
+.btn-primary:hover { box-shadow: 0 0 35px rgba(0,245,255,0.5); transform: scale(1.03); }
+.btn-purple {
+  background: linear-gradient(135deg, rgba(123,47,255,0.2), rgba(123,47,255,0.08));
+  border: 1px solid #7b2fff; color: #b18fff;
+  box-shadow: 0 0 20px rgba(123,47,255,0.2);
+}
+.btn-purple:hover { box-shadow: 0 0 35px rgba(123,47,255,0.5); transform: scale(1.03); }
+.btn-green {
+  background: linear-gradient(135deg, rgba(0,255,136,0.15), rgba(0,255,136,0.06));
+  border: 1px solid var(--green); color: var(--green);
+}
+.btn-green:hover { box-shadow: 0 0 30px rgba(0,255,136,0.4); transform: scale(1.03); }
+.btn-red {
+  background: linear-gradient(135deg, rgba(255,43,94,0.15), rgba(255,43,94,0.06));
+  border: 1px solid var(--red); color: var(--red);
+}
+.btn-red:hover { box-shadow: 0 0 30px rgba(255,43,94,0.4); transform: scale(1.03); }
+.btn-full { width: 100%; }
+.btn-shine { position:absolute; top:0; left:-100%; width:60%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent); transform:skewX(-20deg); transition: left 0s; }
+.btn:hover .btn-shine { left:150%; transition:left 0.5s ease; }
+.btn i { font-size: 18px; }
+
+/* ===== OFFICER SELECTOR ===== */
+.officer-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px; max-height: 260px; overflow-y: auto; padding-right: 4px;
+}
+.officer-card {
+  padding: 12px; border-radius: 10px;
+  background: rgba(0,10,30,0.7);
+  border: 1px solid var(--border);
+  cursor: pointer; transition: all 0.25s;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.officer-card:hover { border-color: var(--cyan-mid); background: var(--cyan-dim); }
+.officer-card.selected { border-color: var(--cyan); background: rgba(0,245,255,0.1); box-shadow: 0 0 16px rgba(0,245,255,0.2); }
+.officer-name { font-family: var(--font-head); font-size: 13px; font-weight: 600; letter-spacing: 0.5px; color: var(--text-main); }
+.officer-id { font-family: var(--font-mono); font-size: 10px; color: var(--cyan-mid); }
+.officer-rank { font-size: 11px; color: var(--text-dim); }
+.officer-station { font-family: var(--font-mono); font-size: 10px; color: var(--warn); margin-top: 2px; }
+.officer-status { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; margin-top: 2px; }
+.officer-status .dot { width: 6px; height: 6px; border-radius: 50%; }
+.officer-status .dot.avail { background: var(--green); box-shadow: 0 0 5px var(--green); }
+.officer-status .dot.busy { background: var(--warn); }
+.officer-status .dot.off { background: var(--text-dim); }
+
+/* Filter bar */
+.filter-bar { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.filter-chip {
+  padding: 5px 14px; border-radius: 20px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 1px;
+  border: 1px solid var(--border); color: var(--text-dim);
+  cursor: pointer; transition: all 0.2s; background: rgba(0,10,30,0.5);
+}
+.filter-chip:hover, .filter-chip.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim); }
+.search-input-wrap { flex: 1; position: relative; min-width: 160px; }
+.search-input-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 14px; }
+.search-input-wrap input { padding-left: 32px; margin: 0; }
+
+/* ===== EVIDENCE ITEMS ===== */
+.evidence-list { display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; }
+.ev-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border-radius: 8px;
+  background: rgba(0,10,30,0.7); border: 1px solid var(--border);
+  animation: evIn 0.4s ease; transition: border-color 0.2s;
+}
+.ev-item:hover { border-color: rgba(0,245,255,0.3); }
+@keyframes evIn { from{opacity:0;transform:translateX(-10px);} to{opacity:1;transform:translateX(0);} }
+.ev-icon { font-size: 22px; color: var(--cyan); flex-shrink: 0; }
+.ev-icon.purple { color: #b18fff; }
+.ev-icon.green { color: var(--green); }
+.ev-icon.warn { color: var(--warn); }
+.ev-info { flex: 1; min-width: 0; }
+.ev-name { font-family: var(--font-head); font-size: 13px; font-weight: 600; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ev-meta { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); letter-spacing: 1px; margin-top: 2px; }
+.ev-hash { font-family: var(--font-mono); font-size: 9px; color: var(--cyan-mid); }
+.ev-badge {
+  font-family: var(--font-mono); font-size: 9px; padding: 2px 8px;
+  border-radius: 3px; border: 1px solid var(--border); color: var(--text-dim);
+  flex-shrink: 0;
+}
+.ev-badge.sealed { border-color: rgba(0,255,136,0.4); color: var(--green); background: rgba(0,255,136,0.05); }
+.ev-badge.pending { border-color: rgba(255,184,0,0.4); color: var(--warn); background: rgba(255,184,0,0.05); }
+.ev-remove { color: var(--red); cursor: pointer; font-size: 16px; opacity: 0.6; transition: opacity 0.2s; flex-shrink: 0; }
+.ev-remove:hover { opacity: 1; }
+
+/* ===== TIMELINE ===== */
+.timeline-list { display: flex; flex-direction: column; gap: 0; max-height: 300px; overflow-y: auto; padding-right: 4px; }
+.tl-item {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 10px 0; position: relative;
+  animation: tlIn 0.4s ease;
+}
+@keyframes tlIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+.tl-dot-wrap { display: flex; flex-direction: column; align-items: center; gap: 0; flex-shrink: 0; margin-top: 4px; }
+.tl-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); flex-shrink: 0; }
+.tl-dot.purple { background: var(--purple); box-shadow: 0 0 8px var(--purple); }
+.tl-dot.green { background: var(--green); box-shadow: 0 0 8px var(--green); }
+.tl-dot.warn { background: var(--warn); box-shadow: 0 0 8px var(--warn); }
+.tl-dot.red { background: var(--red); box-shadow: 0 0 8px var(--red); }
+.tl-line { width: 1px; flex: 1; min-height: 20px; background: var(--border); margin-top: 4px; }
+.tl-item:last-child .tl-line { display: none; }
+.tl-content { flex: 1; padding-bottom: 6px; }
+.tl-action { font-family: var(--font-head); font-size: 13px; font-weight: 600; letter-spacing: 0.5px; color: var(--text-main); }
+.tl-time { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); letter-spacing: 1px; margin-top: 2px; }
+.tl-detail { font-size: 12px; color: var(--text-dim); margin-top: 3px; line-height: 1.5; }
+
+/* ===== CUSTODY LOG ===== */
+.custody-list { display: flex; flex-direction: column; gap: 6px; max-height: 260px; overflow-y: auto; }
+.cl-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 7px;
+  background: rgba(0,10,30,0.6); border: 1px solid var(--border);
+  font-size: 12px; animation: evIn 0.4s ease;
+}
+.cl-item i { color: var(--cyan); font-size: 14px; flex-shrink: 0; }
+.cl-text { flex: 1; }
+.cl-name { font-family: var(--font-head); font-size: 12px; font-weight: 600; letter-spacing: 0.5px; }
+.cl-detail { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); letter-spacing: 1px; margin-top: 1px; }
+.cl-time { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); flex-shrink: 0; }
+
+/* ===== CASE CARD (existing cases) ===== */
+.case-cards { display: flex; flex-direction: column; gap: 10px; max-height: 320px; overflow-y: auto; }
+.case-card {
+  padding: 14px 16px; border-radius: 10px;
+  background: rgba(0,10,30,0.7); border: 1px solid var(--border);
+  cursor: pointer; transition: all 0.25s; animation: evIn 0.4s ease;
+  display: flex; gap: 14px; align-items: center;
+}
+.case-card:hover { border-color: var(--cyan-mid); background: var(--cyan-dim); }
+.case-card.active { border-color: var(--cyan); box-shadow: 0 0 16px rgba(0,245,255,0.2); }
+.cc-id-block { text-align: center; min-width: 60px; }
+.cc-id { font-family: var(--font-head); font-size: 22px; font-weight: 700; color: var(--cyan); line-height: 1; }
+.cc-year { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); }
+.cc-info { flex: 1; }
+.cc-title { font-family: var(--font-head); font-size: 14px; font-weight: 600; letter-spacing: 0.5px; color: var(--text-main); }
+.cc-meta { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); letter-spacing: 1px; margin-top: 3px; }
+.cc-status { font-family: var(--font-mono); font-size: 9px; padding: 3px 10px; border-radius: 3px; flex-shrink: 0; }
+.cc-status.open { color: var(--green); border: 1px solid rgba(0,255,136,0.3); background: rgba(0,255,136,0.06); }
+.cc-status.closed { color: var(--text-dim); border: 1px solid var(--border); }
+.cc-status.active-s { color: var(--cyan); border: 1px solid var(--border); background: var(--cyan-dim); }
+.cc-status.pending { color: var(--warn); border: 1px solid rgba(255,184,0,0.3); background: rgba(255,184,0,0.06); }
+
+/* ===== AI PANEL ===== */
+.ai-scan-wrap { display: flex; flex-direction: column; gap: 14px; }
+.ai-score-ring { display: flex; justify-content: center; margin: 8px 0; }
+.ai-score-svg { position: relative; }
+.ai-score-svg text { font-family: var(--font-head); }
+.ai-checks { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ai-check {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 7px;
+  background: rgba(0,10,30,0.6); border: 1px solid var(--border);
+  font-size: 12px;
+}
+.ai-check i { font-size: 14px; flex-shrink: 0; }
+.ai-check.pass i { color: var(--green); }
+.ai-check.fail i { color: var(--red); }
+.ai-check.warn-c i { color: var(--warn); }
+.ai-check.pending-c i { color: var(--text-dim); }
+.ai-result-text {
+  padding: 14px; border-radius: 8px;
+  background: rgba(0,245,255,0.04); border: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 11px; color: var(--cyan-mid);
+  line-height: 1.8; letter-spacing: 0.5px;
+}
+
+/* ===== MAP PANEL ===== */
+.map-placeholder {
+  height: 220px; border-radius: 10px; overflow: hidden;
+  background: rgba(0,10,30,0.8); border: 1px solid var(--border);
+  position: relative; display: flex; align-items: center; justify-content: center;
+}
+.map-placeholder canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.map-overlay-text { position: relative; z-index: 2; font-family: var(--font-mono); font-size: 11px; color: var(--cyan-mid); letter-spacing: 2px; }
+
+/* Station dots on map */
+.station-pins { position: absolute; inset: 0; z-index: 3; }
+.station-pin {
+  position: absolute; cursor: pointer;
+  transform: translate(-50%, -50%);
+  transition: all 0.2s;
+}
+.station-pin-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--cyan); box-shadow: 0 0 10px var(--cyan);
+  animation: pinPulse 2s ease-in-out infinite;
+  transition: all 0.2s;
+}
+@keyframes pinPulse { 0%,100%{transform:scale(1); box-shadow:0 0 10px var(--cyan);} 50%{transform:scale(1.3); box-shadow:0 0 18px var(--cyan);} }
+.station-pin:hover .station-pin-dot { width: 14px; height: 14px; background: white; box-shadow: 0 0 16px var(--cyan); }
+.station-pin-label {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-family: var(--font-mono); font-size: 8px; color: var(--cyan-mid);
+  white-space: nowrap; pointer-events: none;
+  opacity: 0; transition: opacity 0.2s;
+}
+.station-pin:hover .station-pin-label { opacity: 1; }
+
+/* Station list */
+.station-list { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; margin-top: 12px; }
+.st-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border-radius: 7px;
+  background: rgba(0,10,30,0.6); border: 1px solid var(--border);
+  cursor: pointer; transition: all 0.2s;
+}
+.st-item:hover { border-color: var(--cyan-mid); background: var(--cyan-dim); }
+.st-item.selected { border-color: var(--cyan); background: rgba(0,245,255,0.08); }
+.st-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.st-name { font-family: var(--font-head); font-size: 13px; font-weight: 600; flex: 1; }
+.st-count { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); }
+
+/* ===== NOTIFICATION ===== */
+.notif {
+  position: fixed; top: 80px; right: 24px; z-index: 10000;
+  min-width: 280px; max-width: 360px;
+  background: rgba(2, 12, 28, 0.96);
+  border-radius: 10px; padding: 16px 20px;
+  border: 1px solid var(--border-bright);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 30px rgba(0,245,255,0.12);
+  display: flex; align-items: flex-start; gap: 12px;
+  animation: notifIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  transition: opacity 0.4s, transform 0.4s;
+}
+@keyframes notifIn { from{opacity:0;transform:translateX(40px);} to{opacity:1;transform:translateX(0);} }
+.notif.hide { opacity: 0; transform: translateX(40px); }
+.notif.success { border-color: rgba(0,255,136,0.5); box-shadow: 0 0 30px rgba(0,255,136,0.15); }
+.notif.error { border-color: rgba(255,43,94,0.5); box-shadow: 0 0 30px rgba(255,43,94,0.15); }
+.notif.warn { border-color: rgba(255,184,0,0.5); box-shadow: 0 0 30px rgba(255,184,0,0.15); }
+.notif-icon { font-size: 22px; flex-shrink: 0; }
+.notif.success .notif-icon { color: var(--green); }
+.notif.error .notif-icon { color: var(--red); }
+.notif.warn .notif-icon { color: var(--warn); }
+.notif-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.notif-msg { font-size: 12px; color: var(--text-dim); margin-top: 3px; line-height: 1.5; }
+.notif-close { margin-left: auto; color: var(--text-dim); cursor: pointer; font-size: 18px; flex-shrink: 0; }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 9990;
+  background: rgba(2,8,16,0.85); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  animation: overlayIn 0.3s ease;
+}
+@keyframes overlayIn { from{opacity:0;} to{opacity:1;} }
+.modal {
+  background: rgba(5,15,35,0.98); border: 1px solid var(--border-bright);
+  border-radius: 16px; padding: 30px; width: 640px; max-width: 95vw;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 60px rgba(0,245,255,0.1);
+  animation: modalIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  max-height: 85vh; overflow-y: auto;
+}
+@keyframes modalIn { from{opacity:0;transform:scale(0.85);} to{opacity:1;transform:scale(1);} }
+.modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.modal-title { font-family: var(--font-head); font-size: 20px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--cyan); }
+.modal-close { color: var(--text-dim); cursor: pointer; font-size: 22px; transition: color 0.2s; }
+.modal-close:hover { color: var(--red); }
+
+/* ===== BOTTOM NAV ===== */
+.bottom-nav {
+  position: relative; z-index: 2;
+  padding: 20px 60px 80px;
+  display: flex; gap: 14px;
+}
+
+/* ===== STATUS BAR ===== */
+.status-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  display: flex; align-items: center; gap: 24px;
+  padding: 6px 20px;
+  background: rgba(2, 8, 16, 0.95);
+  border-top: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);
+  z-index: 600; backdrop-filter: blur(10px);
+}
+.status-bar-item { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.status-bar-item i { font-size: 13px; color: var(--cyan); }
+.ok { color: var(--green); }
+.wn { color: var(--warn); }
+.marquee-wrap { flex: 1; overflow: hidden; }
+.marquee-text { display: inline-block; white-space: nowrap; animation: marqueeScroll 30s linear infinite; color: rgba(0,245,255,0.3); }
+@keyframes marqueeScroll { from{transform:translateX(100%);} to{transform:translateX(-100%);} }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1100px) {
+  .main-grid { grid-template-columns: 1fr 1fr; padding: 10px 24px 40px; }
+  .panel.span-3 { grid-column: span 2; }
+}
+@media (max-width: 700px) {
+  .main-grid { grid-template-columns: 1fr; padding: 10px 14px 40px; }
+  .panel.span-2, .panel.span-3 { grid-column: span 1; }
+  .page-header { padding: 24px 14px 14px; }
+  .nav-center { display: none; }
+}
+
+/* ===== LOADING PULSE ===== */
+.pulse-ring {
+  display: inline-block; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--cyan); animation: pulseDot 1.2s ease-in-out infinite;
+}
+@keyframes pulseDot { 0%,100%{transform:scale(1);opacity:1;} 50%{transform:scale(1.5);opacity:0.5;} }
+
+/* ===== PRIORITY BADGES ===== */
+.priority {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 1.5px;
+  padding: 2px 8px; border-radius: 3px;
+}
+.priority.high { color: var(--red); border: 1px solid rgba(255,43,94,0.4); background: rgba(255,43,94,0.06); }
+.priority.medium { color: var(--warn); border: 1px solid rgba(255,184,0,0.4); background: rgba(255,184,0,0.06); }
+.priority.low { color: var(--green); border: 1px solid rgba(0,255,136,0.4); background: rgba(0,255,136,0.06); }
+
+/* ===== DRAG HANDLE ===== */
+.drag-handle { cursor: grab; }
+.drag-handle:active { cursor: grabbing; }
+
+/* ===== PROGRESS BAR ===== */
+.progress-bar-wrap { height: 3px; background: rgba(0,245,255,0.08); border-radius: 2px; overflow: hidden; margin-top: 6px; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--cyan), #00aaff); border-radius: 2px; transition: width 0.6s ease; }
+
+/* ===== STATS ROW ===== */
+.stats-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.mini-stat {
+  flex: 1; min-width: 80px;
+  padding: 12px; border-radius: 8px;
+  background: rgba(0,10,30,0.7); border: 1px solid var(--border);
+  text-align: center;
+}
+.mini-stat-val { font-family: var(--font-head); font-size: 22px; font-weight: 700; color: var(--cyan); text-shadow: 0 0 14px rgba(0,245,255,0.4); }
+.mini-stat-label { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); letter-spacing: 1.5px; margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="scanline-overlay"></div>
+<canvas id="bgCanvas"></canvas>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-left">
+    <div style="display:flex;flex-direction:column;gap:1px;">
+      <span class="brand">JusticeFlowX</span>
+      <span class="brand-sub">CASE & EVIDENCE CONTROL v3.1</span>
+    </div>
+  </div>
+  <div class="nav-center">
+    <a href="index.html" class="nav-link"><i class='bx bx-grid-alt'></i><span>Dashboard</span></a>
+    <a href="criminal.html" class="nav-link"><i class='bx bx-user'></i><span>Criminal DB</span></a>
+    <a href="case.html" class="nav-link active"><i class='bx bx-folder'></i><span>Case Control</span></a>
+    <a href="evidence.html" class="nav-link"><i class='bx bx-archive'></i><span>Evidence</span></a>
+  </div>
+  <div class="nav-right">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="status-dot"></div>
+      <span class="system-status">SYSTEMS ONLINE</span>
+    </div>
+    <div class="clock-display" id="clockDisplay">00:00:00</div>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="page-header-left">
+    <div class="badge"><i class='bx bx-folder-open' style="font-size:11px;"></i> CASE MANAGEMENT MODULE — JURISDICTION: PUNE DISTRICT</div>
+    <h1 class="page-title">Case & Evidence <span class="accent">Control</span></h1>
+    <p class="page-sub">Assign cases to officers, manage evidence vault, track chain of custody and run AI integrity analysis</p>
+  </div>
+  <div class="header-stats">
+    <div class="hstat"><span class="hstat-val" id="totalCases">0</span><span class="hstat-label">TOTAL CASES</span></div>
+    <div class="hstat"><span class="hstat-val" id="openCases">0</span><span class="hstat-label">OPEN</span></div>
+    <div class="hstat"><span class="hstat-val" id="totalOfficers">0</span><span class="hstat-label">OFFICERS</span></div>
+    <div class="hstat"><span class="hstat-val" id="totalEvidence">0</span><span class="hstat-label">EVIDENCE</span></div>
+  </div>
+</div>
+
+<!-- MAIN GRID -->
+<div class="main-grid">
+
+  <!-- ===== CASE INITIALIZATION ===== -->
+  <div class="panel">
+    <div class="c-tl"></div><div class="c-tr"></div><div class="c-bl"></div><div class="c-br"></div>
+    <div class="panel-sweep"></div>
+    <div class="panel-head">
+      <div class="panel-icon"><i class='bx bx-plus-circle'></i></div>
+      <div><div class="panel-title">New Case</div><div class="panel-title-sub">INITIALIZE & ASSIGN</div></div>
+      <div class="panel-badge">MODULE 01</div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Case ID</label>
+        <input type="text" id="caseId" placeholder="Auto-generated" readonly>
+      </div>
+      <div class="form-group">
+        <label>Date Filed</label>
+        <input type="date" id="caseDate">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Case Title</label>
+        <input type="text" id="caseTitle" placeholder="Brief title of the case">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Category</label>
+        <select id="caseCategory">
+          <option>Theft / Burglary</option>
+          <option>Assault / Violence</option>
+          <option>Cybercrime</option>
+          <option>Fraud / Forgery</option>
+          <option>Drug Offense</option>
+          <option>Murder / Homicide</option>
+          <option>Missing Person</option>
+          <option>Traffic Offense</option>
+          <option>Terrorism</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Priority</label>
+        <select id="casePriority">
+          <option value="HIGH">⬥ HIGH</option>
+          <option value="MEDIUM" selected>◆ MEDIUM</option>
+          <option value="LOW">◇ LOW</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:12px;">
+      <label>Case Summary</label>
+      <textarea id="caseDesc" placeholder="Detailed case summary, location, circumstances..."></textarea>
+    </div>
+
+    <div class="form-group" style="margin-bottom:14px;">
+      <label>Location / FIR Area</label>
+      <input type="text" id="caseLocation" placeholder="Street, area, ward, district">
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="createCase()">
+      <div class="btn-shine"></div>
+      <i class='bx bx-folder-plus'></i> Initialize Case
+    </button>
+  </div>
+
+  <!-- ===== OFFICER ASSIGNMENT ===== -->
+  <div class="panel span-2">
+    <div class="c-tl"></div><div class="c-tr"></div><div class="c-bl"></div><div class="c-br"></div>
+    <div class="panel-head">
+      <div class="panel-icon purple"><i class='bx bx-user-check'></i></div>
+      <div><div class="panel-title">Assign Officer</div><div class="panel-title-sub">SELECT FROM ACTIVE ROSTER</div></div>
+      <div class="panel-badge" id="selectedOfficerBadge">NONE SELECTED</div>
+    </div>
+
+    <div class="filter-bar">
+      <div class="search-input-wrap">
+        <i class='bx bx-search'></i>
+        <input type="text" id="officerSearch" placeholder="Search officer or station..." oninput="filterOfficers()">
+      </div>
+      <button class="filter-chip active" data-filter="all" onclick="setFilter(this,'all')">All</button>
+      <button class="filter-chip" data-filter="available" onclick="setFilter(this,'available')">Available</button>
+      <button class="filter-chip" data-filter="Pune City" onclick="setFilter(this,'Pune City')">Pune City</button>
+      <button class="filter-chip" data-filter="Pimpri-Chinchwad" onclick="setFilter(this,'Pimpri-Chinchwad')">PCMC</button>
+      <button class="filter-chip" data-filter="Rural" onclick="setFilter(this,'Rural')">Rural</button>
+    </div>
+
+    <div class="officer-grid" id="officerGrid"></div>
+
+    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="btn btn-purple" onclick="assignOfficer()" style="flex:1">
+        <div class="btn-shine"></div>
+        <i class='bx bx-link'></i> Assign to Active Case
+      </button>
+      <button class="btn btn-green" onclick="showOfficerDetails()" style="flex:1">
+        <div class="btn-shine"></div>
+        <i class='bx bx-id-card'></i> View Officer Profile
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== EVIDENCE UPLOAD ===== -->
+  <div class="panel">
+    <div class="c-tl"></div><div class="c-tr"></div><div class="c-bl"></div><div class="c-br"></div>
+    <div class="panel-sweep" style="animation-delay:1.5s;"></div>
+    <div class="panel-head">
+      <div class="panel-icon green"><i class='bx bx-lock-open-alt'></i></div>
+      <div><div class="panel-title">Evidence Upload</div><div class="panel-title-sub">SECURE VAULT INTAKE</div></div>
+      <div class="panel-badge">MODULE 02</div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Evidence Label</label>
+        <input type="text" id="evidenceName" placeholder="Descriptive label">
+      </div>
+      <div class="form-group">
+        <label>Type</label>
+        <select id="evidenceType">
+          <option value="image">📷 Image</option>
+          <option value="video">🎥 Video</option>
+          <option value="audio">🎤 Audio</option>
+          <option value="document">📄 Document</option>
+          <option value="weapon">🔪 Physical (Weapon)</option>
+          <option value="forensics">🧬 Forensic Sample</option>
+          <option value="digital">💾 Digital Media</option>
+          <option value="other">📦 Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom:12px;">
+      <label>Source / Collection Location</label>
+      <input type="text" id="evidenceSource" placeholder="Crime scene address or source">
+    </div>
+
+    <div class="file-drop" id="fileDrop" onclick="document.getElementById('fileInput').click()">
+      <i class='bx bx-cloud-upload'></i>
+      <p>Click or drag & drop file here</p>
+      <span id="fileNameDisplay">No file selected</span>
+      <input type="file" id="fileInput" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx">
+    </div>
+
+    <div class="form-group" style="margin-top:12px; margin-bottom:14px;">
+      <label>Officer Notes</label>
+      <textarea id="evidenceNotes" placeholder="Collection notes, condition, chain details..." style="min-height:60px;"></textarea>
+    </div>
+
+    <button class="btn btn-green btn-full" onclick="addEvidence()">
+      <div class="btn-shine"></div>
+      <i class='bx bx-shield-quarter'></i> Seal Evidence to Vault
+    </button>
+  </div>
+
+  <!-- ===== EVIDENCE VAULT ===== -->
+  <div class="panel">
+    <div class="c-tl"></div><div class="c-tr"></div><div class="c-bl"></div><div class="c-br"></div>
+    <div class="panel-head">
+      <div class="panel-icon warn"><i class='bx bx-package'></i></div>
+      <div><div class="panel-title">Evidence Vault</div><div class="panel-title-sub">SEALED & ENCRYPTED</div></div>
+      <div class="panel-badge" id="vaultCount">0 ITEMS</div>
+    </div>
+
+    <div class="evidence-list" id="evidenceList">
+      <div style="text-align:center;padding:30px;color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:2px;">
+        VAULT EMPTY — AWAITING EVIDENCE
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== STATION MAP ===== -->
+  <div class="panel">
+    <div class="c-tl"></div><div class="c-tr"></div><div class="c-bl"></div><div class="c-br"></div>
+    <div class="panel-head">
+      <div class="panel-icon"><i class='bx bx-map-alt'></i></div>
+      <div><div class="panel-title">Station Grid</div><div class="panel-title-sub">PUNE DISTRICT COVERAGE</div></div>
+    </div>
+
+    <div class="map-placeholder" id="mapArea">
+      <canvas id="mapCanvas"></canvas>
+      <div class="station-pins" id="stationPins"></div>
+    </div>
+
+    <div class="station-list" id="stationList"></div>
+  </div>
+
+  <!-- ===== CASE TIMELINE ===== -->
+  <div class="panel">
+    <div class="c-tl"></div><div class="c-tr"></div><div class="c-bl"></div><div class="c-br"></div>
+    <div class="panel-sweep" style="animation-delay:3s;"></div>
+    <div class="panel-head">
+      <div class="panel-icon"><i class='bx bx-time-five'></i></div>
+      <div><div class="panel-title">Case Timeline</div><div class="panel-title-sub">CHRONOLOGICAL LOG</div></div>
+      <div class="panel-badge" id="tlCount">0 EVENTS</div>
+    </div>
+
+    <div class="timeline-list" id="timeline">
+      <div style="text-align:center;padding:30px;color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:2px;">
+        NO ACTIVE CASE — INITIALIZE FIRST
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ACTIVE CASES ===== -->
+  <div class="panel">
+    <div class="c-tl"></div><div class="c-tr"></div><div class="c-bl"></div><div class="c-br"></div>
+    <div class="panel-head">
+      <div class="panel-icon purple"><i class='bx bx-list-ul'></i></div>
+      <div><div class="panel-title">Active Cases</div><div class="panel-title-sub">CASE REGISTRY</div></div>
+      <div class="panel-badge" id="caseCount">0 CASES</div>
+    </div>
+
+    <div class="case-cards" id="caseCards">
+      <div style="text-align:center;padding:30px;color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:2px;">
+        NO CASES REGISTERED
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== CHAIN OF CUSTODY ===== -->
+  <div class="panel">
+    <div class="c-tl"></div><div class="c-tr"></div><div class="c-bl"></div><div class="c-br"></div>
+    <div class="panel-head">
+      <div class="panel-icon red"><i class='bx bx-receipt'></i></div>
+      <div><div class="panel-title">Chain of Custody</div><div class="panel-title-sub">IMMUTABLE AUDIT LOG</div></div>
+    </div>
+
+    <div class="custody-list" id="custodyLog">
+      <div style="text-align:center;padding:20px;color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:2px;">
+        AWAITING CASE ACTIVITY
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== AI INTEGRITY ===== -->
+  <div class="panel span-3" id="aiPanel">
+    <div class="c-tl"></div><div class="c-tr"></div><div class="c-bl"></div><div class="c-br"></div>
+    <div class="panel-head">
+      <div class="panel-icon purple"><i class='bx bx-brain'></i></div>
+      <div><div class="panel-title">AI Integrity Analysis</div><div class="panel-title-sub">JUSTICEFX NEURAL ENGINE v2.4</div></div>
+      <div class="panel-badge" id="aiBadge">STANDBY</div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:auto 1fr 1fr;gap:24px;align-items:start;">
+      <!-- Score ring -->
+      <div class="ai-score-wrap" style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+        <svg id="aiRingSvg" width="130" height="130" viewBox="0 0 130 130">
+          <circle cx="65" cy="65" r="54" fill="none" stroke="rgba(0,245,255,0.08)" stroke-width="10"/>
+          <circle id="aiRingFill" cx="65" cy="65" r="54" fill="none" stroke="url(#aiGrad)" stroke-width="10"
+            stroke-dasharray="339.3" stroke-dashoffset="339.3" stroke-linecap="round"
+            transform="rotate(-90 65 65)" style="transition:stroke-dashoffset 1.2s ease;"/>
+          <defs>
+            <linearGradient id="aiGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#00f5ff"/>
+              <stop offset="100%" stop-color="#7b2fff"/>
+            </linearGradient>
+          </defs>
+          <text x="65" y="60" text-anchor="middle" fill="#cdeeff" font-size="26" font-family="Rajdhani" font-weight="700" id="aiScoreText">--</text>
+          <text x="65" y="78" text-anchor="middle" fill="rgba(180,220,240,0.5)" font-size="9" font-family="Share Tech Mono" letter-spacing="2">INTEGRITY</text>
+        </svg>
+        <button class="btn btn-purple" onclick="runAI()" style="padding:9px 18px;">
+          <div class="btn-shine"></div>
+          <i class='bx bx-play'></i> Run Analysis
+        </button>
+      </div>
+
+      <!-- Check grid -->
+      <div>
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:2px;margin-bottom:10px;">SYSTEM CHECKS</div>
+        <div class="ai-checks" id="aiChecks">
+          <div class="ai-check pending-c"><i class='bx bx-circle'></i> Timeline Consistency</div>
+          <div class="ai-check pending-c"><i class='bx bx-circle'></i> Evidence Integrity</div>
+          <div class="ai-check pending-c"><i class='bx bx-circle'></i> Chain of Custody</div>
+          <div class="ai-check pending-c"><i class='bx bx-circle'></i> Officer Authorization</div>
+          <div class="ai-check pending-c"><i class='bx bx-circle'></i> Duplicate Detection</div>
+          <div class="ai-check pending-c"><i class='bx bx-circle'></i> Hash Verification</div>
+          <div class="ai-check pending-c"><i class='bx bx-circle'></i> Metadata Analysis</div>
+          <div class="ai-check pending-c"><i class='bx bx-circle'></i> Court-Ready Status</div>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div>
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:2px;margin-bottom:10px;">ANALYSIS REPORT</div>
+        <div class="ai-result-text" id="aiResult">
+          ▸ Awaiting case initialization and evidence submission...<br>
+          ▸ Run analysis after sealing evidence to generate report.<br>
+          ▸ AI engine will cross-reference all 14,217 records.
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;">
+          <button class="btn btn-green" onclick="exportReport()" style="flex:1;padding:9px;">
+            <div class="btn-shine"></div><i class='bx bx-download'></i> Export Report
+          </button>
+          <button class="btn btn-primary" onclick="sendToPolice()" style="flex:1;padding:9px;">
+            <div class="btn-shine"></div><i class='bx bx-send'></i> Send to Station
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="btn btn-primary" onclick="window.location.href='index.html'">
+    <div class="btn-shine"></div><i class='bx bx-arrow-back'></i> Back to Dashboard
+  </button>
+  <button class="btn btn-purple" onclick="clearCase()">
+    <div class="btn-shine"></div><i class='bx bx-trash'></i> Clear Active Case
+  </button>
+  <button class="btn btn-green" onclick="exportFullReport()">
+    <div class="btn-shine"></div><i class='bx bx-file-export'></i> Export Full Case File
+  </button>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div class="status-bar-item"><i class='bx bx-cpu'></i> CPU: <span id="cpuVal" class="ok">34%</span></div>
+  <div class="status-bar-item"><i class='bx bx-data'></i> DB Sync: <span class="ok">LIVE</span></div>
+  <div class="status-bar-item"><i class='bx bx-shield-quarter'></i> Vault: <span class="ok">SEALED</span></div>
+  <div class="status-bar-item"><i class='bx bx-lock'></i> Encryption: <span class="ok">AES-256</span></div>
+  <div class="status-bar-item marquee-wrap">
+    <span class="marquee-text">⬢ JUSTICEFX CASE MANAGEMENT ACTIVE  ◆  ALL STATIONS ONLINE 14/14  ◆  EVIDENCE CHAIN SECURED  ◆  BIOMETRIC LOCK ENGAGED  ◆  NEXT AUDIT: 06:00 UTC  ◆  PUNE DISTRICT JURISDICTION ACTIVE</span>
+  </div>
+</div>
+
+<script>
+// ===========================
+// DATABASE — PUNE DISTRICT
+// ===========================
+const POLICE_DB = {
+  stations: [
+    { id:"PS001", name:"Shivajinagar Police Station", zone:"Pune City", officers:["O001","O002","O003","O004"], lat:0.38, lng:0.52 },
+    { id:"PS002", name:"Deccan Police Station", zone:"Pune City", officers:["O005","O006","O007"], lat:0.35, lng:0.44 },
+    { id:"PS003", name:"Kothrud Police Station", zone:"Pune City", officers:["O008","O009","O010"], lat:0.30, lng:0.38 },
+    { id:"PS004", name:"Hadapsar Police Station", zone:"Pune City", officers:["O011","O012","O013"], lat:0.55, lng:0.65 },
+    { id:"PS005", name:"Kondhwa Police Station", zone:"Pune City", officers:["O014","O015"], lat:0.50, lng:0.58 },
+    { id:"PS006", name:"Wanowrie Police Station", zone:"Pune City", officers:["O016","O017"], lat:0.48, lng:0.60 },
+    { id:"PS007", name:"Pimpri Police Station", zone:"Pimpri-Chinchwad", officers:["O018","O019","O020"], lat:0.22, lng:0.35 },
+    { id:"PS008", name:"Chinchwad Police Station", zone:"Pimpri-Chinchwad", officers:["O021","O022"], lat:0.18, lng:0.28 },
+    { id:"PS009", name:"Nigdi Police Station", zone:"Pimpri-Chinchwad", officers:["O023","O024"], lat:0.14, lng:0.22 },
+    { id:"PS010", name:"Akurdi Police Station", zone:"Pimpri-Chinchwad", officers:["O025","O026"], lat:0.20, lng:0.20 },
+    { id:"PS011", name:"Lonavala Police Station", zone:"Rural", officers:["O027","O028"], lat:0.20, lng:0.72 },
+    { id:"PS012", name:"Maval Police Station", zone:"Rural", officers:["O029","O030"], lat:0.25, lng:0.75 },
+    { id:"PS013", name:"Bhor Police Station", zone:"Rural", officers:["O031","O032"], lat:0.68, lng:0.48 },
+    { id:"PS014", name:"Baramati Police Station", zone:"Rural", officers:["O033","O034","O035"], lat:0.75, lng:0.70 },
+  ],
+  officers: [
+    { id:"O001", name:"ACP Rajesh Sharma", rank:"ACP", badge:"B-1001", station:"PS001", status:"available", specialty:"Homicide", cases:12 },
+    { id:"O002", name:"Insp. Priya Desai", rank:"Inspector", badge:"B-1002", station:"PS001", status:"busy", specialty:"Cybercrime", cases:8 },
+    { id:"O003", name:"SI Aakash More", rank:"Sub-Inspector", badge:"B-1003", station:"PS001", status:"available", specialty:"Fraud", cases:5 },
+    { id:"O004", name:"Const. Vikram Patil", rank:"Constable", badge:"B-1004", station:"PS001", status:"available", specialty:"Patrol", cases:3 },
+    { id:"O005", name:"Insp. Sunita Rao", rank:"Inspector", badge:"B-1005", station:"PS002", status:"available", specialty:"Narcotics", cases:14 },
+    { id:"O006", name:"SI Deepak Kumar", rank:"Sub-Inspector", badge:"B-1006", station:"PS002", status:"off-duty", specialty:"Traffic", cases:2 },
+    { id:"O007", name:"Const. Meena Kulkarni", rank:"Constable", badge:"B-1007", station:"PS002", status:"available", specialty:"Patrol", cases:1 },
+    { id:"O008", name:"ACP Santosh Jadhav", rank:"ACP", badge:"B-1008", station:"PS003", status:"busy", specialty:"Violent Crime", cases:19 },
+    { id:"O009", name:"Insp. Kavita Nair", rank:"Inspector", badge:"B-1009", station:"PS003", status:"available", specialty:"Missing Persons", cases:7 },
+    { id:"O010", name:"SI Ravi Shinde", rank:"Sub-Inspector", badge:"B-1010", station:"PS003", status:"available", specialty:"Theft", cases:4 },
+    { id:"O011", name:"Insp. Suresh Pawar", rank:"Inspector", badge:"B-1011", station:"PS004", status:"available", specialty:"Homicide", cases:16 },
+    { id:"O012", name:"SI Anita Bhosale", rank:"Sub-Inspector", badge:"B-1012", station:"PS004", status:"busy", specialty:"Forensics", cases:9 },
+    { id:"O013", name:"Const. Rahul Gaikwad", rank:"Constable", badge:"B-1013", station:"PS004", status:"available", specialty:"Patrol", cases:2 },
+    { id:"O014", name:"Insp. Hemant Mane", rank:"Inspector", badge:"B-1014", station:"PS005", status:"off-duty", specialty:"Cybercrime", cases:11 },
+    { id:"O015", name:"SI Pallavi Wagh", rank:"Sub-Inspector", badge:"B-1015", station:"PS005", status:"available", specialty:"Fraud", cases:6 },
+    { id:"O016", name:"Insp. Nitin Sawant", rank:"Inspector", badge:"B-1016", station:"PS006", status:"available", specialty:"Narcotics", cases:13 },
+    { id:"O017", name:"SI Shital Kamble", rank:"Sub-Inspector", badge:"B-1017", station:"PS006", status:"busy", specialty:"Theft", cases:4 },
+    { id:"O018", name:"ACP Dilip Chavan", rank:"ACP", badge:"B-1018", station:"PS007", status:"available", specialty:"Organized Crime", cases:22 },
+    { id:"O019", name:"Insp. Rekha Pande", rank:"Inspector", badge:"B-1019", station:"PS007", status:"available", specialty:"Child Welfare", cases:5 },
+    { id:"O020", name:"SI Ganesh Lokhande", rank:"Sub-Inspector", badge:"B-1020", station:"PS007", status:"off-duty", specialty:"Patrol", cases:2 },
+    { id:"O021", name:"Insp. Sameer Kale", rank:"Inspector", badge:"B-1021", station:"PS008", status:"available", specialty:"Violent Crime", cases:8 },
+    { id:"O022", name:"SI Pooja Thombare", rank:"Sub-Inspector", badge:"B-1022", station:"PS008", status:"busy", specialty:"Narcotics", cases:6 },
+    { id:"O023", name:"Insp. Abhijit Deshpande", rank:"Inspector", badge:"B-1023", station:"PS009", status:"available", specialty:"Fraud", cases:9 },
+    { id:"O024", name:"SI Rupali Nagare", rank:"Sub-Inspector", badge:"B-1024", station:"PS009", status:"available", specialty:"Missing Persons", cases:3 },
+    { id:"O025", name:"Insp. Vijay Tambe", rank:"Inspector", badge:"B-1025", station:"PS010", status:"busy", specialty:"Homicide", cases:15 },
+    { id:"O026", name:"SI Nandini Joshi", rank:"Sub-Inspector", badge:"B-1026", station:"PS010", status:"available", specialty:"Cybercrime", cases:7 },
+    { id:"O027", name:"Insp. Balasaheb Mule", rank:"Inspector", badge:"B-1027", station:"PS011", status:"available", specialty:"Rural Crime", cases:4 },
+    { id:"O028", name:"Const. Dattatray Bhore", rank:"Constable", badge:"B-1028", station:"PS011", status:"available", specialty:"Patrol", cases:1 },
+    { id:"O029", name:"SI Mangesh Surve", rank:"Sub-Inspector", badge:"B-1029", station:"PS012", status:"available", specialty:"Theft", cases:5 },
+    { id:"O030", name:"Const. Varsha Dhande", rank:"Constable", badge:"B-1030", station:"PS012", status:"off-duty", specialty:"Patrol", cases:0 },
+    { id:"O031", name:"Insp. Prakash Hadkar", rank:"Inspector", badge:"B-1031", station:"PS013", status:"available", specialty:"Land Dispute", cases:6 },
+    { id:"O032", name:"SI Archana Pol", rank:"Sub-Inspector", badge:"B-1032", station:"PS013", status:"available", specialty:"Fraud", cases:3 },
+    { id:"O033", name:"Insp. Yashwant Ghodke", rank:"Inspector", badge:"B-1033", station:"PS014", status:"available", specialty:"Rural Crime", cases:8 },
+    { id:"O034", name:"SI Madhuri Pandit", rank:"Sub-Inspector", badge:"B-1034", station:"PS014", status:"busy", specialty:"Missing Persons", cases:4 },
+    { id:"O035", name:"Const. Sandesh Kadam", rank:"Constable", badge:"B-1035", station:"PS014", status:"available", specialty:"Patrol", cases:1 },
+  ]
+};
+
+// ===========================
+// STATE
+// ===========================
+let currentCase = null;
+let currentFilter = 'all';
+let selectedOfficerId = null;
+let evidenceItems = [];
+let timelineItems = [];
+let custodyItems = [];
+let allCases = [];
+let caseCounter = 1000;
+let notifQueue = [];
+
+// ===========================
+// INIT
+// ===========================
+document.addEventListener('DOMContentLoaded', () => {
+  startClock();
+  startCpuMeter();
+  initBgCanvas();
+  renderOfficers(POLICE_DB.officers);
+  renderStations();
+  renderMapCanvas();
+  generateCaseId();
+  setDefaultDate();
+  initFileDrop();
+  updateHeaderStats();
+  log('sys', 'Case Management Module initialized', 'cyan');
+  log('sys', `${POLICE_DB.officers.length} officers loaded — 14 stations online`, 'green');
+});
+
+// ===========================
+// CLOCK
+// ===========================
+function startClock() {
+  const el = document.getElementById('clockDisplay');
+  setInterval(() => { el.textContent = new Date().toTimeString().slice(0,8); }, 1000);
+}
+
+// ===========================
+// CPU METER
+// ===========================
+function startCpuMeter() {
+  const el = document.getElementById('cpuVal');
+  let base = 32;
+  setInterval(() => {
+    base = Math.max(10, Math.min(85, base + (Math.random()-0.5)*12));
+    const v = Math.round(base);
+    el.textContent = v + '%';
+    el.style.color = v > 70 ? 'var(--red)' : v > 50 ? 'var(--warn)' : 'var(--green)';
+  }, 1800);
+}
+
+// ===========================
+// BACKGROUND CANVAS
+// ===========================
+function initBgCanvas() {
+  const c = document.getElementById('bgCanvas');
+  const ctx = c.getContext('2d');
+  function resize() { c.width = window.innerWidth; c.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  const hexSize = 36;
+  const cols = Math.ceil(window.innerWidth / (hexSize*1.75)) + 2;
+  const rows = Math.ceil(window.innerHeight / (hexSize*1.55)) + 2;
+  const hexs = [];
+  for(let r=0;r<rows;r++) for(let c2=0;c2<cols;c2++) hexs.push({ x:c2*hexSize*1.75+(r%2===0?0:hexSize*0.875), y:r*hexSize*1.55, phase:Math.random()*Math.PI*2, spd:0.002+Math.random()*0.004, act:false, t:0 });
+  setInterval(() => { const h=hexs[Math.floor(Math.random()*hexs.length)]; if(!h.act){h.act=true;h.t=60;} }, 200);
+  function draw() {
+    ctx.clearRect(0,0,c.width,c.height);
+    hexs.forEach(h => {
+      h.phase+=h.spd;
+      const p=0.04+Math.sin(h.phase)*0.03;
+      ctx.beginPath();
+      for(let i=0;i<6;i++) { const a=(Math.PI/3)*i-Math.PI/6; const px=h.x+hexSize*Math.cos(a); const py=h.y+hexSize*Math.sin(a); i===0?ctx.moveTo(px,py):ctx.lineTo(px,py); }
+      ctx.closePath();
+      if(h.act) { h.t--; if(h.t<=0)h.act=false; ctx.strokeStyle=`rgba(0,245,255,${p*3})`; ctx.lineWidth=1.2; }
+      else { ctx.strokeStyle=`rgba(0,180,200,${p})`; ctx.lineWidth=0.5; }
+      ctx.stroke();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ===========================
+// MAP CANVAS
+// ===========================
+function renderMapCanvas() {
+  const c = document.getElementById('mapCanvas');
+  const mapArea = document.getElementById('mapArea');
+  c.width = mapArea.offsetWidth;
+  c.height = mapArea.offsetHeight;
+  const ctx = c.getContext('2d');
+  ctx.strokeStyle = 'rgba(0,245,255,0.08)';
+  ctx.lineWidth = 1;
+  for(let x=0; x<c.width; x+=30) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,c.height); ctx.stroke(); }
+  for(let y=0; y<c.height; y+=30) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(c.width,y); ctx.stroke(); }
+  // District boundary outline
+  ctx.strokeStyle = 'rgba(0,245,255,0.15)';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(c.width*0.45, c.height*0.5, c.width*0.38, c.height*0.42, 0.2, 0, Math.PI*2);
+  ctx.stroke();
+
+  // Render station pins
+  const pinsContainer = document.getElementById('stationPins');
+  pinsContainer.innerHTML = '';
+  POLICE_DB.stations.forEach(st => {
+    const pin = document.createElement('div');
+    pin.className = 'station-pin';
+    pin.style.left = (st.lng * 100) + '%';
+    pin.style.top = (st.lat * 100) + '%';
+    pin.innerHTML = `<div class="station-pin-dot" style="background:${st.zone==='Pune City'?'var(--cyan)':st.zone==='Pimpri-Chinchwad'?'var(--purple)':'var(--green)'}; box-shadow:0 0 10px ${st.zone==='Pune City'?'var(--cyan)':st.zone==='Pimpri-Chinchwad'?'var(--purple)':'var(--green)'}"></div><span class="station-pin-label">${st.name}</span>`;
+    pin.title = st.name;
+    pin.onclick = () => filterByStation(st.id);
+    pinsContainer.appendChild(pin);
+  });
+}
+
+// ===========================
+// RENDER STATIONS LIST
+// ===========================
+function renderStations() {
+  const list = document.getElementById('stationList');
+  const zones = ['Pune City','Pimpri-Chinchwad','Rural'];
+  const colors = { 'Pune City':'var(--cyan)', 'Pimpri-Chinchwad':'var(--purple)', 'Rural':'var(--green)' };
+  list.innerHTML = '';
+  zones.forEach(z => {
+    const sts = POLICE_DB.stations.filter(s=>s.zone===z);
+    sts.forEach(st => {
+      const avail = POLICE_DB.officers.filter(o=>o.station===st.id&&o.status==='available').length;
+      const item = document.createElement('div');
+      item.className = 'st-item';
+      item.id = 'st-'+st.id;
+      item.onclick = () => filterByStation(st.id);
+      item.innerHTML = `<div class="st-dot" style="background:${colors[z]};box-shadow:0 0 6px ${colors[z]}"></div><span class="st-name">${st.name}</span><span class="st-count">${avail} avail</span>`;
+      list.appendChild(item);
+    });
+  });
+}
+
+// ===========================
+// RENDER OFFICERS
+// ===========================
+function renderOfficers(officers) {
+  const grid = document.getElementById('officerGrid');
+  grid.innerHTML = '';
+  if(!officers.length) {
+    grid.innerHTML = '<div style="grid-column:span 3;text-align:center;padding:20px;color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:2px;">NO OFFICERS MATCH FILTER</div>';
+    return;
+  }
+  officers.forEach(o => {
+    const station = POLICE_DB.stations.find(s=>s.id===o.station);
+    const statusColor = o.status==='available'?'avail':o.status==='busy'?'busy':'off';
+    const statusLabel = o.status==='available'?'AVAILABLE':o.status==='busy'?'ON DUTY':'OFF DUTY';
+    const card = document.createElement('div');
+    card.className = 'officer-card';
+    card.id = 'oc-'+o.id;
+    card.onclick = () => selectOfficer(o.id);
+    card.innerHTML = `
+      <div class="officer-name">${o.name}</div>
+      <div class="officer-id">${o.badge} · ${o.rank}</div>
+      <div class="officer-rank" style="color:var(--cyan-mid);">${o.specialty}</div>
+      <div class="officer-station">${station?station.name:'—'}</div>
+      <div class="officer-status">
+        <div class="dot ${statusColor}"></div>
+        <span style="color:${o.status==='available'?'var(--green)':o.status==='busy'?'var(--warn)':'var(--text-dim)'}">${statusLabel}</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function selectOfficer(id) {
+  selectedOfficerId = id;
+  document.querySelectorAll('.officer-card').forEach(c => c.classList.remove('selected'));
+  const card = document.getElementById('oc-'+id);
+  if(card) card.classList.add('selected');
+  const o = POLICE_DB.officers.find(x=>x.id===id);
+  if(o) document.getElementById('selectedOfficerBadge').textContent = o.name.toUpperCase();
+}
+
+function filterOfficers() {
+  const q = document.getElementById('officerSearch').value.toLowerCase();
+  let officers = POLICE_DB.officers;
+  if(currentFilter !== 'all') {
+    if(currentFilter === 'available') officers = officers.filter(o=>o.status==='available');
+    else {
+      const zoneStations = POLICE_DB.stations.filter(s=>s.zone===currentFilter).map(s=>s.id);
+      officers = officers.filter(o=>zoneStations.includes(o.station));
+    }
+  }
+  if(q) {
+    officers = officers.filter(o => {
+      const st = POLICE_DB.stations.find(s=>s.id===o.station);
+      return o.name.toLowerCase().includes(q) || o.badge.toLowerCase().includes(q) || (st&&st.name.toLowerCase().includes(q));
+    });
+  }
+  renderOfficers(officers);
+}
+
+function setFilter(el, filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  filterOfficers();
+}
+
+function filterByStation(stId) {
+  document.querySelectorAll('.st-item').forEach(s=>s.classList.remove('selected'));
+  const el = document.getElementById('st-'+stId);
+  if(el) el.classList.add('selected');
+  const officers = POLICE_DB.officers.filter(o=>o.station===stId);
+  renderOfficers(officers);
+  currentFilter = 'all';
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  document.querySelector('[data-filter="all"]').classList.add('active');
+}
+
+// ===========================
+// CASE CREATION
+// ===========================
+function generateCaseId() {
+  const id = 'JFX-' + new Date().getFullYear() + '-' + String(++caseCounter).padStart(5,'0');
+  document.getElementById('caseId').value = id;
+}
+
+function setDefaultDate() {
+  document.getElementById('caseDate').value = new Date().toISOString().split('T')[0];
+}
+
+function createCase() {
+  const title = document.getElementById('caseTitle').value.trim();
+  if(!title) { notify('error','Validation Error','Please enter a case title before proceeding.'); return; }
+
+  const id = document.getElementById('caseId').value;
+  currentCase = {
+    id, title,
+    date: document.getElementById('caseDate').value,
+    category: document.getElementById('caseCategory').value,
+    priority: document.getElementById('casePriority').value,
+    desc: document.getElementById('caseDesc').value,
+    location: document.getElementById('caseLocation').value,
+    officer: null,
+    evidence: [],
+    status: 'ACTIVE',
+    createdAt: new Date().toLocaleString()
+  };
+
+  allCases.push(currentCase);
+  renderCaseCards();
+  addTimeline(`Case ${id} initialized`, `${title} — ${currentCase.category}`, 'cyan');
+  addCustody(`Case ${id} created`, `System — Priority: ${currentCase.priority}`);
+  notify('success','Case Initialized', `${id} is now active in the system.`);
+  generateCaseId();
+  updateHeaderStats();
+  document.getElementById('caseTitle').value='';
+  document.getElementById('caseDesc').value='';
+  document.getElementById('caseLocation').value='';
+}
+
+// ===========================
+// OFFICER ASSIGNMENT
+// ===========================
+function assignOfficer() {
+  if(!currentCase) { notify('error','No Active Case','Initialize a case first before assigning an officer.'); return; }
+  if(!selectedOfficerId) { notify('warn','No Officer Selected','Please select an officer from the roster.'); return; }
+
+  const o = POLICE_DB.officers.find(x=>x.id===selectedOfficerId);
+  if(!o) return;
+  if(o.status === 'off-duty') { notify('warn','Officer Off Duty',`${o.name} is currently off duty. Select another officer.`); return; }
+
+  currentCase.officer = selectedOfficerId;
+  const station = POLICE_DB.stations.find(s=>s.id===o.station);
+  addTimeline(`Officer Assigned`, `${o.name} (${o.badge}) — ${o.rank}`, 'purple');
+  addCustody(`Assigned: ${o.name}`, `${station?station.name:''} — ${o.specialty}`);
+  notify('success','Officer Assigned',`${o.name} has been assigned to Case ${currentCase.id}.`);
+  renderCaseCards();
+}
+
+function showOfficerDetails() {
+  if(!selectedOfficerId) { notify('warn','No Selection','Select an officer to view their profile.'); return; }
+  const o = POLICE_DB.officers.find(x=>x.id===selectedOfficerId);
+  const station = POLICE_DB.stations.find(s=>s.id===o.station);
+  showModal(`
+    <div class="modal-head"><span class="modal-title"><i class='bx bx-id-card'></i> Officer Profile</span><span class="modal-close" onclick="closeModal()">✕</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+      <div>
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:2px;margin-bottom:6px;">PERSONAL DATA</div>
+        ${infoRow('Name', o.name)}
+        ${infoRow('Badge', o.badge)}
+        ${infoRow('Rank', o.rank)}
+        ${infoRow('Specialty', o.specialty)}
+        ${infoRow('Status', `<span style="color:${o.status==='available'?'var(--green)':o.status==='busy'?'var(--warn)':'var(--text-dim)'}">${o.status.toUpperCase()}</span>`)}
+      </div>
+      <div>
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:2px;margin-bottom:6px;">ASSIGNMENT DATA</div>
+        ${infoRow('Station', station?station.name:'—')}
+        ${infoRow('Zone', station?station.zone:'—')}
+        ${infoRow('Active Cases', o.cases)}
+        ${infoRow('Station ID', station?station.id:'—')}
+      </div>
+    </div>
+    <div style="margin-top:18px;">
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${Math.min(o.cases*4,100)}%"></div></div>
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:1px;margin-top:4px;">${o.cases} CASES HANDLED — ${o.status==='available'?'AVAILABLE FOR ASSIGNMENT':'NOT AVAILABLE'}</div>
+    </div>
+    <div style="margin-top:20px;display:flex;gap:10px;">
+      <button class="btn btn-primary" onclick="closeModal();selectOfficer('${o.id}');assignOfficer();" style="flex:1">
+        <div class="btn-shine"></div><i class='bx bx-link'></i> Assign to Case
+      </button>
+      <button class="btn btn-red" onclick="closeModal()" style="flex:1">
+        <div class="btn-shine"></div><i class='bx bx-x'></i> Close
+      </button>
+    </div>
+  `);
+}
+
+function infoRow(label, val) {
+  return `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);">
+    <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:1px;">${label}</span>
+    <span style="font-family:var(--font-head);font-size:13px;font-weight:600;">${val}</span>
+  </div>`;
+}
+
+// ===========================
+// EVIDENCE
+// ===========================
+function initFileDrop() {
+  const drop = document.getElementById('fileDrop');
+  const inp = document.getElementById('fileInput');
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag-over'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('drag-over'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('drag-over');
+    inp.files = e.dataTransfer.files;
+    updateFileName();
+  });
+  inp.addEventListener('change', updateFileName);
+}
+function updateFileName() {
+  const inp = document.getElementById('fileInput');
+  const display = document.getElementById('fileNameDisplay');
+  if(inp.files.length) display.textContent = inp.files.length > 1 ? `${inp.files.length} files selected` : inp.files[0].name;
+  else display.textContent = 'No file selected';
+}
+
+const EV_ICONS = { image:'bx bx-image', video:'bx bxl-youtube', audio:'bx bx-microphone', document:'bx bx-file-blank', weapon:'bx bx-shield-x', forensics:'bx bxs-dna', digital:'bx bx-memory-card', other:'bx bx-package' };
+const EV_COLORS = { image:'cyan', video:'purple', audio:'warn', document:'', weapon:'red', forensics:'green', digital:'cyan', other:'' };
+
+function addEvidence() {
+  if(!currentCase) { notify('error','No Active Case','Initialize a case before sealing evidence.'); return; }
+  const name = document.getElementById('evidenceName').value.trim();
+  if(!name) { notify('warn','Missing Label','Please enter an evidence label.'); return; }
+  const type = document.getElementById('evidenceType').value;
+  const source = document.getElementById('evidenceSource').value;
+  const notes = document.getElementById('evidenceNotes').value;
+  const hash = genHash();
+  const ev = { id:'EV-'+hash.slice(0,6), name, type, source, notes, hash, sealed:true, time:nowStr() };
+  currentCase.evidence.push(ev);
+  evidenceItems.push(ev);
+  renderEvidenceList();
+  addTimeline(`Evidence Sealed: ${name}`, `${type.toUpperCase()} — Hash: ${hash}`, 'green');
+  addCustody(`Evidence: ${name}`, `Type: ${type} — Source: ${source||'unspecified'}`);
+  notify('success','Evidence Sealed', `${name} has been added to the vault.`);
+  document.getElementById('evidenceName').value='';
+  document.getElementById('evidenceSource').value='';
+  document.getElementById('evidenceNotes').value='';
+  document.getElementById('fileNameDisplay').textContent='No file selected';
+  document.getElementById('fileInput').value='';
+  updateHeaderStats();
+  document.getElementById('vaultCount').textContent = evidenceItems.length + ' ITEMS';
+}
+
+function renderEvidenceList() {
+  const list = document.getElementById('evidenceList');
+  if(!evidenceItems.length) { list.innerHTML='<div style="text-align:center;padding:30px;color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:2px;">VAULT EMPTY</div>'; return; }
+  list.innerHTML='';
+  evidenceItems.forEach((ev,i) => {
+    const item = document.createElement('div');
+    item.className = 'ev-item';
+    item.innerHTML = `
+      <i class="${EV_ICONS[ev.type]||'bx bx-package'} ev-icon ${EV_COLORS[ev.type]||''}"></i>
+      <div class="ev-info">
+        <div class="ev-name">${ev.name}</div>
+        <div class="ev-meta">${ev.type.toUpperCase()} · ${ev.id} · ${ev.time}</div>
+        <div class="ev-hash">SHA: ${ev.hash}</div>
+      </div>
+      <div class="ev-badge sealed">SEALED</div>
+      <i class='bx bx-trash ev-remove' onclick="removeEvidence(${i})" title="Remove evidence"></i>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function removeEvidence(i) {
+  const ev = evidenceItems[i];
+  if(!ev) return;
+  evidenceItems.splice(i,1);
+  if(currentCase) currentCase.evidence = currentCase.evidence.filter(e=>e.id!==ev.id);
+  addTimeline(`Evidence Removed: ${ev.name}`, `Removed from vault`, 'red');
+  renderEvidenceList();
+  document.getElementById('vaultCount').textContent = evidenceItems.length + ' ITEMS';
+  updateHeaderStats();
+}
+
+// ===========================
+// CASE CARDS
+// ===========================
+function renderCaseCards() {
+  const container = document.getElementById('caseCards');
+  if(!allCases.length) { container.innerHTML='<div style="text-align:center;padding:30px;color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:2px;">NO CASES REGISTERED</div>'; return; }
+  container.innerHTML='';
+  allCases.slice().reverse().forEach(c => {
+    const officer = c.officer ? POLICE_DB.officers.find(o=>o.id===c.officer) : null;
+    const card = document.createElement('div');
+    card.className = 'case-card' + (currentCase&&currentCase.id===c.id?' active':'');
+    card.onclick = () => loadCase(c.id);
+    const statusClass = c.status==='ACTIVE'?'active-s':c.status==='OPEN'?'open':c.status==='CLOSED'?'closed':'pending';
+    card.innerHTML = `
+      <div class="cc-id-block">
+        <div class="cc-id">${c.id.split('-')[2]||c.id}</div>
+        <div class="cc-year">${c.date||''}</div>
+      </div>
+      <div class="cc-info">
+        <div class="cc-title">${c.title}</div>
+        <div class="cc-meta">${c.category} · ${officer?officer.name:'Unassigned'} · ${c.evidence.length} evidence</div>
+      </div>
+      <div class="cc-status ${statusClass}">${c.status}</div>
+    `;
+    container.appendChild(card);
+  });
+  document.getElementById('caseCount').textContent = allCases.length + ' CASES';
+}
+
+function loadCase(id) {
+  const c = allCases.find(x=>x.id===id);
+  if(c) { currentCase = c; renderCaseCards(); notify('success','Case Loaded',`${c.id} is now the active case.`); }
+}
+
+// ===========================
+// TIMELINE
+// ===========================
+function addTimeline(action, detail, color='cyan') {
+  const item = { action, detail, color, time:nowStr() };
+  timelineItems.push(item);
+  renderTimeline();
+  document.getElementById('tlCount').textContent = timelineItems.length + ' EVENTS';
+}
+
+function renderTimeline() {
+  const list = document.getElementById('timeline');
+  if(!timelineItems.length) { list.innerHTML='<div style="text-align:center;padding:30px;color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:2px;">NO EVENTS</div>'; return; }
+  list.innerHTML='';
+  timelineItems.slice().reverse().forEach((t,i) => {
+    const div = document.createElement('div');
+    div.className='tl-item';
+    div.innerHTML=`
+      <div class="tl-dot-wrap">
+        <div class="tl-dot ${t.color}"></div>
+        <div class="tl-line"></div>
+      </div>
+      <div class="tl-content">
+        <div class="tl-action">${t.action}</div>
+        <div class="tl-detail">${t.detail}</div>
+        <div class="tl-time">${t.time}</div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+  list.scrollTop=0;
+}
+
+// ===========================
+// CUSTODY LOG
+// ===========================
+function addCustody(name, detail) {
+  const item = { name, detail, time:nowStr() };
+  custodyItems.push(item);
+  renderCustody();
+}
+
+function renderCustody() {
+  const list = document.getElementById('custodyLog');
+  if(!custodyItems.length) { list.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:2px;">AWAITING ACTIVITY</div>'; return; }
+  list.innerHTML='';
+  custodyItems.slice().reverse().slice(0,15).forEach(c => {
+    const div=document.createElement('div');
+    div.className='cl-item';
+    div.innerHTML=`<i class='bx bx-check-shield'></i><div class="cl-text"><div class="cl-name">${c.name}</div><div class="cl-detail">${c.detail}</div></div><div class="cl-time">${c.time.split(',')[1]||c.time}</div>`;
+    list.appendChild(div);
+  });
+}
+
+// ===========================
+// AI ANALYSIS
+// ===========================
+function runAI() {
+  if(!currentCase) { notify('error','No Active Case','Initialize a case before running AI analysis.'); return; }
+  document.getElementById('aiBadge').textContent = 'SCANNING...';
+  const checks = document.getElementById('aiChecks');
+  const items = checks.querySelectorAll('.ai-check');
+  items.forEach(i => { i.className='ai-check pending-c'; i.querySelector('i').className='bx bx-loader-alt'; });
+
+  const score = 72 + Math.floor(Math.random()*26);
+  const offset = 339.3 * (1 - score/100);
+
+  let idx=0;
+  const results = [
+    score>80?'pass':'warn-c', score>75?'pass':'warn-c', currentCase.evidence.length>0?'pass':'fail',
+    currentCase.officer?'pass':'warn-c', 'pass', currentCase.evidence.length>0?'pass':'pending-c',
+    'pass', score>85?'pass':'warn-c'
+  ];
+  const labels = ['Timeline Consistency','Evidence Integrity','Chain of Custody','Officer Authorization','Duplicate Detection','Hash Verification','Metadata Analysis','Court-Ready Status'];
+  const icons = { pass:'bx bx-check-circle', fail:'bx bxs-x-circle', 'warn-c':'bx bx-error', 'pending-c':'bx bx-circle' };
+
+  const interval = setInterval(() => {
+    if(idx<items.length) {
+      items[idx].className = 'ai-check '+results[idx];
+      items[idx].innerHTML = `<i class="${icons[results[idx]]}"></i> ${labels[idx]}`;
+      idx++;
+    } else {
+      clearInterval(interval);
+      document.getElementById('aiRingFill').style.strokeDashoffset = offset;
+      document.getElementById('aiScoreText').textContent = score+'%';
+      document.getElementById('aiBadge').textContent = score>=85?'COURT-READY':score>=70?'REVIEW NEEDED':'ISSUES FOUND';
+
+      const failCount = results.filter(r=>r==='fail').length;
+      const warnCount = results.filter(r=>r==='warn-c').length;
+      document.getElementById('aiResult').innerHTML = `
+▸ Integrity Score: <span style="color:var(--cyan);font-weight:700;">${score}%</span><br>
+▸ Evidence count: ${currentCase.evidence.length} sealed item(s)<br>
+▸ Officer assigned: ${currentCase.officer?(POLICE_DB.officers.find(o=>o.id===currentCase.officer)||{name:'Unknown'}).name:'NONE — CRITICAL'}<br>
+▸ Checks passed: ${results.filter(r=>r==='pass').length}/8 · Warnings: ${warnCount} · Failures: ${failCount}<br>
+▸ Timeline events: ${timelineItems.length} logged<br>
+▸ Chain of custody: ${custodyItems.length} entries<br>
+▸ Verdict: <span style="color:${score>=85?'var(--green)':score>=70?'var(--warn)':'var(--red)'};">${score>=85?'COURT-READY — No issues detected':score>=70?'REVIEW REQUIRED — Address warnings':'CRITICAL ISSUES — Cannot proceed'}</span>
+      `;
+      addTimeline('AI Analysis Complete', `Score: ${score}% — ${score>=85?'Court-ready':score>=70?'Review needed':'Issues found'}`, score>=85?'green':score>=70?'warn':'red');
+    }
+  }, 280);
+}
+
+// ===========================
+// SEND TO POLICE / EXPORT
+// ===========================
+function sendToPolice() {
+  if(!currentCase) { notify('error','No Active Case','No case to send.'); return; }
+  if(!currentCase.officer) { notify('warn','No Officer Assigned','Assign an officer before sending the case.'); return; }
+  const o = POLICE_DB.officers.find(x=>x.id===currentCase.officer);
+  const st = POLICE_DB.stations.find(s=>s.id===o.station);
+  showModal(`
+    <div class="modal-head"><span class="modal-title"><i class='bx bx-send'></i> Send to Police Station</span><span class="modal-close" onclick="closeModal()">✕</span></div>
+    <div style="padding:16px;background:rgba(0,10,30,0.8);border:1px solid var(--border);border-radius:10px;margin-bottom:16px;">
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);letter-spacing:2px;margin-bottom:10px;">TRANSMISSION DETAILS</div>
+      ${infoRow('Case ID', currentCase.id)}
+      ${infoRow('Assigned Officer', o.name)}
+      ${infoRow('Destination Station', st?st.name:'—')}
+      ${infoRow('Zone', st?st.zone:'—')}
+      ${infoRow('Evidence Count', currentCase.evidence.length + ' item(s)')}
+      ${infoRow('Priority', `<span class="priority ${currentCase.priority.toLowerCase()}">${currentCase.priority}</span>`)}
+    </div>
+    <div class="ai-result-text" style="margin-bottom:16px;">
+▸ Case file package ready for transmission<br>
+▸ All evidence hashes verified<br>
+▸ Chain of custody: ${custodyItems.length} entries<br>
+▸ Encryption: AES-256 active<br>
+▸ Recipient: ${st?st.name:'Unknown Station'}
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-primary" style="flex:1" onclick="confirmSend()">
+        <div class="btn-shine"></div><i class='bx bx-check'></i> Confirm Transmission
+      </button>
+      <button class="btn btn-red" style="flex:1" onclick="closeModal()">
+        <div class="btn-shine"></div><i class='bx bx-x'></i> Cancel
+      </button>
+    </div>
+  `);
+}
+
+function confirmSend() {
+  closeModal();
+  const o = POLICE_DB.officers.find(x=>x.id===currentCase.officer);
+  const st = POLICE_DB.stations.find(s=>s.id===o.station);
+  addTimeline('Case Transmitted', `Sent to ${st?st.name:'station'} — Officer: ${o.name}`, 'purple');
+  addCustody('Transmitted to Station', `${st?st.name:''} — Secure channel`);
+  notify('success','Case Transmitted', `Case ${currentCase.id} successfully sent to ${st?st.name:'station'}.`);
+}
+
+function exportReport() {
+  if(!currentCase) { notify('error','No Active Case','No case data to export.'); return; }
+  const o = currentCase.officer ? POLICE_DB.officers.find(x=>x.id===currentCase.officer) : null;
+  const st = o ? POLICE_DB.stations.find(s=>s.id===o.station) : null;
+  const data = `JUSTICEFX CASE REPORT\n${'='.repeat(50)}\nCase ID: ${currentCase.id}\nTitle: ${currentCase.title}\nDate: ${currentCase.date}\nCategory: ${currentCase.category}\nPriority: ${currentCase.priority}\nLocation: ${currentCase.location||'N/A'}\nOfficer: ${o?o.name:'Unassigned'}\nStation: ${st?st.name:'N/A'}\nSummary: ${currentCase.desc||'N/A'}\n\nEVIDENCE (${evidenceItems.length} items)\n${'-'.repeat(30)}\n${evidenceItems.map(e=>`[${e.id}] ${e.name} (${e.type}) - Hash: ${e.hash}`).join('\n')}\n\nTIMELINE (${timelineItems.length} events)\n${'-'.repeat(30)}\n${timelineItems.map(t=>`[${t.time}] ${t.action}: ${t.detail}`).join('\n')}\n\nCHAIN OF CUSTODY (${custodyItems.length} entries)\n${'-'.repeat(30)}\n${custodyItems.map(c=>`[${c.time}] ${c.name}: ${c.detail}`).join('\n')}\n\nGenerated: ${new Date().toLocaleString()} by JusticeFlowX v3.1`;
+  const blob = new Blob([data], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${currentCase.id}_report.txt`;
+  a.click();
+  notify('success','Report Exported', `${currentCase.id}_report.txt downloaded.`);
+}
+
+function exportFullReport() { exportReport(); }
+
+// ===========================
+// CLEAR CASE
+// ===========================
+function clearCase() {
+  currentCase = null;
+  evidenceItems = [];
+  timelineItems = [];
+  custodyItems = [];
+  selectedOfficerId = null;
+  document.getElementById('evidenceList').innerHTML='<div style="text-align:center;padding:30px;color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:2px;">VAULT EMPTY — AWAITING EVIDENCE</div>';
+  document.getElementById('timeline').innerHTML='<div style="text-align:center;padding:30px;color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:2px;">NO ACTIVE CASE — INITIALIZE FIRST</div>';
+  document.getElementById('custodyLog').innerHTML='<div style="text-align:center;padding:20px;color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:2px;">AWAITING CASE ACTIVITY</div>';
+  document.getElementById('vaultCount').textContent='0 ITEMS';
+  document.getElementById('tlCount').textContent='0 EVENTS';
+  document.getElementById('selectedOfficerBadge').textContent='NONE SELECTED';
+  document.getElementById('aiScoreText').textContent='--';
+  document.getElementById('aiRingFill').style.strokeDashoffset='339.3';
+  document.getElementById('aiResult').innerHTML='▸ Awaiting case initialization and evidence submission...<br>▸ Run analysis after sealing evidence to generate report.<br>▸ AI engine will cross-reference all 14,217 records.';
+  document.querySelectorAll('.ai-check').forEach(c=>{c.className='ai-check pending-c';c.innerHTML="<i class='bx bx-circle'></i> "+c.textContent;});
+  generateCaseId();
+  renderCaseCards();
+  updateHeaderStats();
+  notify('warn','Case Cleared','Active case session has been reset.');
+}
+
+// ===========================
+// MODAL
+// ===========================
+function showModal(html) {
+  const overlay = document.createElement('div');
+  overlay.className='modal-overlay';
+  overlay.id='activeModal';
+  overlay.onclick = e => { if(e.target===overlay) closeModal(); };
+  overlay.innerHTML=`<div class="modal">${html}</div>`;
+  document.body.appendChild(overlay);
+}
+function closeModal() {
+  const m = document.getElementById('activeModal');
+  if(m) m.remove();
+}
+
+// ===========================
+// NOTIFICATIONS
+// ===========================
+function notify(type, title, msg) {
+  const icons = { success:'bx bx-check-circle', error:'bx bx-error-circle', warn:'bx bx-error' };
+  const n = document.createElement('div');
+  n.className = `notif ${type==='error'?'error':type==='warn'?'warn':'success'}`;
+  n.innerHTML=`<i class="${icons[type]||icons.success} notif-icon"></i><div><div class="notif-title">${title}</div><div class="notif-msg">${msg}</div></div><i class='bx bx-x notif-close' onclick="this.parentElement.remove()"></i>`;
+  // Stack positioning
+  const existing = document.querySelectorAll('.notif');
+  const top = 80 + existing.length * 90;
+  n.style.top = top+'px';
+  document.body.appendChild(n);
+  setTimeout(() => { n.classList.add('hide'); setTimeout(()=>n.remove(),450); }, 3500);
+}
+
+// ===========================
+// STATS
+// ===========================
+function updateHeaderStats() {
+  document.getElementById('totalCases').textContent = allCases.length;
+  document.getElementById('openCases').textContent = allCases.filter(c=>c.status==='ACTIVE').length;
+  document.getElementById('totalOfficers').textContent = POLICE_DB.officers.filter(o=>o.status==='available').length;
+  document.getElementById('totalEvidence').textContent = evidenceItems.length;
+}
+
+// ===========================
+// HELPERS
+// ===========================
+function nowStr() { return new Date().toLocaleString('en-IN',{dateStyle:'short',timeStyle:'medium'}); }
+function genHash() { return [...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,'0')).join('').toUpperCase(); }
+function log(type, text, color) { /* internal */ }
+</script>
+</body>
+</html>

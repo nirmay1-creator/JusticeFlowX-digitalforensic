@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JusticeFlowX — Paper & Ink Analysis</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="justice.css">
+  <link rel="stylesheet" href="forensic.css">
+</head>
+<body>
+<div class="scanline-overlay"></div>
+<div class="noise-overlay"></div>
+<canvas id="hexCanvas"></canvas>
+<div class="data-streams" id="dataStreams"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="logo-wrapper">
+      <div class="logo-text-badge">JFX</div>
+      <div class="logo-ping"></div>
+    </div>
+    <div class="brand-block">
+      <span class="brand">JusticeFlowX</span>
+      <span class="brand-sub">Verification System v2.4</span>
+    </div>
+  </div>
+  <div class="nav-center">
+    <a href="index.html" class="nav-link"><i class='bx bx-grid-alt'></i><span>Dashboard</span></a>
+    <a href="forensic.html" class="nav-link"><i class='bx bx-search-alt'></i><span>Forensics</span></a>
+    <a href="forensic-metadata.html" class="nav-link"><i class='bx bx-code-alt'></i><span>Metadata</span></a>
+    <a href="forensic-ink.html" class="nav-link active"><i class='bx bx-droplet'></i><span>Ink Analysis</span></a>
+    <a href="forensic-serial.html" class="nav-link"><i class='bx bx-barcode'></i><span>Serial Check</span></a>
+  </div>
+  <div class="nav-right">
+    <div class="status-cluster"><div class="status-dot"></div><span class="system-status">SYSTEMS ONLINE</span></div>
+    <div class="clock-display" id="clockDisplay">00:00:00</div>
+  </div>
+</nav>
+
+<div class="module-page-header">
+  <a href="forensic.html" class="back-btn"><i class='bx bx-left-arrow-alt'></i> Back to Forensics</a>
+  <div class="mph-badge purple-badge"><i class='bx bx-droplet'></i> MODULE 02 — PAPER & INK ANALYSIS</div>
+  <h1 class="mph-title">PAPER & <span class="accent-purple">INK</span> ANALYSIS</h1>
+  <p class="mph-sub">Simulate UV-light scanning, microprinting detection, paper grade verification, and security thread analysis to detect physically forged documents</p>
+</div>
+
+<div class="ink-workspace">
+  <!-- UV SCANNER PANEL -->
+  <div class="uv-panel">
+    <div class="uv-header">
+      <i class='bx bx-sun'></i>
+      UV LIGHT SCANNER SIMULATION
+      <div class="uv-toggle-wrap">
+        <span class="uv-label" id="uvLabel">UV OFF</span>
+        <div class="uv-toggle" id="uvToggle">
+          <div class="uv-knob" id="uvKnob"></div>
+        </div>
+      </div>
+    </div>
+    <div class="uv-doc-area" id="uvDocArea">
+      <div class="uv-doc-base">
+        <!-- Simulated ID document -->
+        <div class="sim-id-card" id="simIdCard">
+          <div class="sim-id-header">
+            <div class="sim-id-flag"></div>
+            <div class="sim-id-title">NATIONAL IDENTITY DOCUMENT</div>
+            <div class="sim-id-code">IND-2024-SECURE</div>
+          </div>
+          <div class="sim-id-body">
+            <div class="sim-id-photo">
+              <i class='bx bx-user-circle'></i>
+            </div>
+            <div class="sim-id-info">
+              <div class="sim-field">
+                <span class="sfl">Name</span>
+                <span class="sfv" id="simName">SUBJECT NAME</span>
+              </div>
+              <div class="sim-field">
+                <span class="sfl">DOB</span>
+                <span class="sfv" id="simDob">01 / JAN / 1990</span>
+              </div>
+              <div class="sim-field">
+                <span class="sfl">ID No.</span>
+                <span class="sfv" id="simSerial">IND-2024-XXXXXX</span>
+              </div>
+              <div class="sim-field">
+                <span class="sfl">Issued</span>
+                <span class="sfv">GOVT OF INDIA</span>
+              </div>
+            </div>
+          </div>
+          <div class="sim-id-footer">
+            <div class="sim-barcode">
+              <div class="bc-lines" id="bcLines"></div>
+            </div>
+            <div class="sim-mrz" id="simMrz">P&lt;INDSUBJECT&lt;NAME&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+          </div>
+          <!-- UV-only elements -->
+          <div class="uv-element uv-watermark" id="uvWatermark">VERIFIED ✓</div>
+          <div class="uv-element uv-thread" id="uvThread"></div>
+          <div class="uv-element uv-micro" id="uvMicro">MICROPRINTING BAND — AUTHENTIC DOCUMENT — DO NOT REPRODUCE</div>
+          <div class="uv-element uv-pattern" id="uvPattern"></div>
+        </div>
+      </div>
+    </div>
+    <!-- UV Spectrum Indicator -->
+    <div class="uv-spectrum">
+      <div class="uvs-label">UV WAVELENGTH</div>
+      <div class="uvs-bar">
+        <div class="uvs-fill" id="uvsFill"></div>
+      </div>
+      <div class="uvs-val" id="uvsVal">0 nm</div>
+    </div>
+  </div>
+
+  <!-- ANALYSIS CHECKS PANEL -->
+  <div class="ink-checks-panel">
+    <div class="icp-header"><i class='bx bx-list-check'></i> ANALYSIS CHECKLIST</div>
+
+    <div class="ink-doc-input">
+      <div class="idi-title">Enter Document Details</div>
+      <div class="idi-field">
+        <label>Document Type</label>
+        <select id="docTypeSelect" class="forensic-select">
+          <option value="">Select Type...</option>
+          <option value="passport">Passport</option>
+          <option value="national_id">National ID Card</option>
+          <option value="drivers_license">Driver's License</option>
+          <option value="visa">Visa Document</option>
+          <option value="birth_cert">Birth Certificate</option>
+        </select>
+      </div>
+      <div class="idi-field">
+        <label>Country of Issue</label>
+        <select id="countrySelect" class="forensic-select">
+          <option value="">Select Country...</option>
+          <option value="IN">India</option>
+          <option value="US">United States</option>
+          <option value="UK">United Kingdom</option>
+          <option value="DE">Germany</option>
+          <option value="FR">France</option>
+          <option value="JP">Japan</option>
+          <option value="AU">Australia</option>
+        </select>
+      </div>
+      <div class="idi-field">
+        <label>Issue Year</label>
+        <input type="number" id="issueYear" class="forensic-input" placeholder="e.g. 2022" min="2000" max="2026">
+      </div>
+      <button class="run-ink-btn" id="runInkBtn">
+        <i class='bx bx-search'></i> RUN INK ANALYSIS
+        <div class="btn-shine"></div>
+      </button>
+    </div>
+
+    <div class="ink-check-list" id="inkCheckList">
+      <div class="icl-placeholder"><i class='bx bx-info-circle'></i> Fill in details and run analysis</div>
+    </div>
+
+    <div class="ink-verdict-box" id="inkVerdictBox" style="display:none">
+      <div class="ivb-title">PAPER & INK VERDICT</div>
+      <div class="ivb-result" id="ivbResult"></div>
+      <div class="ivb-confidence" id="ivbConfidence"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MICROPRINT ZOOM SECTION -->
+<div class="microprint-section" id="microprintSection" style="display:none">
+  <div class="mps-header"><i class='bx bx-zoom-in'></i> MICROPRINTING ANALYSIS — 400x MAGNIFICATION</div>
+  <div class="mps-grid">
+    <div class="mps-zone" id="mpsZone1">
+      <div class="mpz-label">ZONE A — LEFT MARGIN</div>
+      <canvas class="mpz-canvas" id="mpzCanvas1" width="200" height="80"></canvas>
+      <div class="mpz-result" id="mpzR1"></div>
+    </div>
+    <div class="mps-zone" id="mpsZone2">
+      <div class="mpz-label">ZONE B — BOTTOM BAND</div>
+      <canvas class="mpz-canvas" id="mpzCanvas2" width="200" height="80"></canvas>
+      <div class="mpz-result" id="mpzR2"></div>
+    </div>
+    <div class="mps-zone" id="mpsZone3">
+      <div class="mpz-label">ZONE C — PHOTO BORDER</div>
+      <canvas class="mpz-canvas" id="mpzCanvas3" width="200" height="80"></canvas>
+      <div class="mpz-result" id="mpzR3"></div>
+    </div>
+    <div class="mps-zone" id="mpsZone4">
+      <div class="mpz-label">ZONE D — SERIAL BAND</div>
+      <canvas class="mpz-canvas" id="mpzCanvas4" width="200" height="80"></canvas>
+      <div class="mpz-result" id="mpzR4"></div>
+    </div>
+  </div>
+</div>
+
+<div class="status-bar">
+  <div class="status-bar-item"><i class='bx bx-cpu'></i> CPU: <span id="cpuVal">34%</span></div>
+  <div class="status-bar-item"><i class='bx bx-data'></i> DB Sync: <span class="ok">LIVE</span></div>
+  <div class="status-bar-item"><i class='bx bx-wifi'></i> Uplink: <span class="ok">SECURE</span></div>
+  <div class="status-bar-item marquee-wrap"><span class="marquee-text">⬢ INK ANALYSIS MODULE ACTIVE — UV SPECTRUM SCANNER CALIBRATED — PAPER GRADE DATABASE: 890 PROFILES — MICROPRINT LIBRARY: 3,200 PATTERNS — SECURITY THREAD CATALOG UPDATED 2025</span></div>
+</div>
+
+<script src="justice.js"></script>
+<script src="forensic.js"></script>
+<script src="forensic-ink.js"></script>
+</body>
+</html>

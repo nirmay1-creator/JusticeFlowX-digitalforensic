@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JusticeFlowX — Fingerprint Verification</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="finger2.css">
+</head>
+<body>
+
+<!-- OVERLAYS -->
+<div class="scanline-overlay"></div>
+<div class="noise-overlay"></div>
+<canvas id="hexCanvas"></canvas>
+<div class="data-streams" id="dataStreams"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="logo-wrapper">
+      <div class="logo-placeholder"><i class='bx bx-shield-quarter'></i></div>
+      <div class="logo-ping"></div>
+    </div>
+    <div class="brand-block">
+      <span class="brand">JusticeFlowX</span>
+      <span class="brand-sub">Fingerprint Verification Module v2.4</span>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="status-cluster">
+      <div class="status-dot" id="statusDot"></div>
+      <span class="system-status" id="systemStatus">BIOMETRIC READY</span>
+    </div>
+    <div class="clock-display" id="clockDisplay">00:00:00</div>
+    <a href="index.html" class="back-btn">
+      <i class='bx bx-arrow-back'></i> Dashboard
+    </a>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main-content">
+
+  <!-- LEFT PANEL -->
+  <section class="panel panel-left">
+    <div class="panel-header">
+      <span class="panel-badge">⬢ SCAN MODULE</span>
+      <h2 class="panel-title">Biometric<br><span class="accent">Fingerprint</span></h2>
+      <p class="panel-desc">Place your registered finger on the biometric reader or enter a Fingerprint ID to authenticate and run a criminal background check.</p>
+    </div>
+
+    <!-- STATS ROW -->
+    <div class="mini-stats">
+      <div class="mini-stat">
+        <span class="ms-val" data-count="99.7">0</span><span class="ms-unit">%</span>
+        <span class="ms-label">Match Rate</span>
+      </div>
+      <div class="ms-divider"></div>
+      <div class="mini-stat">
+        <span class="ms-val" data-count="1200">0</span><span class="ms-unit">ms</span>
+        <span class="ms-label">Avg Scan</span>
+      </div>
+      <div class="ms-divider"></div>
+      <div class="mini-stat">
+        <span class="ms-val" data-count="14">0</span><span class="ms-unit">K+</span>
+        <span class="ms-label">Records</span>
+      </div>
+    </div>
+
+    <!-- SCAN LOG -->
+    <div class="scan-log-box">
+      <div class="slb-header">
+        <i class='bx bx-terminal'></i> SCAN LOG
+        <span id="logTime"></span>
+      </div>
+      <div class="slb-body" id="scanLog">
+        <div class="log-line ok">System initialized successfully</div>
+        <div class="log-line">Biometric reader — standby</div>
+        <div class="log-line">Encryption layer active (AES-256)</div>
+        <div class="log-line">Awaiting fingerprint input...</div>
+      </div>
+    </div>
+
+    <!-- CAPABILITY BADGES -->
+    <div class="cap-badges">
+      <div class="cap-badge"><i class='bx bx-lock-alt'></i> 256-bit AES</div>
+      <div class="cap-badge"><i class='bx bx-chip'></i> Ridge Analysis</div>
+      <div class="cap-badge"><i class='bx bx-data'></i> Live DB Sync</div>
+      <div class="cap-badge"><i class='bx bx-time-five'></i> ~1.2s Scan</div>
+    </div>
+  </section>
+
+  <!-- CENTER PANEL — SCANNER -->
+  <section class="panel panel-center">
+
+    <!-- SCANNER VISUAL -->
+    <div class="scanner-wrapper">
+      <div class="scanner-frame" id="scannerFrame">
+        <!-- Corner brackets -->
+        <div class="sf-corner tl"></div>
+        <div class="sf-corner tr"></div>
+        <div class="sf-corner bl"></div>
+        <div class="sf-corner br"></div>
+
+        <!-- Grid lines -->
+        <div class="sf-grid"></div>
+
+        <!-- Fingerprint SVG -->
+        <div class="fp-visual" id="fpVisual">
+          <svg viewBox="0 0 200 240" fill="none" xmlns="http://www.w3.org/2000/svg" class="fp-svg" id="fpSvg">
+            <!-- Outer arches -->
+            <path d="M100 220 C40 220 10 170 10 120 C10 60 50 20 100 20 C150 20 190 60 190 120 C190 170 160 220 100 220Z" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+            <path d="M100 205 C48 205 25 162 25 120 C25 70 58 35 100 35 C142 35 175 70 175 120 C175 162 152 205 100 205Z" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.55"/>
+            <path d="M100 190 C56 190 40 155 40 120 C40 78 66 50 100 50 C134 50 160 78 160 120 C160 155 144 190 100 190Z" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.6"/>
+            <path d="M100 175 C64 175 55 148 55 120 C55 88 74 65 100 65 C126 65 145 88 145 120 C145 148 136 175 100 175Z" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.65"/>
+            <path d="M100 160 C72 160 70 142 70 120 C70 98 82 80 100 80 C118 80 130 98 130 120 C130 142 128 160 100 160Z" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.7"/>
+            <!-- Core loop -->
+            <path d="M100 145 C82 145 85 130 85 120 C85 108 91 97 100 97 C109 97 115 108 115 120 C115 130 118 145 100 145Z" stroke="currentColor" stroke-width="1.4" fill="none" opacity="0.8"/>
+            <path d="M100 130 C93 130 93 124 93 120 C93 114 96 110 100 110 C104 110 107 114 107 120 C107 124 107 130 100 130Z" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.9"/>
+            <!-- Minutiae points -->
+            <circle cx="85" cy="78" r="2" fill="currentColor" opacity="0.6"/>
+            <circle cx="115" cy="78" r="2" fill="currentColor" opacity="0.6"/>
+            <circle cx="68" cy="105" r="2" fill="currentColor" opacity="0.6"/>
+            <circle cx="132" cy="105" r="2" fill="currentColor" opacity="0.6"/>
+            <circle cx="72" cy="140" r="2" fill="currentColor" opacity="0.6"/>
+            <circle cx="128" cy="140" r="2" fill="currentColor" opacity="0.6"/>
+            <!-- Ridge endings (short lines) -->
+            <line x1="78" y1="60" x2="82" y2="66" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+            <line x1="122" y1="60" x2="118" y2="66" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+            <line x1="58" y1="92" x2="65" y2="95" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+            <line x1="142" y1="92" x2="135" y2="95" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+          </svg>
+
+          <!-- Scan sweep line -->
+          <div class="fp-sweep" id="fpSweep"></div>
+
+          <!-- Scan glow -->
+          <div class="fp-glow" id="fpGlow"></div>
+
+          <!-- Match grid overlay -->
+          <div class="fp-match-grid" id="fpMatchGrid"></div>
+
+          <!-- Center status -->
+          <div class="fp-center-text" id="fpCenterText">
+            <i class='bx bx-fingerprint'></i>
+          </div>
+        </div>
+
+        <!-- Status ring -->
+        <div class="scanner-ring" id="scannerRing">
+          <svg viewBox="0 0 260 260" class="ring-svg">
+            <circle cx="130" cy="130" r="120" class="ring-track"/>
+            <circle cx="130" cy="130" r="120" class="ring-fill" id="ringFill"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Scanner status text -->
+      <div class="scanner-status" id="scannerStatus">
+        <span class="ss-icon"><i class='bx bx-radio-circle-marked'></i></span>
+        <span class="ss-text" id="ssText">READY FOR SCAN</span>
+      </div>
+    </div>
+
+    <!-- INPUT FORM -->
+    <div class="input-section">
+      <div class="input-label">
+        <i class='bx bx-id-card'></i> FINGERPRINT IDENTIFIER
+      </div>
+      <div class="input-row">
+        <div class="input-wrapper">
+          <span class="input-prefix">FP</span>
+          <input
+            type="text"
+            id="fingerId"
+            class="fp-input"
+            placeholder="Enter ID (e.g. 1001)"
+            maxlength="12"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <span class="input-suffix" id="inputStatus">
+            <i class='bx bx-circle'></i>
+          </span>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="btn-row">
+        <button class="scan-btn primary" id="scanBtn" onclick="startScan()">
+          <div class="btn-bg"></div>
+          <i class='bx bx-fingerprint'></i>
+          <span>Initiate Scan</span>
+          <div class="btn-shine"></div>
+        </button>
+        <button class="scan-btn secondary" id="webauthnBtn" onclick="startWebAuthn()">
+          <div class="btn-bg"></div>
+          <i class='bx bx-usb'></i>
+          <span>Hardware Reader</span>
+          <div class="btn-shine"></div>
+        </button>
+      </div>
+
+      <div class="or-divider"><span>or enter ID manually above</span></div>
+    </div>
+
+  </section>
+
+  <!-- RIGHT PANEL — RESULTS -->
+  <section class="panel panel-right" id="resultPanel">
+    <div class="panel-header">
+      <span class="panel-badge badge-alt">⬢ ANALYSIS OUTPUT</span>
+      <h2 class="panel-title">Scan <span class="accent-purple">Result</span></h2>
+    </div>
+
+    <!-- RESULT CARD -->
+    <div class="result-card" id="resultCard">
+      <div class="rc-idle" id="rcIdle">
+        <div class="rc-idle-icon"><i class='bx bx-search-alt-2'></i></div>
+        <div class="rc-idle-text">Awaiting biometric<br>scan input</div>
+        <div class="rc-idle-sub">Identity data will appear here after successful scan</div>
+      </div>
+      <div class="rc-data" id="rcData" style="display:none">
+        <div class="rc-status-banner" id="rcBanner">
+          <i class='bx bx-check-circle' id="rcBannerIcon"></i>
+          <span id="rcBannerText">IDENTITY VERIFIED</span>
+        </div>
+        <div class="rc-field">
+          <span class="rcf-label">NAME</span>
+          <span class="rcf-val" id="rcName">—</span>
+        </div>
+        <div class="rc-field">
+          <span class="rcf-label">FINGERPRINT ID</span>
+          <span class="rcf-val mono" id="rcFpId">—</span>
+        </div>
+        <div class="rc-field">
+          <span class="rcf-label">CRIMINAL RECORD</span>
+          <span class="rcf-val" id="rcCriminal">—</span>
+        </div>
+        <div class="rc-field" id="rcCaseRow" style="display:none">
+          <span class="rcf-label">CASE REFERENCE</span>
+          <span class="rcf-val" id="rcCase">—</span>
+        </div>
+        <div class="rc-field">
+          <span class="rcf-label">CONFIDENCE</span>
+          <div class="confidence-bar-wrap">
+            <div class="confidence-bar" id="confBar"></div>
+            <span class="conf-val" id="confVal">0%</span>
+          </div>
+        </div>
+        <div class="rc-field">
+          <span class="rcf-label">SCAN TIME</span>
+          <span class="rcf-val mono" id="rcScanTime">—</span>
+        </div>
+        <div class="rc-field">
+          <span class="rcf-label">TIMESTAMP</span>
+          <span class="rcf-val mono" id="rcTimestamp">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- THREAT INDICATOR -->
+    <div class="threat-box" id="threatBox" style="display:none">
+      <div class="threat-header"><i class='bx bx-error-alt'></i> THREAT ASSESSMENT</div>
+      <div class="threat-level" id="threatLevel">LOW</div>
+      <div class="threat-bar-wrap">
+        <div class="threat-bar" id="threatBar"></div>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div class="status-bar-item"><i class='bx bx-cpu'></i> CPU: <span id="cpuVal">34%</span></div>
+  <div class="status-bar-item"><i class='bx bx-data'></i> DB: <span class="ok">LIVE</span></div>
+  <div class="status-bar-item"><i class='bx bx-wifi'></i> Uplink: <span class="ok">SECURE</span></div>
+  <div class="status-bar-item"><i class='bx bx-fingerprint'></i> BIO: <span class="ok">ONLINE</span></div>
+  <div class="marquee-wrap"><span class="marquee-text">⬢ JUSTICEFX BIOMETRIC AUTH LAYER 2 ACTIVE ◆ DATABASE 14,217 RECORDS LOADED ◆ ENCRYPTION: AES-256 ◆ LAST SYNC: 00:04 AGO ◆ ALL SUBSYSTEMS NOMINAL ◆</span></div>
+</div>
+
+<script src="finger2.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "JusticeFlowXVerification",
+			"path": "JusticeFlowXVerification"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "justice"
+	}
+}

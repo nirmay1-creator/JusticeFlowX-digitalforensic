@@ -1,0 +1,128 @@
+body {
+margin:0;
+font-family:Segoe UI, sans-serif;
+background:radial-gradient(circle at top,#0a0f2c,#000);
+color:#e0f7fa;
+overflow-x:hidden;
+}
+
+.topbar {
+padding:15px;
+background:linear-gradient(90deg,#0d47a1,#00acc1);
+text-align:center;
+font-size:22px;
+letter-spacing:2px;
+box-shadow:0 0 20px cyan;
+}
+
+.status {
+float:right;
+font-size:12px;
+padding:5px 10px;
+border-radius:20px;
+background:#00e676;
+color:black;
+}
+
+.scene {
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:25px;
+padding:30px;
+perspective:1200px;
+}
+
+.panel {
+background:rgba(15,25,60,0.9);
+border-radius:15px;
+padding:20px;
+transform-style:preserve-3d;
+transition:0.4s;
+box-shadow:0 20px 40px rgba(0,255,255,0.15);
+}
+
+.panel:hover {
+transform:rotateX(6deg) rotateY(-6deg) scale(1.03);
+}
+
+.panel h2 {
+color:#4dd0e1;
+margin-bottom:15px;
+}
+
+input, textarea, select {
+width:100%;
+padding:10px;
+margin-bottom:10px;
+background:#020726;
+border:1px solid #00bcd4;
+color:white;
+border-radius:8px;
+}
+
+button {
+width:100%;
+padding:10px;
+background:#00e5ff;
+border:none;
+border-radius:10px;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:hover {
+background:#1de9b6;
+}
+
+ul {
+list-style:none;
+padding:0;
+font-size:13px;
+}
+
+li {
+padding:10px;
+border-bottom:1px solid rgba(255,255,255,0.1);
+animation:scan 0.6s ease;
+}
+
+@keyframes scan {
+from {opacity:0; transform:translateY(10px);}
+to {opacity:1;}
+}
+
+.ai {
+background:linear-gradient(135deg,#1a237e,#0d47a1);
+}
+
+#aiResult {
+margin:10px 0;
+font-size:14px;
+}
+.back-btn {
+    background: rgba(0, 255, 255, 0.15);
+    border: 1px solid #00e5ff;
+    color: #00e5ff;
+    padding: 10px 26px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    box-shadow: 0 0 15px rgba(0,255,255,0.5);
+    transition: 0.3s ease;
+}
+
+.back-btn:hover {
+    background: #00e5ff;
+    color: #000;
+    box-shadow: 0 0 30px rgba(0,255,255,0.9);
+}
+.bottom-nav {
+    width: 100%;
+    padding: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.6));
+}

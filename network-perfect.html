@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JusticeFlowX — Too Perfect Flag</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="justice.css">
+  <link rel="stylesheet" href="forensic.css">
+  <link rel="stylesheet" href="network.css">
+</head>
+<body>
+<div class="scanline-overlay"></div>
+<div class="noise-overlay"></div>
+<canvas id="hexCanvas"></canvas>
+<div class="data-streams" id="dataStreams"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="logo-wrapper"><div class="logo-text-badge">JFX</div><div class="logo-ping"></div></div>
+    <div class="brand-block"><span class="brand">JusticeFlowX</span><span class="brand-sub">Verification System v2.4</span></div>
+  </div>
+  <div class="nav-center">
+    <a href="index.html" class="nav-link"><i class='bx bx-grid-alt'></i><span>Dashboard</span></a>
+    <a href="network.html" class="nav-link"><i class='bx bx-network-chart'></i><span>Network</span></a>
+    <a href="network-social.html" class="nav-link"><i class='bx bx-group'></i><span>Social Graph</span></a>
+    <a href="network-location.html" class="nav-link"><i class='bx bx-map-alt'></i><span>Location</span></a>
+    <a href="network-perfect.html" class="nav-link active"><i class='bx bx-badge-check'></i><span>Wear Check</span></a>
+  </div>
+  <div class="nav-right">
+    <div class="status-cluster"><div class="status-dot"></div><span class="system-status">SYSTEMS ONLINE</span></div>
+    <div class="clock-display" id="clockDisplay">00:00:00</div>
+  </div>
+</nav>
+
+<div class="module-page-header">
+  <a href="network.html" class="back-btn"><i class='bx bx-left-arrow-alt'></i> Back to Network</a>
+  <div class="mph-badge green-badge"><i class='bx bx-badge-check'></i> MODULE 12 — THE "TOO PERFECT" FLAG</div>
+  <h1 class="mph-title">DOCUMENT <span class="accent-green">WEAR ANALYSIS</span></h1>
+  <p class="mph-sub">AI analyzes document aging signatures. Forged documents are often suspiciously pristine — a 10-year-old ID with zero wear, no creases, and perfect laminate is a critical red flag</p>
+</div>
+
+<div class="wear-workspace">
+  <!-- UPLOAD + CONTROLS -->
+  <div class="wear-input-panel">
+    <div class="wip-header"><i class='bx bx-id-card'></i> DOCUMENT INPUT</div>
+
+    <div class="wear-upload-zone" id="wearUploadZone">
+      <div class="wuz-inner">
+        <i class='bx bx-image-add'></i>
+        <p class="wuz-title">UPLOAD DOCUMENT SCAN</p>
+        <p class="wuz-sub">Front + back scan recommended</p>
+        <label class="uz-btn">
+          <input type="file" id="wearFileInput" accept="image/*" hidden>
+          Browse Image
+        </label>
+      </div>
+    </div>
+    <div class="wear-preview-wrap" id="wearPreviewWrap" style="display:none">
+      <canvas id="wearCanvas" width="300" height="190"></canvas>
+      <div class="wp-controls">
+        <button class="wp-ctrl-btn active" data-mode="normal" id="btnNormal"><i class='bx bx-show'></i> Normal</button>
+        <button class="wp-ctrl-btn" data-mode="enhanced" id="btnEnhanced"><i class='bx bx-contrast'></i> Enhanced</button>
+        <button class="wp-ctrl-btn" data-mode="wear" id="btnWear"><i class='bx bx-analyse'></i> Wear Map</button>
+        <button class="wp-ctrl-btn" data-mode="edge" id="btnEdge"><i class='bx bx-border-all'></i> Edge</button>
+      </div>
+    </div>
+
+    <div class="wear-meta-inputs">
+      <div class="sg-field">
+        <label>Document Type</label>
+        <select id="wearDocType" class="forensic-select">
+          <option value="national_id">National ID Card</option>
+          <option value="passport">Passport</option>
+          <option value="drivers_license">Driver's License</option>
+          <option value="voter_id">Voter ID</option>
+        </select>
+      </div>
+      <div class="sg-field">
+        <label>Issue Year on Document</label>
+        <input type="number" id="wearIssueYear" class="forensic-input" placeholder="e.g. 2014" min="1990" max="2026">
+      </div>
+      <div class="sg-field">
+        <label>Claimed Usage Frequency</label>
+        <select id="wearUsage" class="forensic-select">
+          <option value="heavy">Heavy (daily/weekly)</option>
+          <option value="moderate">Moderate (monthly)</option>
+          <option value="light">Light (few times/year)</option>
+          <option value="rare">Rare (almost never)</option>
+        </select>
+      </div>
+      <div class="sg-field">
+        <label>Storage Conditions</label>
+        <select id="wearStorage" class="forensic-select">
+          <option value="wallet">Wallet (constant)</option>
+          <option value="drawer">Drawer/safe</option>
+          <option value="bag">Bag/purse</option>
+        </select>
+      </div>
+      <button class="sg-analyze-btn" id="wearAnalyzeBtn" style="background:rgba(0,255,136,0.08);border-color:rgba(0,255,136,0.4);color:var(--green)">
+        <i class='bx bx-search-alt'></i> ANALYZE WEAR SIGNATURE
+        <div class="btn-shine"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- RESULTS PANEL -->
+  <div class="wear-results-panel">
+    <div class="wrp-header"><i class='bx bx-analyse'></i> WEAR FORENSICS RESULTS</div>
+    <div class="wrp-waiting" id="wrpWaiting">
+      <i class='bx bx-badge-check'></i>
+      <p>Upload a document and run analysis</p>
+    </div>
+    <div class="wrp-scanning" id="wrpScanning" style="display:none">
+      <div class="wear-scan-anim">
+        <div class="wsa-doc" id="wsaDoc">
+          <div class="wsa-scanline" id="wsaScanline"></div>
+          <div class="wsa-grid"></div>
+          <div class="wsa-markers" id="wsaMarkers"></div>
+        </div>
+        <div class="wsa-steps" id="wsaSteps"></div>
+      </div>
+    </div>
+    <div class="wrp-results" id="wrpResults" style="display:none">
+      <!-- Age vs condition gauge -->
+      <div class="wear-gauge-section">
+        <div class="wgs-title">AGE vs CONDITION ANALYSIS</div>
+        <div class="wear-gauge-wrap">
+          <div class="wg-left">
+            <div class="wg-label">Document Age</div>
+            <div class="wg-val" id="wgAge">—</div>
+            <div class="wg-sub">years old</div>
+          </div>
+          <div class="wg-middle">
+            <canvas id="wearGaugeCanvas" width="200" height="130"></canvas>
+            <div class="wg-score-label" id="wgScoreLabel">—</div>
+          </div>
+          <div class="wg-right">
+            <div class="wg-label">Condition Score</div>
+            <div class="wg-val" id="wgCondition">—</div>
+            <div class="wg-sub">out of 100</div>
+          </div>
+        </div>
+        <div class="wg-expected-band" id="wgExpectedBand"></div>
+      </div>
+      <!-- Wear checks -->
+      <div class="wear-checks-grid" id="wearChecksGrid"></div>
+      <!-- Verdict -->
+      <div class="wear-verdict" id="wearVerdict"></div>
+    </div>
+  </div>
+</div>
+
+<!-- REFERENCE COMPARISON -->
+<div class="wear-reference-section" id="wearRefSection" style="display:none">
+  <div class="wrs-header"><i class='bx bx-images'></i> EXPECTED WEAR REFERENCE — AUTHENTIC vs FORGED</div>
+  <div class="wrs-grid">
+    <div class="wrs-card authentic">
+      <div class="wrs-label">GENUINE 10-YEAR-OLD ID</div>
+      <canvas id="wrsCanvas1" width="280" height="180"></canvas>
+      <div class="wrs-desc">Faded print, corner wear, laminate bubbles, natural creases, ink fade on high-touch areas</div>
+    </div>
+    <div class="wrs-card subject">
+      <div class="wrs-label">SUBMITTED DOCUMENT</div>
+      <canvas id="wrsCanvas2" width="280" height="180"></canvas>
+      <div class="wrs-desc" id="wrsDesc2">Analysis pending...</div>
+    </div>
+    <div class="wrs-card forged">
+      <div class="wrs-label">TYPICAL FORGERY PATTERN</div>
+      <canvas id="wrsCanvas3" width="280" height="180"></canvas>
+      <div class="wrs-desc">Pristine laminate, sharp edges, no wear zones, too-uniform color, no crease lines</div>
+    </div>
+  </div>
+</div>
+
+<div class="status-bar">
+  <div class="status-bar-item"><i class='bx bx-cpu'></i> CPU: <span id="cpuVal">34%</span></div>
+  <div class="status-bar-item"><i class='bx bx-data'></i> DB Sync: <span class="ok">LIVE</span></div>
+  <div class="status-bar-item marquee-wrap"><span class="marquee-text">⬢ WEAR ANALYSIS MODULE — AI DOCUMENT AGING MODEL v1.9 LOADED — 240,000 REFERENCE SAMPLES — CONDITION SCORING MATRIX CALIBRATED — LAMINATE DATABASE UPDATED</span></div>
+</div>
+
+<script src="justice.js"></script>
+<script src="network-perfect.js"></script>
+</body>
+</html>

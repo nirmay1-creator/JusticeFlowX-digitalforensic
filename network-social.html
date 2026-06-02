@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JusticeFlowX — Social Graph Analysis</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="justice.css">
+  <link rel="stylesheet" href="forensic.css">
+  <link rel="stylesheet" href="network.css">
+</head>
+<body>
+<div class="scanline-overlay"></div>
+<div class="noise-overlay"></div>
+<canvas id="hexCanvas"></canvas>
+<div class="data-streams" id="dataStreams"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="logo-wrapper"><div class="logo-text-badge">JFX</div><div class="logo-ping"></div></div>
+    <div class="brand-block">
+      <span class="brand">JusticeFlowX</span>
+      <span class="brand-sub">Verification System v2.4</span>
+    </div>
+  </div>
+  <div class="nav-center">
+    <a href="index.html" class="nav-link"><i class='bx bx-grid-alt'></i><span>Dashboard</span></a>
+    <a href="network.html" class="nav-link"><i class='bx bx-network-chart'></i><span>Network</span></a>
+    <a href="network-social.html" class="nav-link active"><i class='bx bx-group'></i><span>Social Graph</span></a>
+    <a href="network-location.html" class="nav-link"><i class='bx bx-map-alt'></i><span>Location</span></a>
+    <a href="network-perfect.html" class="nav-link"><i class='bx bx-badge-check'></i><span>Wear Check</span></a>
+  </div>
+  <div class="nav-right">
+    <div class="status-cluster"><div class="status-dot"></div><span class="system-status">SYSTEMS ONLINE</span></div>
+    <div class="clock-display" id="clockDisplay">00:00:00</div>
+  </div>
+</nav>
+
+<div class="module-page-header">
+  <a href="network.html" class="back-btn"><i class='bx bx-left-arrow-alt'></i> Back to Network</a>
+  <div class="mph-badge cyan-badge"><i class='bx bx-group'></i> MODULE 10 — SOCIAL GRAPH ANALYSIS</div>
+  <h1 class="mph-title">SOCIAL <span class="accent">GRAPH</span></h1>
+  <p class="mph-sub">Map a subject's verified social connections. Real people have detectable networks — family members, employers, neighbors all leave traces. A fake identity leaves none.</p>
+</div>
+
+<div class="social-workspace">
+  <!-- INPUT PANEL -->
+  <div class="sg-input-panel">
+    <div class="sgip-header"><i class='bx bx-search'></i> SUBJECT LOOKUP</div>
+    <div class="sgip-body">
+      <div class="sg-field">
+        <label>Full Name</label>
+        <input type="text" id="sgName" class="forensic-input" placeholder="e.g. Rajesh Kumar Sharma">
+      </div>
+      <div class="sg-field">
+        <label>Date of Birth</label>
+        <input type="date" id="sgDob" class="forensic-input">
+      </div>
+      <div class="sg-field">
+        <label>Claimed City of Residence</label>
+        <input type="text" id="sgCity" class="forensic-input" placeholder="e.g. New Delhi">
+      </div>
+      <div class="sg-field">
+        <label>ID Number (optional)</label>
+        <input type="text" id="sgId" class="forensic-input" placeholder="e.g. IND-2020-AB123456">
+      </div>
+      <div class="sg-field">
+        <label>Claimed Employer / Institution</label>
+        <input type="text" id="sgEmployer" class="forensic-input" placeholder="e.g. Infosys Ltd, New Delhi">
+      </div>
+      <div class="sg-field">
+        <label>Years at Claimed Address</label>
+        <input type="number" id="sgYears" class="forensic-input" placeholder="e.g. 8" min="0" max="80">
+      </div>
+      <button class="sg-analyze-btn" id="sgAnalyzeBtn">
+        <i class='bx bx-network-chart'></i> ANALYZE SOCIAL GRAPH
+        <div class="btn-shine"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- GRAPH CANVAS PANEL -->
+  <div class="sg-graph-panel">
+    <div class="sggp-header">
+      <span><i class='bx bx-sitemap'></i> SOCIAL NETWORK MAP</span>
+      <div class="sg-legend">
+        <span class="sgl-item"><span class="sgl-dot" style="background:var(--cyan)"></span>Subject</span>
+        <span class="sgl-item"><span class="sgl-dot" style="background:var(--green)"></span>Verified</span>
+        <span class="sgl-item"><span class="sgl-dot" style="background:var(--warn)"></span>Unverified</span>
+        <span class="sgl-item"><span class="sgl-dot" style="background:var(--red)"></span>Flagged</span>
+      </div>
+    </div>
+    <canvas id="socialGraph" width="700" height="440"></canvas>
+    <div class="sg-graph-overlay" id="sgGraphOverlay">
+      <i class='bx bx-group'></i>
+      <p>Enter subject details and run analysis</p>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS SECTION -->
+<div class="sg-results-section" id="sgResultsSection" style="display:none">
+  <!-- Isolation score -->
+  <div class="sg-isolation-panel">
+    <div class="sgi-header"><i class='bx bx-shield-quarter'></i> ISOLATION SCORE</div>
+    <div class="sgi-body">
+      <div class="sgi-ring-wrap">
+        <canvas id="isolationRing" width="160" height="160"></canvas>
+        <div class="sgi-ring-center">
+          <span class="sgi-score" id="sgIsolationScore">0</span>
+          <span class="sgi-label">RISK</span>
+        </div>
+      </div>
+      <div class="sgi-breakdown" id="sgiBreakdown"></div>
+    </div>
+  </div>
+  <!-- Connection table -->
+  <div class="sg-connections-panel">
+    <div class="sgcp-header"><i class='bx bx-list-check'></i> CONNECTION AUDIT</div>
+    <div class="sgcp-body" id="sgConnectionsBody"></div>
+  </div>
+  <!-- Verdict -->
+  <div class="sg-verdict-panel" id="sgVerdictPanel"></div>
+</div>
+
+<div class="status-bar">
+  <div class="status-bar-item"><i class='bx bx-cpu'></i> CPU: <span id="cpuVal">34%</span></div>
+  <div class="status-bar-item"><i class='bx bx-data'></i> DB Sync: <span class="ok">LIVE</span></div>
+  <div class="status-bar-item marquee-wrap"><span class="marquee-text">⬢ SOCIAL GRAPH ENGINE ACTIVE — 14 DATABASE SOURCES — FAMILY REGISTRY, EMPLOYER RECORDS, TAX DB, VOTER ROLLS, SOCIAL MEDIA ARCHIVES</span></div>
+</div>
+
+<script src="justice.js"></script>
+<script src="network-social.js"></script>
+</body>
+</html>

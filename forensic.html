@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JusticeFlowX — Document Forensics</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="justice.css">
+  <link rel="stylesheet" href="forensic.css">
+</head>
+<body>
+
+<div class="scanline-overlay"></div>
+<div class="noise-overlay"></div>
+<canvas id="hexCanvas"></canvas>
+<div class="data-streams" id="dataStreams"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="logo-wrapper">
+      <div class="logo-text-badge">JFX</div>
+      <div class="logo-ping"></div>
+    </div>
+    <div class="brand-block">
+      <span class="brand" data-text="JusticeFlowX">JusticeFlowX</span>
+      <span class="brand-sub">Verification System v2.4</span>
+    </div>
+  </div>
+  <div class="nav-center">
+    <a href="index.html" class="nav-link"><i class='bx bx-grid-alt'></i><span>Dashboard</span></a>
+    <a href="criminal.html" class="nav-link"><i class='bx bx-user'></i><span>Criminal DB</span></a>
+    <a href="case.html" class="nav-link"><i class='bx bx-folder'></i><span>Case Control</span></a>
+    <a href="evidence.html" class="nav-link"><i class='bx bx-archive'></i><span>Evidence</span></a>
+    <a href="forensic.html" class="nav-link active"><i class='bx bx-search-alt'></i><span>Forensics</span></a>
+  </div>
+  <div class="nav-right">
+    <div class="status-cluster">
+      <div class="status-dot"></div>
+      <span class="system-status">SYSTEMS ONLINE</span>
+    </div>
+    <div class="clock-display" id="clockDisplay">00:00:00</div>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="forensic-header">
+  <div class="fh-left">
+    <div class="fh-badge"><i class='bx bx-shield-quarter'></i> DOCUMENT FORENSICS MODULE — LEVEL 4 CLEARANCE</div>
+    <h1 class="fh-title">DOCUMENT <span class="accent">FORENSICS</span></h1>
+    <p class="fh-sub">Advanced AI-powered analysis to detect forged, tampered, or fraudulent identity documents using multi-layer forensic techniques</p>
+  </div>
+  <div class="fh-threat-panel">
+    <div class="threat-ring-wrap">
+      <svg class="threat-ring-svg" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(0,245,255,0.1)" stroke-width="6"/>
+        <circle cx="60" cy="60" r="50" fill="none" stroke="url(#threatGrad)" stroke-width="6"
+          stroke-dasharray="314" stroke-dashoffset="94" stroke-linecap="round"
+          transform="rotate(-90 60 60)" id="threatCircle"/>
+        <defs>
+          <linearGradient id="threatGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ffb800"/>
+            <stop offset="100%" stop-color="#ff2b5e"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="threat-center">
+        <span class="threat-val">70%</span>
+        <span class="threat-lbl">THREAT</span>
+      </div>
+    </div>
+    <div class="fh-stats-col">
+      <div class="fh-stat"><span class="fh-stat-val" id="scansToday">0</span><span class="fh-stat-lbl">Scans Today</span></div>
+      <div class="fh-stat"><span class="fh-stat-val red" id="forgeries">0</span><span class="fh-stat-lbl">Forgeries Found</span></div>
+      <div class="fh-stat"><span class="fh-stat-val green" id="verified">0</span><span class="fh-stat-lbl">Verified Clean</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- THREE MODULE CARDS -->
+<div class="forensic-modules">
+
+  <!-- MODULE 1: METADATA ANALYSIS -->
+  <div class="fmod-card" id="mod1">
+    <div class="fmod-glow glow-cyan"></div>
+    <div class="card-corner tl"></div><div class="card-corner tr"></div>
+    <div class="card-corner bl"></div><div class="card-corner br"></div>
+    <div class="fmod-scan-sweep"></div>
+    <div class="fmod-num">01</div>
+    <div class="fmod-icon-wrap">
+      <i class='bx bx-code-alt'></i>
+      <div class="fmod-rings">
+        <div class="fmod-ring r1"></div>
+        <div class="fmod-ring r2"></div>
+      </div>
+    </div>
+    <h2 class="fmod-title">Metadata Analysis</h2>
+    <p class="fmod-desc">Detect wrong file creation dates, edited pixels, incorrect DPI, copy-paste artifacts, font inconsistencies, and misaligned holograms using AI pixel forensics.</p>
+    <div class="fmod-tags">
+      <span class="ftag ftag-cyan">File Dates</span>
+      <span class="ftag ftag-cyan">DPI Check</span>
+      <span class="ftag ftag-cyan">Pixel Scan</span>
+      <span class="ftag ftag-cyan">Font Analysis</span>
+    </div>
+    <div class="fmod-divider"></div>
+    <div class="fmod-accuracy">
+      <span class="fmod-acc-label">Detection Rate</span>
+      <div class="fmod-bar-wrap"><div class="fmod-bar-fill" data-width="94"></div></div>
+      <span class="fmod-acc-val">94%</span>
+    </div>
+    <a href="forensic-metadata.html" class="fmod-btn">
+      <span>Launch Module</span>
+      <i class='bx bx-right-arrow-alt'></i>
+      <div class="btn-shine"></div>
+    </a>
+  </div>
+
+  <!-- MODULE 2: PAPER & INK ANALYSIS -->
+  <div class="fmod-card" id="mod2">
+    <div class="fmod-glow glow-purple"></div>
+    <div class="card-corner tl"></div><div class="card-corner tr"></div>
+    <div class="card-corner bl"></div><div class="card-corner br"></div>
+    <div class="fmod-scan-sweep" style="animation-delay:1s"></div>
+    <div class="fmod-num">02</div>
+    <div class="fmod-icon-wrap icon-purple">
+      <i class='bx bx-droplet'></i>
+      <div class="fmod-rings">
+        <div class="fmod-ring r1 purple-ring"></div>
+        <div class="fmod-ring r2 purple-ring"></div>
+      </div>
+    </div>
+    <h2 class="fmod-title">Paper & Ink Analysis</h2>
+    <p class="fmod-desc">Analyze UV-reactive ink patterns, microprinting visibility, paper grade signatures, and security thread detection to expose physically forged documents.</p>
+    <div class="fmod-tags">
+      <span class="ftag ftag-purple">UV Ink</span>
+      <span class="ftag ftag-purple">Microprint</span>
+      <span class="ftag ftag-purple">Paper Grade</span>
+      <span class="ftag ftag-purple">Security Thread</span>
+    </div>
+    <div class="fmod-divider"></div>
+    <div class="fmod-accuracy">
+      <span class="fmod-acc-label">Detection Rate</span>
+      <div class="fmod-bar-wrap"><div class="fmod-bar-fill bar-purple" data-width="88"></div></div>
+      <span class="fmod-acc-val">88%</span>
+    </div>
+    <a href="forensic-ink.html" class="fmod-btn fmod-btn-purple">
+      <span>Launch Module</span>
+      <i class='bx bx-right-arrow-alt'></i>
+      <div class="btn-shine"></div>
+    </a>
+  </div>
+
+  <!-- MODULE 3: SERIAL NUMBER VERIFICATION -->
+  <div class="fmod-card" id="mod3">
+    <div class="fmod-glow glow-green"></div>
+    <div class="card-corner tl"></div><div class="card-corner tr"></div>
+    <div class="card-corner bl"></div><div class="card-corner br"></div>
+    <div class="fmod-scan-sweep" style="animation-delay:2s"></div>
+    <div class="fmod-num">03</div>
+    <div class="fmod-icon-wrap icon-green">
+      <i class='bx bx-barcode'></i>
+      <div class="fmod-rings">
+        <div class="fmod-ring r1 green-ring"></div>
+        <div class="fmod-ring r2 green-ring"></div>
+      </div>
+    </div>
+    <h2 class="fmod-title">Serial Number Verification</h2>
+    <p class="fmod-desc">Cross-reference ID serial numbers against government-registered databases. Expose fake documents that carry non-existent, duplicated, or revoked serial codes.</p>
+    <div class="fmod-tags">
+      <span class="ftag ftag-green">DB Lookup</span>
+      <span class="ftag ftag-green">Duplicate Check</span>
+      <span class="ftag ftag-green">Revocation</span>
+      <span class="ftag ftag-green">Format Verify</span>
+    </div>
+    <div class="fmod-divider"></div>
+    <div class="fmod-accuracy">
+      <span class="fmod-acc-label">Detection Rate</span>
+      <div class="fmod-bar-wrap"><div class="fmod-bar-fill bar-green" data-width="99"></div></div>
+      <span class="fmod-acc-val">99%</span>
+    </div>
+    <a href="forensic-serial.html" class="fmod-btn fmod-btn-green">
+      <span>Launch Module</span>
+      <i class='bx bx-right-arrow-alt'></i>
+      <div class="btn-shine"></div>
+    </a>
+  </div>
+
+</div>
+
+<!-- LIVE SCAN FEED -->
+<div class="live-feed-section">
+  <div class="lf-header">
+    <div class="lf-title"><i class='bx bx-broadcast'></i> LIVE FORENSIC SCAN FEED</div>
+    <div class="lf-indicator"><span class="live-dot"></span>LIVE</div>
+  </div>
+  <div class="lf-table-wrap">
+    <table class="lf-table">
+      <thead>
+        <tr>
+          <th>TIMESTAMP</th>
+          <th>DOC TYPE</th>
+          <th>SERIAL</th>
+          <th>METADATA</th>
+          <th>INK/PAPER</th>
+          <th>VERDICT</th>
+          <th>RISK SCORE</th>
+        </tr>
+      </thead>
+      <tbody id="liveFeedBody">
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- BOTTOM STATUS BAR -->
+<div class="status-bar">
+  <div class="status-bar-item"><i class='bx bx-cpu'></i> CPU: <span id="cpuVal">34%</span></div>
+  <div class="status-bar-item"><i class='bx bx-data'></i> DB Sync: <span class="ok">LIVE</span></div>
+  <div class="status-bar-item"><i class='bx bx-wifi'></i> Uplink: <span class="ok">SECURE</span></div>
+  <div class="status-bar-item"><i class='bx bx-shield-quarter'></i> Forensics: <span class="ok">ACTIVE</span></div>
+  <div class="status-bar-item marquee-wrap"><span class="marquee-text">⬢ FORENSICS MODULE ACTIVE — AI DOCUMENT ANALYSIS ENGINE v3.1 — METADATA SCANNER NOMINAL — INK PATTERN DB UPDATED — SERIAL REGISTRY: 4.2M RECORDS — ALL NODES SECURE</span></div>
+</div>
+
+<script src="justice.js"></script>
+<script src="forensic.js"></script>
+</body>
+</html>

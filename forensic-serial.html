@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JusticeFlowX — Serial Number Verification</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="justice.css">
+  <link rel="stylesheet" href="forensic.css">
+</head>
+<body>
+<div class="scanline-overlay"></div>
+<div class="noise-overlay"></div>
+<canvas id="hexCanvas"></canvas>
+<div class="data-streams" id="dataStreams"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="logo-wrapper">
+      <div class="logo-text-badge">JFX</div>
+      <div class="logo-ping"></div>
+    </div>
+    <div class="brand-block">
+      <span class="brand">JusticeFlowX</span>
+      <span class="brand-sub">Verification System v2.4</span>
+    </div>
+  </div>
+  <div class="nav-center">
+    <a href="index.html" class="nav-link"><i class='bx bx-grid-alt'></i><span>Dashboard</span></a>
+    <a href="forensic.html" class="nav-link"><i class='bx bx-search-alt'></i><span>Forensics</span></a>
+    <a href="forensic-metadata.html" class="nav-link"><i class='bx bx-code-alt'></i><span>Metadata</span></a>
+    <a href="forensic-ink.html" class="nav-link"><i class='bx bx-droplet'></i><span>Ink Analysis</span></a>
+    <a href="forensic-serial.html" class="nav-link active"><i class='bx bx-barcode'></i><span>Serial Check</span></a>
+  </div>
+  <div class="nav-right">
+    <div class="status-cluster"><div class="status-dot"></div><span class="system-status">SYSTEMS ONLINE</span></div>
+    <div class="clock-display" id="clockDisplay">00:00:00</div>
+  </div>
+</nav>
+
+<div class="module-page-header">
+  <a href="forensic.html" class="back-btn"><i class='bx bx-left-arrow-alt'></i> Back to Forensics</a>
+  <div class="mph-badge green-badge"><i class='bx bx-barcode'></i> MODULE 03 — SERIAL NUMBER VERIFICATION</div>
+  <h1 class="mph-title">SERIAL <span class="accent-green">VERIFICATION</span></h1>
+  <p class="mph-sub">Cross-reference document serial numbers against government-registered databases to expose non-existent, duplicated, revoked, or format-invalid serial codes</p>
+</div>
+
+<div class="serial-workspace">
+
+  <!-- INPUT PANEL -->
+  <div class="serial-input-panel">
+    <div class="sip-header"><i class='bx bx-barcode-reader'></i> SERIAL NUMBER INPUT</div>
+
+    <div class="serial-type-grid">
+      <button class="stype-btn active" data-type="national_id">
+        <i class='bx bx-id-card'></i>
+        <span>National ID</span>
+      </button>
+      <button class="stype-btn" data-type="passport">
+        <i class='bx bx-book'></i>
+        <span>Passport</span>
+      </button>
+      <button class="stype-btn" data-type="drivers_license">
+        <i class='bx bx-car'></i>
+        <span>Driver License</span>
+      </button>
+      <button class="stype-btn" data-type="visa">
+        <i class='bx bx-world'></i>
+        <span>Visa</span>
+      </button>
+    </div>
+
+    <div class="serial-input-area">
+      <div class="sia-field">
+        <label>Document Serial Number</label>
+        <div class="sia-input-wrap">
+          <input type="text" id="serialInput" class="forensic-input big-input" 
+            placeholder="e.g. IND-2024-AB123456" maxlength="30">
+          <button class="scan-serial-btn" id="scanSerialBtn">
+            <i class='bx bx-scan'></i>
+          </button>
+        </div>
+        <div class="sia-format-hint" id="serialFormatHint">Format: Country-Year-AlphaNumeric</div>
+      </div>
+
+      <div class="sia-field">
+        <label>Country of Issue</label>
+        <select id="serialCountry" class="forensic-select">
+          <option value="IND">India (IND)</option>
+          <option value="USA">United States (USA)</option>
+          <option value="GBR">United Kingdom (GBR)</option>
+          <option value="DEU">Germany (DEU)</option>
+          <option value="FRA">France (FRA)</option>
+          <option value="JPN">Japan (JPN)</option>
+          <option value="AUS">Australia (AUS)</option>
+        </select>
+      </div>
+
+      <div class="sia-field">
+        <label>Document Type Confirmation</label>
+        <div class="doc-type-display" id="docTypeDisplay">National ID Card</div>
+      </div>
+
+      <div class="sia-actions">
+        <button class="verify-btn" id="verifyBtn">
+          <i class='bx bx-search-alt'></i>
+          VERIFY SERIAL
+          <div class="btn-shine"></div>
+        </button>
+        <button class="clear-btn" id="clearBtn">
+          <i class='bx bx-trash'></i> Clear
+        </button>
+      </div>
+    </div>
+
+    <!-- QUICK BATCH -->
+    <div class="batch-section">
+      <div class="bs-header"><i class='bx bx-list-ul'></i> BATCH VERIFICATION</div>
+      <textarea id="batchInput" class="forensic-textarea" 
+        placeholder="Paste multiple serial numbers, one per line...&#10;IND-2024-AB123456&#10;IND-2023-CD789012"></textarea>
+      <button class="batch-btn" id="batchBtn">
+        <i class='bx bx-play'></i> RUN BATCH CHECK
+      </button>
+    </div>
+  </div>
+
+  <!-- RESULTS PANEL -->
+  <div class="serial-results-panel">
+    <div class="srp-header"><i class='bx bx-shield'></i> VERIFICATION RESULTS</div>
+
+    <div class="srp-waiting" id="srpWaiting">
+      <div class="srp-wait-icon">
+        <i class='bx bx-barcode'></i>
+        <div class="srp-wait-rings">
+          <div class="srp-ring r1"></div>
+          <div class="srp-ring r2"></div>
+        </div>
+      </div>
+      <p>Enter a serial number to begin verification</p>
+    </div>
+
+    <div class="srp-scanning" id="srpScanning" style="display:none">
+      <div class="serial-scan-anim">
+        <div class="ssa-box">
+          <div class="ssa-cursor" id="ssaCursor"></div>
+          <div class="ssa-text" id="ssaText">Querying database...</div>
+        </div>
+        <div class="ssa-nodes" id="ssaNodes"></div>
+      </div>
+      <div class="db-query-log" id="dbQueryLog"></div>
+    </div>
+
+    <div class="srp-result" id="srpResult" style="display:none">
+      <div class="sr-verdict-banner" id="srVerdictBanner"></div>
+      <div class="sr-detail-grid" id="srDetailGrid"></div>
+      <div class="sr-checks-list" id="srChecksList"></div>
+      <div class="sr-history" id="srHistory"></div>
+    </div>
+
+    <!-- BATCH RESULTS -->
+    <div class="batch-results" id="batchResults" style="display:none">
+      <div class="br-summary" id="brSummary"></div>
+      <div class="br-table-wrap">
+        <table class="br-table">
+          <thead>
+            <tr>
+              <th>#</th><th>SERIAL NUMBER</th><th>STATUS</th><th>RISK</th><th>DETAILS</th>
+            </tr>
+          </thead>
+          <tbody id="brTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DB STATS -->
+<div class="db-stats-bar">
+  <div class="dsb-item">
+    <i class='bx bx-data'></i>
+    <span class="dsb-val" id="dbTotal">4,218,440</span>
+    <span class="dsb-lbl">Total Records</span>
+  </div>
+  <div class="dsb-sep"></div>
+  <div class="dsb-item">
+    <i class='bx bx-check-shield'></i>
+    <span class="dsb-val green" id="dbValid">4,210,122</span>
+    <span class="dsb-lbl">Valid Serials</span>
+  </div>
+  <div class="dsb-sep"></div>
+  <div class="dsb-item">
+    <i class='bx bx-x-circle'></i>
+    <span class="dsb-val red" id="dbRevoked">5,218</span>
+    <span class="dsb-lbl">Revoked</span>
+  </div>
+  <div class="dsb-sep"></div>
+  <div class="dsb-item">
+    <i class='bx bx-copy'></i>
+    <span class="dsb-val warn" id="dbDupe">3,100</span>
+    <span class="dsb-lbl">Duplicates Found</span>
+  </div>
+  <div class="dsb-sep"></div>
+  <div class="dsb-item">
+    <i class='bx bx-time'></i>
+    <span class="dsb-val" id="dbLastSync">—</span>
+    <span class="dsb-lbl">Last DB Sync</span>
+  </div>
+</div>
+
+<div class="status-bar">
+  <div class="status-bar-item"><i class='bx bx-cpu'></i> CPU: <span id="cpuVal">34%</span></div>
+  <div class="status-bar-item"><i class='bx bx-data'></i> DB Sync: <span class="ok">LIVE</span></div>
+  <div class="status-bar-item"><i class='bx bx-wifi'></i> Uplink: <span class="ok">SECURE</span></div>
+  <div class="status-bar-item marquee-wrap"><span class="marquee-text">⬢ SERIAL VERIFICATION MODULE ACTIVE — GOVERNMENT DB: 4.2M RECORDS — REAL-TIME REVOCATION FEED — DUPLICATE DETECTION ENABLED — FORMAT VALIDATOR v2.1 LOADED</span></div>
+</div>
+
+<script src="justice.js"></script>
+<script src="forensic.js"></script>
+<script src="forensic-serial.js"></script>
+</body>
+</html>

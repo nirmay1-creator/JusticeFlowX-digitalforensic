@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infrastructure Control Center</title>
+
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+<link rel="stylesheet" href="infraction.css">
+</head>
+<body>
+
+<div class="navbar">
+  <div class="title">📡 Infrastructure Control Center</div>
+  <div class="status">
+    SYSTEM: <span id="sysStatus" class="online">ONLINE</span>
+  </div>
+  <button class="alertBtn" id="threatBtn">⚠ Threat Mode</button>
+  <button class="powerBtn" id="powerBtn">🔴Shutdown</button>
+</div>
+
+<div class="dashboard">
+  <div class="card pulse" onclick="openModal('cctv')">
+    <i class='bx bx-video'></i>
+    <h3>CCTV Network</h3>
+    <p><span id="cams">124</span> Active Cameras</p>
+    <div class="bar"><span id="camBar"></span></div>
+  </div>
+
+  <div class="card pulse drone" onclick="openModal('drone')">
+    <i class='bx bx-drone'></i>
+    <h3>Drone Fleet</h3>
+    <p><span id="drones">4</span> Surveillance Drones</p>
+    <div class="bar"><span id="droneBar"></span></div>
+  </div>
+
+  <div class="card pulse" onclick="openModal('server')">
+    <i class='bx bx-server'></i>
+    <h3>Server Capacity</h3>
+    <p><span id="server">68</span>% Utilized</p>
+    <div class="bar"><span id="serverBar"></span></div>
+  </div>
+
+  <div class="card pulse" onclick="openModal('fingerprint')">
+    <i class='bx bx-fingerprint'></i>
+    <h3>Fingerprint System</h3>
+    <p>1.4M Records Indexed</p>
+    <div class="bar"><span style="width:96%"></span></div>
+  </div>
+
+  <div class="card pulse" onclick="openModal('face')">
+    <i class='bx bx-face'></i>
+    <h3>Facial Recognition</h3>
+    <p>2.8M Faces Stored</p>
+    <div class="bar"><span style="width:94%"></span></div>
+  </div>
+
+  <div class="card pulse" onclick="openModal('criminal')">
+    <i class='bx bx-shield'></i>
+    <h3>Criminal Records</h3>
+    <p>782,450 Profiles</p>
+    <div class="bar"><span style="width:99%"></span></div>
+  </div>
+</div>
+
+<div class="actions">
+  <a href="tempelates.html" class="actionBtn">🧬 Face Scan</a>
+  <a href="finger2.html" class="actionBtn">🆔 Fingerprint</a>
+  <a href="case-report.html" class="actionBtn">📄 Case Reports</a>
+</div>
+
+<div class="map">
+  <h2>Sector Surveillance Grid</h2>
+  <div class="grid">
+    <div class="cell active"></div><div class="cell"></div><div class="cell"></div>
+    <div class="cell"></div><div class="cell active"></div><div class="cell"></div>
+    <div class="cell"></div><div class="cell"></div><div class="cell active"></div>
+  </div>
+</div>
+
+<div class="logs">
+  <h2>Live Activity Feed</h2>
+  <div id="logFeed"></div>
+  <a href="index.html" class="back cyber-btn">⬅ Back to Dashboard</a>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal" id="detailModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">✖</span>
+    <h2 id="modalTitle"></h2>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script src="infraction.js"></script>
+</body>
+</html>

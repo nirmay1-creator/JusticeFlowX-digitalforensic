@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JusticeFlowX — Metadata Analysis</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="justice.css">
+  <link rel="stylesheet" href="forensic.css">
+</head>
+<body>
+<div class="scanline-overlay"></div>
+<div class="noise-overlay"></div>
+<canvas id="hexCanvas"></canvas>
+<div class="data-streams" id="dataStreams"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="logo-wrapper">
+      <div class="logo-text-badge">JFX</div>
+      <div class="logo-ping"></div>
+    </div>
+    <div class="brand-block">
+      <span class="brand">JusticeFlowX</span>
+      <span class="brand-sub">Verification System v2.4</span>
+    </div>
+  </div>
+  <div class="nav-center">
+    <a href="index.html" class="nav-link"><i class='bx bx-grid-alt'></i><span>Dashboard</span></a>
+    <a href="forensic.html" class="nav-link"><i class='bx bx-search-alt'></i><span>Forensics</span></a>
+    <a href="forensic-metadata.html" class="nav-link active"><i class='bx bx-code-alt'></i><span>Metadata</span></a>
+    <a href="forensic-ink.html" class="nav-link"><i class='bx bx-droplet'></i><span>Ink Analysis</span></a>
+    <a href="forensic-serial.html" class="nav-link"><i class='bx bx-barcode'></i><span>Serial Check</span></a>
+  </div>
+  <div class="nav-right">
+    <div class="status-cluster"><div class="status-dot"></div><span class="system-status">SYSTEMS ONLINE</span></div>
+    <div class="clock-display" id="clockDisplay">00:00:00</div>
+  </div>
+</nav>
+
+<div class="module-page-header">
+  <a href="forensic.html" class="back-btn"><i class='bx bx-left-arrow-alt'></i> Back to Forensics</a>
+  <div class="mph-badge cyan-badge"><i class='bx bx-code-alt'></i> MODULE 01 — METADATA ANALYSIS</div>
+  <h1 class="mph-title">METADATA <span class="accent">ANALYSIS</span></h1>
+  <p class="mph-sub">Upload a document image to scan for file creation anomalies, pixel manipulation, DPI inconsistencies, font irregularities, and hologram misalignment</p>
+</div>
+
+<div class="analysis-workspace">
+  <!-- UPLOAD PANEL -->
+  <div class="upload-panel">
+    <div class="up-header">
+      <i class='bx bx-upload'></i>
+      <span>UPLOAD DOCUMENT</span>
+    </div>
+    <div class="upload-zone" id="uploadZone">
+      <div class="uz-inner">
+        <div class="uz-icon-wrap">
+          <i class='bx bx-image-add'></i>
+          <div class="uz-pulse"></div>
+        </div>
+        <p class="uz-title">DROP DOCUMENT HERE</p>
+        <p class="uz-sub">Supports JPG, PNG, PDF, TIFF</p>
+        <label class="uz-btn">
+          <input type="file" id="docUpload" accept="image/*,.pdf" hidden>
+          <i class='bx bx-folder-open'></i> Browse Files
+        </label>
+      </div>
+    </div>
+    <div class="upload-preview" id="uploadPreview" style="display:none">
+      <img id="previewImg" src="" alt="Document Preview">
+      <div class="preview-overlay">
+        <div class="scan-grid" id="scanGrid"></div>
+      </div>
+    </div>
+    <div class="upload-info" id="uploadInfo" style="display:none">
+      <div class="uinfo-row"><span>Filename:</span><span id="uFileName">—</span></div>
+      <div class="uinfo-row"><span>Size:</span><span id="uFileSize">—</span></div>
+      <div class="uinfo-row"><span>Type:</span><span id="uFileType">—</span></div>
+      <div class="uinfo-row"><span>Last Modified:</span><span id="uFileDate">—</span></div>
+    </div>
+    <button class="analyze-btn" id="analyzeBtn" disabled>
+      <i class='bx bx-analyse'></i>
+      <span>RUN METADATA ANALYSIS</span>
+      <div class="btn-shine"></div>
+    </button>
+  </div>
+
+  <!-- RESULTS PANEL -->
+  <div class="results-panel" id="resultsPanel">
+    <div class="rp-waiting" id="rpWaiting">
+      <i class='bx bx-search-alt-2'></i>
+      <p>Upload a document to begin analysis</p>
+    </div>
+
+    <div class="rp-scanning" id="rpScanning" style="display:none">
+      <div class="scanning-animation">
+        <div class="sa-ring sr1"></div>
+        <div class="sa-ring sr2"></div>
+        <div class="sa-ring sr3"></div>
+        <i class='bx bx-code-alt sa-icon'></i>
+      </div>
+      <div class="scanning-steps" id="scanningSteps"></div>
+      <div class="scanning-bar-wrap">
+        <div class="scanning-bar-fill" id="scanningBarFill"></div>
+      </div>
+      <p class="scanning-pct" id="scanningPct">0%</p>
+    </div>
+
+    <div class="rp-results" id="rpResults" style="display:none">
+      <div class="result-verdict" id="resultVerdict"></div>
+      <div class="result-score-wrap">
+        <div class="rs-label">FORGERY PROBABILITY</div>
+        <div class="rs-bar-outer">
+          <div class="rs-bar-fill" id="rsForgeryBar"></div>
+        </div>
+        <div class="rs-pct" id="rsForgeryPct">0%</div>
+      </div>
+      <div class="result-checks" id="resultChecks"></div>
+      <div class="result-details" id="resultDetails"></div>
+    </div>
+  </div>
+</div>
+
+<!-- METADATA VISUALIZER -->
+<div class="metadata-viz-section" id="metadataViz" style="display:none">
+  <div class="mviz-header"><i class='bx bx-bar-chart-alt'></i> METADATA FORENSIC BREAKDOWN</div>
+  <div class="mviz-grid" id="mvizGrid"></div>
+</div>
+
+<div class="status-bar">
+  <div class="status-bar-item"><i class='bx bx-cpu'></i> CPU: <span id="cpuVal">34%</span></div>
+  <div class="status-bar-item"><i class='bx bx-data'></i> DB Sync: <span class="ok">LIVE</span></div>
+  <div class="status-bar-item"><i class='bx bx-wifi'></i> Uplink: <span class="ok">SECURE</span></div>
+  <div class="status-bar-item marquee-wrap"><span class="marquee-text">⬢ METADATA ANALYSIS ENGINE ACTIVE — AI PIXEL FORENSICS v3.1 LOADED — FONT DATABASE: 12,400 TYPEFACES — DPI TOLERANCE: ±2% — HOLOGRAM PATTERN LIBRARY UPDATED</span></div>
+</div>
+
+<script src="justice.js"></script>
+<script src="forensic.js"></script>
+<script src="forensic-metadata.js"></script>
+</body>
+</html>

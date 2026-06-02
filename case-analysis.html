@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JusticeFlowX — AI Case Analysis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="case-analysis.css">
+</head>
+<body>
+
+<div id="bootOverlay">
+  <div class="boot-inner">
+    <div class="boot-logo">⚖</div>
+    <div class="boot-brand">JUSTICEFLOWX</div>
+    <div class="boot-sub">INITIALIZING NEURAL ANALYSIS CORE v2.4</div>
+    <div class="boot-bar-wrap"><div class="boot-bar-fill" id="bootBar"></div></div>
+    <div class="boot-status" id="bootStatus">LOADING MODULES…</div>
+  </div>
+</div>
+
+<canvas id="bgCanvas"></canvas>
+<div class="grid-overlay"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="nav-logo">⚖</div>
+    <div class="nav-brand-block">
+      <span class="nav-brand">JusticeFlowX</span>
+      <span class="nav-ver">NEURAL ANALYSIS v2.4</span>
+    </div>
+  </div>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link" id="dashLink">⬡ DASHBOARD</a>
+    <a href="#" class="nav-link active">ANALYSIS</a>
+    <a href="#" class="nav-link" onclick="switchTab('criminal')">CASE DB</a>
+    <a href="#" class="nav-link" onclick="switchTab('evidence')">EVIDENCE</a>
+    <a href="#" class="nav-link" onclick="switchTab('report')">REPORTS</a>
+  </div>
+  <div class="nav-right">
+    <div class="ai-status"><span class="ai-dot"></span><span>AI ONLINE</span></div>
+    <div class="clock" id="clock">00:00:00</div>
+  </div>
+</nav>
+
+<main class="main-layout">
+
+  <!-- LEFT: INPUT PANEL (tabbed) -->
+  <aside class="input-panel">
+    <div class="panel-header">
+      <span class="panel-icon">⬡</span>
+      <span id="panelTitle">CASE PARAMETERS</span>
+    </div>
+
+    <!-- TAB NAV -->
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('case')">CASE</button>
+      <button class="tab-btn" onclick="switchTab('report')">REPORT</button>
+      <button class="tab-btn" onclick="switchTab('evidence')">EVIDENCE</button>
+      <button class="tab-btn" onclick="switchTab('criminal')">DB SEARCH</button>
+    </div>
+
+    <!-- CASE TAB -->
+    <div id="tab-case" class="tab-content active">
+      <div class="field-group">
+        <label class="field-label">ACCUSED NAME</label>
+        <input type="text" id="accusedName" class="text-input" placeholder="Enter full name…">
+      </div>
+      <div class="field-group">
+        <label class="field-label">CRIME CLASSIFICATION</label>
+        <div class="select-wrap">
+          <select id="crimeType">
+            <option value="">— SELECT TYPE —</option>
+            <optgroup label="VIOLENT CRIMES">
+              <option value="murder">Murder</option>
+              <option value="attempt_murder">Attempted Murder</option>
+              <option value="assault">Assault</option>
+              <option value="kidnapping">Kidnapping</option>
+              <option value="robbery">Robbery</option>
+            </optgroup>
+            <optgroup label="PROPERTY CRIMES">
+              <option value="theft">Theft</option>
+              <option value="extortion">Extortion</option>
+              <option value="trafficking">Trafficking</option>
+            </optgroup>
+            <optgroup label="CYBER CRIMES">
+              <option value="cyber_fraud">Cyber Fraud</option>
+              <option value="identity_theft">Identity Theft</option>
+              <option value="hacking">Hacking</option>
+            </optgroup>
+            <optgroup label="STATE CRIMES">
+              <option value="terrorism">Terrorism</option>
+              <option value="corruption">Corruption</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">SEVERITY INDEX <span id="sevLabel">5</span>/10</label>
+        <input type="range" id="severitySlider" min="1" max="10" value="5">
+        <div class="severity-ticks"><span>LOW</span><span>MED</span><span>HIGH</span><span>CRITICAL</span></div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">EVIDENCE QUALITY</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-ev="strong">STRONG</button>
+          <button class="toggle-btn" data-ev="moderate">MODERATE</button>
+          <button class="toggle-btn" data-ev="weak">WEAK</button>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">JURISDICTION</label>
+        <div class="select-wrap">
+          <select id="jurisdiction">
+            <option value="district">District Court</option>
+            <option value="sessions">Sessions Court</option>
+            <option value="high">High Court</option>
+            <option value="supreme">Supreme Court</option>
+          </select>
+        </div>
+      </div>
+      <button id="analyzeBtn" class="analyze-btn">
+        <span class="btn-icon">◈</span>
+        <span>RUN ANALYSIS</span>
+        <div class="btn-scanner"></div>
+      </button>
+    </div>
+
+    <!-- REPORT TAB -->
+    <div id="tab-report" class="tab-content">
+      <div class="field-group">
+        <label class="field-label">CASE NUMBER / FIR ID</label>
+        <input type="text" id="reportCaseNo" class="text-input" placeholder="e.g. FIR-2024-00847">
+      </div>
+      <div class="field-group">
+        <label class="field-label">INCIDENT DATE</label>
+        <input type="date" id="reportDate" class="text-input">
+      </div>
+      <div class="field-group">
+        <label class="field-label">REPORTING OFFICER</label>
+        <input type="text" id="reportOfficer" class="text-input" placeholder="Officer name & badge no.">
+      </div>
+      <div class="field-group">
+        <label class="field-label">INCIDENT DESCRIPTION</label>
+        <textarea id="reportDesc" class="text-area" placeholder="Describe the incident in detail — location, witnesses, sequence of events…" rows="5"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label">UPLOAD REPORT FILE (PDF/DOC)</label>
+        <div class="upload-zone" id="reportUploadZone" onclick="document.getElementById('reportFileInput').click()">
+          <span class="upload-icon">📄</span>
+          <span class="upload-label">CLICK TO UPLOAD REPORT</span>
+          <span class="upload-sub">PDF, DOC, TXT — max 10MB</span>
+          <input type="file" id="reportFileInput" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="handleReportUpload(this)">
+        </div>
+        <div id="reportFileList" class="file-list"></div>
+      </div>
+      <button class="analyze-btn" onclick="submitReport()">
+        <span class="btn-icon">📋</span>
+        <span>SUBMIT REPORT</span>
+        <div class="btn-scanner"></div>
+      </button>
+    </div>
+
+    <!-- EVIDENCE TAB -->
+    <div id="tab-evidence" class="tab-content">
+      <div class="field-group">
+        <label class="field-label">CASE REFERENCE</label>
+        <input type="text" id="evCaseRef" class="text-input" placeholder="Linked case / FIR number">
+      </div>
+      <div class="field-group">
+        <label class="field-label">EVIDENCE TYPE</label>
+        <div class="select-wrap">
+          <select id="evType">
+            <option value="digital">Digital Evidence</option>
+            <option value="forensic">Forensic Sample</option>
+            <option value="documentary">Documentary</option>
+            <option value="witness">Witness Statement</option>
+            <option value="cctv">CCTV / Video</option>
+            <option value="physical">Physical Object</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">EVIDENCE DESCRIPTION</label>
+        <textarea id="evDesc" class="text-area" placeholder="Describe the evidence, chain of custody, collection method…" rows="3"></textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label">UPLOAD EVIDENCE FILES</label>
+        <div class="upload-zone" id="evUploadZone" onclick="document.getElementById('evFileInput').click()">
+          <span class="upload-icon">🔬</span>
+          <span class="upload-label">CLICK OR DRAG FILES</span>
+          <span class="upload-sub">Images, PDF, Video, Audio — max 50MB</span>
+          <input type="file" id="evFileInput" multiple accept="image/*,.pdf,.mp4,.mp3,.wav" style="display:none" onchange="handleEvidenceUpload(this)">
+        </div>
+        <div id="evFileList" class="file-list"></div>
+      </div>
+      <button class="analyze-btn" onclick="submitEvidence()">
+        <span class="btn-icon">🔬</span>
+        <span>LOG EVIDENCE</span>
+        <div class="btn-scanner"></div>
+      </button>
+    </div>
+
+    <!-- CRIMINAL DB SEARCH TAB -->
+    <div id="tab-criminal" class="tab-content">
+      <div class="field-group">
+        <label class="field-label">SEARCH BY NAME / ID</label>
+        <input type="text" id="dbSearchName" class="text-input" placeholder="Name or criminal ID…" oninput="liveSearch()">
+      </div>
+      <div class="field-group">
+        <label class="field-label">FILTER BY CRIME TYPE</label>
+        <div class="select-wrap">
+          <select id="dbFilterCrime" onchange="liveSearch()">
+            <option value="">ALL CRIMES</option>
+            <option value="murder">Murder</option>
+            <option value="robbery">Robbery</option>
+            <option value="theft">Theft</option>
+            <option value="assault">Assault</option>
+            <option value="cyber_fraud">Cyber Fraud</option>
+            <option value="kidnapping">Kidnapping</option>
+            <option value="terrorism">Terrorism</option>
+            <option value="trafficking">Trafficking</option>
+            <option value="corruption">Corruption</option>
+            <option value="hacking">Hacking</option>
+            <option value="extortion">Extortion</option>
+            <option value="identity_theft">Identity Theft</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">FILTER BY STATUS</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-status="all" onclick="setStatusFilter(this,'all')">ALL</button>
+          <button class="toggle-btn" data-status="Wanted" onclick="setStatusFilter(this,'Wanted')">WANTED</button>
+          <button class="toggle-btn" data-status="Arrested" onclick="setStatusFilter(this,'Arrested')">ARRESTED</button>
+        </div>
+      </div>
+      <div id="dbResults" class="db-results"></div>
+    </div>
+
+    <div class="panel-footer">
+      <div class="footer-stat"><span class="fs-val" id="dbCount">215</span><span class="fs-label">RECORDS</span></div>
+      <div class="footer-divider"></div>
+      <div class="footer-stat"><span class="fs-val">IPC</span><span class="fs-label">2024 ED.</span></div>
+      <div class="footer-divider"></div>
+      <div class="footer-stat"><span class="fs-val">AI</span><span class="fs-label">ACTIVE</span></div>
+    </div>
+  </aside>
+
+  <!-- RIGHT: OUTPUT AREA -->
+  <section class="output-section">
+    <div class="idle-state" id="idleState">
+      <div class="idle-hex">⚖</div>
+      <div class="idle-title">AWAITING CASE INPUT</div>
+      <div class="idle-sub">Configure parameters, upload reports & evidence, then run AI analysis to generate judicial assessment</div>
+      <div class="idle-pulses"><div class="ip ip1"></div><div class="ip ip2"></div><div class="ip ip3"></div></div>
+    </div>
+    <div class="scan-state" id="scanState" style="display:none">
+      <div class="scan-ring-wrap">
+        <div class="scan-ring r1"></div><div class="scan-ring r2"></div><div class="scan-ring r3"></div>
+        <div class="scan-core">AI</div>
+      </div>
+      <div class="scan-label" id="scanLabel">INITIALIZING…</div>
+      <div class="scan-steps" id="scanSteps"></div>
+    </div>
+    <div class="results-state" id="resultsState" style="display:none">
+
+      <!-- Back to Dashboard -->
+      <a href="index.html" class="back-btn">← BACK TO DASHBOARD</a>
+
+      <div class="stats-row">
+        <div class="stat-card" id="sc1"><div class="sc-val" id="convRate">—</div><div class="sc-label">CONVICTION RATE</div><div class="sc-bar"><div class="sc-bar-fill" id="convBar"></div></div></div>
+        <div class="stat-card" id="sc2"><div class="sc-val" id="caseCount">—</div><div class="sc-label">MATCHED CASES</div></div>
+        <div class="stat-card" id="sc3"><div class="sc-val" id="threatLevel">—</div><div class="sc-label">THREAT LEVEL</div></div>
+      </div>
+
+      <!-- Prior Crimes Banner -->
+      <div id="priorCrimesBlock" style="display:none" class="prior-crimes-block">
+        <div class="pcb-header">⚠ PRIOR CRIMINAL RECORD DETECTED — AGGRAVATING FACTOR</div>
+        <div id="priorCrimesContent" class="pcb-content"></div>
+      </div>
+
+      <!-- Evidence Summary Banner -->
+      <div id="evidenceSummaryBlock" style="display:none" class="evidence-summary-block">
+        <div class="esb-header">🔬 UPLOADED EVIDENCE LOGGED</div>
+        <div id="evidenceSummaryContent" class="esb-content"></div>
+      </div>
+
+      <!-- AI Verdict -->
+      <div class="verdict-block" id="verdictBlock">
+        <div class="vb-header"><span class="vb-icon">◈</span><span>AI JUDICIAL ANALYSIS</span><span class="vb-time" id="vbTime"></span></div>
+        <div class="vb-body" id="vbBody"></div>
+      </div>
+
+      <!-- Legal Details Grid -->
+      <div class="legal-grid">
+        <div class="legal-card"><div class="lc-label">IPC SECTIONS</div><div class="lc-val" id="ipcSections"></div></div>
+        <div class="legal-card"><div class="lc-label">BAIL STATUS</div><div class="lc-val bail-val" id="bailStatus"></div></div>
+        <div class="legal-card"><div class="lc-label">FAILURE RISK</div><div class="lc-val risk-val" id="failRisk"></div></div>
+        <div class="legal-card"><div class="lc-label">RECOMMENDED ACTION</div><div class="lc-val" id="recAction"></div></div>
+      </div>
+
+      <!-- Sentence Recommendation -->
+      <div class="sentence-block" id="sentenceBlock">
+        <div class="sb-header"><span>⚡ AI SENTENCING RECOMMENDATION</span></div>
+        <div class="sb-body" id="sbBody"></div>
+      </div>
+
+      <!-- Matched Criminals -->
+      <div class="criminals-block" id="criminalsBlock" style="display:none">
+        <div class="cb-header"><span>◉ MATCHED CRIMINAL PROFILES</span><span class="cb-count" id="cbCount">0 RECORDS</span></div>
+        <div class="cb-list" id="cbList"></div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<div class="terminal-strip">
+  <span class="term-prompt">SYS ▶</span>
+  <span id="termText">SYSTEM READY — JUSTICEFLOWX v2.4 — AI CORE ONLINE</span>
+</div>
+
+<script src="case-analysis.js"></script>
+</body>
+</html>

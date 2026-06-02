@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JusticeFlowX — Criminal Database</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="criminal.css">
+</head>
+<body>
+<div class="scanline-overlay"></div>
+<div class="noise-overlay"></div>
+<canvas id="hexCanvas"></canvas>
+<div class="data-streams" id="dataStreams"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="logo-wrapper" style="position:relative">
+      <div class="logo" style="background:var(--cyan-dim);display:flex;align-items:center;justify-content:center;font-size:20px;">⚖</div>
+      <div class="logo-ping"></div>
+    </div>
+    <div class="brand-block" style="display:flex;flex-direction:column;gap:1px">
+      <span class="brand">JusticeFlowX</span>
+      <span class="brand-sub">Verification System v2.4</span>
+    </div>
+  </div>
+  <div class="nav-center">
+    <a href="index.html" class="nav-link"><i class='bx bx-grid-alt'></i><span>Dashboard</span></a>
+    <a href="criminal.html" class="nav-link active"><i class='bx bx-user'></i><span>Criminal DB</span></a>
+    <a href="case.html" class="nav-link"><i class='bx bx-folder'></i><span>Case Control</span></a>
+    <a href="evidence.html" class="nav-link"><i class='bx bx-archive'></i><span>Evidence</span></a>
+  </div>
+  <div class="nav-right">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="status-dot"></div>
+      <span class="system-status">SYSTEMS ONLINE</span>
+    </div>
+    <div class="clock-display" id="clockDisplay">00:00:00</div>
+    <div class="menu">
+      <button class="menu-trigger" id="menuBtn"><i class='bx bx-dots-vertical-rounded'></i></button>
+      <div class="dropdown" id="menuDropdown">
+        <div class="dropdown-header">QUICK ACCESS</div>
+        <a href="case-report.html"><i class='bx bx-file'></i> Case Reports</a>
+        <a href="infraction.html"><i class='bx bx-list-ul'></i> System Logs</a>
+        <a href="system.html"><i class='bx bx-shield'></i> System Health</a>
+        <a href="case-analysis.html"><i class='bx bx-brain'></i> AI Decision Support</a>
+        <div class="dropdown-divider"></div>
+        <a href="#" id="logoutBtn" style="color:var(--red)"><i class='bx bx-log-out'></i> Logout</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE TITLE -->
+<div class="page-title-block">
+  <div>
+    <div class="page-badge">⬡ NATIONAL CRIMINAL INTELLIGENCE SYSTEM</div>
+    <h1 class="page-heading">Criminal <span class="accent">Database</span></h1>
+    <p class="page-sub">Search and retrieve criminal profiles, biometric records, and case statuses from the national registry</p>
+  </div>
+  <div class="db-stats">
+    <div class="db-stat-item"><span class="stat-val" data-count="20">0</span><span class="stat-label">Records Loaded</span></div>
+    <div class="db-stat-div"></div>
+    <div class="db-stat-item"><span class="stat-val" data-count="8">0</span><span class="stat-label">Wanted</span></div>
+    <div class="db-stat-div"></div>
+    <div class="db-stat-item"><span class="stat-val" data-count="6">0</span><span class="stat-label">Arrested</span></div>
+  </div>
+</div>
+
+<!-- CONTROLS -->
+<div class="controls-bar">
+  <div class="search-wrap">
+    <i class='bx bx-search'></i>
+    <input class="fx-input" id="searchInput" placeholder="Search by name, alias, case ID, location…">
+  </div>
+  <div class="filter-row">
+    <select class="fx-select" id="filterStatus">
+      <option value="All">All Status</option>
+      <option value="Wanted">Wanted</option>
+      <option value="Arrested">Arrested</option>
+      <option value="Under Investigation">Under Investigation</option>
+    </select>
+    <select class="fx-select" id="filterDanger">
+      <option value="All">All Danger Levels</option>
+      <option value="Critical">Critical</option>
+      <option value="High">High</option>
+      <option value="Medium">Medium</option>
+      <option value="Low">Low</option>
+    </select>
+    <select class="fx-select" id="filterCrime">
+      <option value="All">All Crimes</option>
+      <option value="robbery">Robbery</option>
+      <option value="fraud">Fraud</option>
+      <option value="hacking">Cyber Crime</option>
+      <option value="trafficking">Trafficking</option>
+      <option value="terrorism">Terrorism</option>
+      <option value="corruption">Corruption</option>
+      <option value="assault">Assault</option>
+      <option value="kidnapping">Kidnapping</option>
+    </select>
+  </div>
+  <div id="recordCount" class="record-count">Showing 20 records</div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="criminal-layout">
+
+  <!-- GRID -->
+  <div id="criminalGrid" class="criminal-grid"></div>
+
+  <!-- DETAIL PANEL -->
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-empty" id="detailEmpty">
+      <div class="empty-icon"><i class='bx bx-user-circle'></i></div>
+      <p>Select a criminal record to view full profile</p>
+    </div>
+    <div class="detail-content" id="detailContent" style="display:none"></div>
+  </div>
+
+</div>
+
+<!-- SCANNER OVERLAY -->
+<div class="scan-overlay-full" id="scanOverlay" style="display:none">
+  <div class="scan-animation-wrap">
+    <div class="scan-title-overlay" id="scanLabel">SCANNING BIOMETRICS…</div>
+    <div class="scan-visual">
+      <i class='bx bx-fingerprint'></i>
+      <div class="sv-ring"></div><div class="sv-ring"></div><div class="sv-ring"></div>
+      <div class="sv-sweep"></div>
+    </div>
+    <div class="scan-bar-wrap"><div class="scan-bar-fill" id="scanBarFill"></div></div>
+  </div>
+</div>
+
+<!-- TERMINAL + STATUS BAR -->
+<!-- <div id="terminalLogs">
+  <div class="terminal-header"><span>⬢ SYSTEM TERMINAL</span><span id="termTime"></span></div>
+  <div id="terminalBody"></div>
+</div> -->
+<!-- <div class="status-bar">
+  <div class="status-bar-item"><i class='bx bx-cpu'></i> CPU: <span id="cpuVal">34%</span></div>
+  <div class="status-bar-item"><i class='bx bx-data'></i> DB Sync: <span class="ok">LIVE</span></div>
+  <div class="status-bar-item"><i class='bx bx-wifi'></i> Uplink: <span class="ok">SECURE</span></div>
+  <div class="status-bar-item"><i class='bx bx-shield-quarter'></i> Threat: <span class="warn">LOW</span></div>
+  <div class="status-bar-item marquee-wrap"><span class="marquee-text" id="marqueeText"></span></div>
+</div> -->
+
+<script src="database.js"></script>
+<script src="shared.js"></script>
+<script src="criminal.js"></script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JusticeFlowX — Network Detection</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="justice.css">
+  <link rel="stylesheet" href="forensic.css">
+  <link rel="stylesheet" href="network.css">
+</head>
+<body>
+<div class="scanline-overlay"></div>
+<div class="noise-overlay"></div>
+<canvas id="hexCanvas"></canvas>
+<div class="data-streams" id="dataStreams"></div>
+
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="logo-wrapper">
+      <div class="logo-text-badge">JFX</div>
+      <div class="logo-ping"></div>
+    </div>
+    <div class="brand-block">
+      <span class="brand" data-text="JusticeFlowX">JusticeFlowX</span>
+      <span class="brand-sub">Verification System v2.4</span>
+    </div>
+  </div>
+  <div class="nav-center">
+    <a href="index.html" class="nav-link"><i class='bx bx-grid-alt'></i><span>Dashboard</span></a>
+    <a href="criminal.html" class="nav-link"><i class='bx bx-user'></i><span>Criminal DB</span></a>
+    <a href="forensic.html" class="nav-link"><i class='bx bx-search-alt'></i><span>Forensics</span></a>
+    <a href="network.html" class="nav-link active"><i class='bx bx-network-chart'></i><span>Network</span></a>
+  </div>
+  <div class="nav-right">
+    <div class="status-cluster"><div class="status-dot"></div><span class="system-status">SYSTEMS ONLINE</span></div>
+    <div class="clock-display" id="clockDisplay">00:00:00</div>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<div class="net-hub-header">
+  <div class="nhh-left">
+    <div class="nhh-badge"><i class='bx bx-network-chart'></i> NETWORK INTELLIGENCE MODULE — LEVEL 5 CLEARANCE</div>
+    <h1 class="nhh-title">NETWORK-LEVEL <span class="accent">DETECTION</span></h1>
+    <p class="nhh-sub">Three-layer network intelligence system to expose criminals hiding behind fake identities through social graph analysis, location contradiction detection, and physical document aging forensics</p>
+  </div>
+  <div class="nhh-orb-wrap">
+    <canvas id="orbCanvas" width="200" height="200"></canvas>
+    <div class="nhh-orb-stats">
+      <div class="nos-item"><span class="nos-val" id="nosSubjects">0</span><span class="nos-lbl">Subjects Analyzed</span></div>
+      <div class="nos-item"><span class="nos-val red" id="nosFlagged">0</span><span class="nos-lbl">Flagged Today</span></div>
+      <div class="nos-item"><span class="nos-val green" id="nosCleared">0</span><span class="nos-lbl">Cleared</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- THREE MODULE CARDS -->
+<div class="net-modules">
+
+  <div class="nmod-card" id="nmod1">
+    <div class="nmod-glow gcyan"></div>
+    <div class="card-corner tl"></div><div class="card-corner tr"></div>
+    <div class="card-corner bl"></div><div class="card-corner br"></div>
+    <div class="nmod-sweep"></div>
+    <div class="nmod-num">10</div>
+    <div class="nmod-icon-wrap">
+      <i class='bx bx-group'></i>
+      <div class="nmod-rings"><div class="nr r1"></div><div class="nr r2"></div></div>
+    </div>
+    <h2 class="nmod-title">Social Graph Analysis</h2>
+    <p class="nmod-desc">Map verified connections — family, colleagues, neighbors. A fake identity is socially isolated with 0 linked relatives or references in any public record.</p>
+    <div class="nmod-tags">
+      <span class="ntag t-cyan">Family Links</span>
+      <span class="ntag t-cyan">Work History</span>
+      <span class="ntag t-cyan">Social Graph</span>
+      <span class="ntag t-cyan">Isolation Score</span>
+    </div>
+    <div class="nmod-stat-row">
+      <div class="nsr-item"><span class="nsr-val">98%</span><span class="nsr-lbl">Accuracy</span></div>
+      <div class="nsr-sep"></div>
+      <div class="nsr-item"><span class="nsr-val">2.1s</span><span class="nsr-lbl">Avg Scan</span></div>
+      <div class="nsr-sep"></div>
+      <div class="nsr-item"><span class="nsr-val">14DB</span><span class="nsr-lbl">Sources</span></div>
+    </div>
+    <a href="network-social.html" class="nmod-btn btn-cyan">
+      <i class='bx bx-group'></i> Launch Social Graph
+      <div class="btn-shine"></div>
+    </a>
+  </div>
+
+  <div class="nmod-card" id="nmod2">
+    <div class="nmod-glow gpurple"></div>
+    <div class="card-corner tl"></div><div class="card-corner tr"></div>
+    <div class="card-corner bl"></div><div class="card-corner br"></div>
+    <div class="nmod-sweep" style="animation-delay:1.2s"></div>
+    <div class="nmod-num">11</div>
+    <div class="nmod-icon-wrap icon-p">
+      <i class='bx bx-map-alt'></i>
+      <div class="nmod-rings"><div class="nr r1 rp"></div><div class="nr r2 rp"></div></div>
+    </div>
+    <h2 class="nmod-title">Location History Contradiction</h2>
+    <p class="nmod-desc">Cross-match claimed residence against phone tower pings, IP geolocation, border crossing records, and CCTV timestamps to expose impossible claims.</p>
+    <div class="nmod-tags">
+      <span class="ntag t-purple">IP Geolocation</span>
+      <span class="ntag t-purple">Cell Towers</span>
+      <span class="ntag t-purple">Border Records</span>
+      <span class="ntag t-purple">Timeline Check</span>
+    </div>
+    <div class="nmod-stat-row">
+      <div class="nsr-item"><span class="nsr-val" style="color:#b18fff">96%</span><span class="nsr-lbl">Accuracy</span></div>
+      <div class="nsr-sep"></div>
+      <div class="nsr-item"><span class="nsr-val" style="color:#b18fff">3.4s</span><span class="nsr-lbl">Avg Scan</span></div>
+      <div class="nsr-sep"></div>
+      <div class="nsr-item"><span class="nsr-val" style="color:#b18fff">8DB</span><span class="nsr-lbl">Sources</span></div>
+    </div>
+    <a href="network-location.html" class="nmod-btn btn-purple">
+      <i class='bx bx-map-alt'></i> Launch Location Check
+      <div class="btn-shine"></div>
+    </a>
+  </div>
+
+  <div class="nmod-card" id="nmod3">
+    <div class="nmod-glow ggreen"></div>
+    <div class="card-corner tl"></div><div class="card-corner tr"></div>
+    <div class="card-corner bl"></div><div class="card-corner br"></div>
+    <div class="nmod-sweep" style="animation-delay:2.4s"></div>
+    <div class="nmod-num">12</div>
+    <div class="nmod-icon-wrap icon-g">
+      <i class='bx bx-badge-check'></i>
+      <div class="nmod-rings"><div class="nr r1 rg"></div><div class="nr r2 rg"></div></div>
+    </div>
+    <h2 class="nmod-title">The "Too Perfect" Flag</h2>
+    <p class="nmod-desc">Forged documents are often suspiciously pristine. AI analyzes document age vs. condition score — a 10-year-old ID with zero wear is a major red flag.</p>
+    <div class="nmod-tags">
+      <span class="ntag t-green">Wear Analysis</span>
+      <span class="ntag t-green">Age vs Condition</span>
+      <span class="ntag t-green">Crease Detection</span>
+      <span class="ntag t-green">Laminate Check</span>
+    </div>
+    <div class="nmod-stat-row">
+      <div class="nsr-item"><span class="nsr-val" style="color:var(--green)">91%</span><span class="nsr-lbl">Accuracy</span></div>
+      <div class="nsr-sep"></div>
+      <div class="nsr-item"><span class="nsr-val" style="color:var(--green)">1.8s</span><span class="nsr-lbl">Avg Scan</span></div>
+      <div class="nsr-sep"></div>
+      <div class="nsr-item"><span class="nsr-val" style="color:var(--green)">AI</span><span class="nsr-lbl">Powered</span></div>
+    </div>
+    <a href="network-perfect.html" class="nmod-btn btn-green">
+      <i class='bx bx-badge-check'></i> Launch Wear Analysis
+      <div class="btn-shine"></div>
+    </a>
+  </div>
+
+</div>
+
+<!-- LIVE NETWORK FEED -->
+<div class="live-feed-section" style="margin:0 60px 80px">
+  <div class="lf-header">
+    <div class="lf-title"><i class='bx bx-broadcast'></i> LIVE NETWORK INTELLIGENCE FEED</div>
+    <div class="lf-indicator"><span class="live-dot"></span>LIVE</div>
+  </div>
+  <div class="lf-table-wrap">
+    <table class="lf-table">
+      <thead><tr>
+        <th>TIME</th><th>SUBJECT ID</th><th>SOCIAL SCORE</th><th>LOCATION MATCH</th><th>DOC CONDITION</th><th>COMBINED RISK</th><th>ACTION</th>
+      </tr></thead>
+      <tbody id="netFeedBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="status-bar">
+  <div class="status-bar-item"><i class='bx bx-cpu'></i> CPU: <span id="cpuVal">34%</span></div>
+  <div class="status-bar-item"><i class='bx bx-data'></i> DB Sync: <span class="ok">LIVE</span></div>
+  <div class="status-bar-item"><i class='bx bx-wifi'></i> Uplink: <span class="ok">SECURE</span></div>
+  <div class="status-bar-item marquee-wrap"><span class="marquee-text">⬢ NETWORK INTELLIGENCE ACTIVE — SOCIAL GRAPH ENGINE v4.2 — GEOLOCATION MATRIX: 2.8B RECORDS — DOCUMENT AGING AI v1.9 — ALL 3 DETECTION LAYERS NOMINAL</span></div>
+</div>
+
+<script src="justice.js"></script>
+<script src="network.js"></script>
+</body>
+</html>

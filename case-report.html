@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JusticeFlowX – Case Management</title>
+    <link rel="stylesheet" href="case-report.css">
+</head>
+<body>
+
+<div class="navbar">⚖️ JusticeFlowX – Case Automation</div>
+
+<div class="container">
+
+
+    <div class="card">
+        <h2>📂 Case ID: FIR-2025-1189</h2>
+
+        <p><strong>Status:</strong> <span id="caseStatus" class="status open">OPEN</span></p>
+        <p><strong>Assigned Officer:</strong> <span id="officer">Not Assigned</span></p>
+
+        <div class="actions">
+            <button onclick="assignOfficer()">Auto Assign Officer</button>
+            <button onclick="generateFIR()">Generate FIR</button>
+            <button onclick="changeStatus()">Update Case Status</button>
+        </div>
+    </div>
+
+    
+    <div class="card">
+        <h2>📝 FIR Report</h2>
+        <pre id="firReport">No FIR generated yet.</pre>
+    </div>
+
+  
+    <div class="card">
+        <h2>🔔 Notifications</h2>
+        <ul id="notifications"></ul>
+    </div>
+
+</div>
+
+<script src="app.js"></script>
+<a href="index.html" class="back">⬅ Back to Dashboard</a>
+</body>
+</html>

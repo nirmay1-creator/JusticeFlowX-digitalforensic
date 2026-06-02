@@ -1,0 +1,127 @@
+/* =============================================
+   SYSTEM HEALTH PAGE STYLES
+   ============================================= */
+
+/* ── Layout ─────────────────────────────────── */
+.health-layout {
+  position:relative; z-index:2;
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap:18px;
+  padding:0 56px 100px;
+}
+
+/* ── Health Card ────────────────────────────── */
+.health-card {
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:22px;
+  position:relative; overflow:hidden;
+  backdrop-filter:blur(18px);
+  transition:var(--transition);
+  animation:fadeUp 0.5s ease both;
+}
+.health-card:hover {
+  border-color:var(--border-med);
+  transform:translateY(-4px) scale(1.01);
+  box-shadow:0 20px 50px rgba(0,0,0,0.4), 0 0 30px rgba(0,245,255,0.10);
+}
+
+/* Top glow line color per card type */
+.health-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+}
+.card-cpu::before      { background:var(--cyan); }
+.card-memory::before   { background:var(--purple); }
+.card-disk::before     { background:var(--green); }
+.card-network::before  { background:var(--warn); }
+.card-security::before { background:var(--red); }
+.card-db::before       { background:#00aaff; }
+
+.health-card-icon {
+  width:48px; height:48px; border-radius:var(--radius-sm);
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; margin-bottom:14px;
+}
+.icon-cyan   { background:var(--cyan-dim);   color:var(--cyan);   border:1px solid var(--border-med); }
+.icon-purple { background:var(--purple-dim); color:var(--purple); border:1px solid rgba(123,47,255,0.3); }
+.icon-green  { background:var(--green-dim);  color:var(--green);  border:1px solid rgba(0,255,136,0.3); }
+.icon-warn   { background:var(--warn-dim);   color:var(--warn);   border:1px solid rgba(255,184,0,0.3); }
+.icon-red    { background:var(--red-dim);    color:var(--red);    border:1px solid rgba(255,43,94,0.3); }
+.icon-blue   { background:rgba(0,170,255,0.12); color:#00aaff;   border:1px solid rgba(0,170,255,0.3); }
+
+.health-card-title { font-family:var(--font-head); font-size:14px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-sub); margin-bottom:4px; }
+.health-card-value { font-family:var(--font-head); font-size:38px; font-weight:700; color:var(--text-main); line-height:1; margin-bottom:12px; }
+.health-card-value.ok   { color:var(--green); text-shadow:0 0 20px rgba(0,255,136,0.4); }
+.health-card-value.warn { color:var(--warn);  text-shadow:0 0 20px rgba(255,184,0,0.4); }
+.health-card-value.alert{ color:var(--red);   text-shadow:0 0 20px rgba(255,43,94,0.4); }
+
+/* Meter */
+.hc-meter { margin-bottom:14px; }
+.hc-meter-track { width:100%; height:5px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; position:relative; }
+.hc-meter-fill { height:100%; width:0; border-radius:3px; transition:width 0.8s ease; position:relative; }
+.hc-meter-fill.cyan   { background:linear-gradient(90deg,var(--cyan),#0088ff); box-shadow:0 0 8px var(--cyan); }
+.hc-meter-fill.purple { background:linear-gradient(90deg,var(--purple),#aa55ff); box-shadow:0 0 8px var(--purple); }
+.hc-meter-fill.green  { background:linear-gradient(90deg,var(--green),#00cc66); box-shadow:0 0 8px var(--green); }
+.hc-meter-fill.warn   { background:linear-gradient(90deg,var(--warn),#ff8800); box-shadow:0 0 8px var(--warn); }
+.hc-meter-fill.red    { background:linear-gradient(90deg,var(--red),#ff0044); box-shadow:0 0 8px var(--red); }
+
+/* Scan sweep on meter */
+.hc-meter-track::after {
+  content:''; position:absolute; top:0; left:-60%; width:60%; height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);
+  animation:shimmer 2.5s ease-in-out infinite;
+}
+
+/* Sub-stats */
+.hc-sub-stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.hc-sub-stat { background:rgba(0,0,0,0.3); border-radius:var(--radius-sm); padding:8px 10px; }
+.hc-sub-label { font-family:var(--font-mono); font-size:9px; color:var(--text-dim); letter-spacing:1.5px; margin-bottom:4px; }
+.hc-sub-val   { font-family:var(--font-head); font-size:16px; font-weight:600; color:var(--text-main); }
+
+/* Security card special */
+.security-indicators { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+.sec-indicator { display:flex; align-items:center; gap:10px; padding:8px 10px; background:rgba(0,0,0,0.3); border-radius:var(--radius-sm); font-size:12px; color:var(--text-sub); }
+.sec-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.sec-dot.ok   { background:var(--green); box-shadow:0 0 6px var(--green); }
+.sec-dot.warn { background:var(--warn);  box-shadow:0 0 6px var(--warn); }
+.sec-dot.bad  { background:var(--red);   box-shadow:0 0 6px var(--red); }
+.sec-label { flex:1; }
+.sec-status { font-family:var(--font-mono); font-size:9px; letter-spacing:1px; }
+.sec-status.ok   { color:var(--green); }
+.sec-status.warn { color:var(--warn);  }
+.sec-status.bad  { color:var(--red);   }
+
+/* Power controls */
+.power-controls {
+  position:relative; z-index:2;
+  display:flex; align-items:center; gap:14px;
+  padding:0 56px 20px;
+  flex-wrap:wrap;
+}
+.power-controls .fx-btn { font-size:12px; padding:10px 20px; }
+
+/* Boot, Streams shared */
+#bootOverlay {
+  position:fixed; inset:0; background:#020810;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  z-index:99999; gap:22px;
+}
+.boot-logo { font-family:var(--font-head); font-size:34px; font-weight:700; color:var(--cyan); letter-spacing:6px; text-transform:uppercase; text-shadow:0 0 36px rgba(0,245,255,0.5); animation:bootTitle 1.5s ease-in-out infinite alternate; }
+@keyframes bootTitle{from{opacity:1}to{opacity:0.45}}
+.boot-sub { font-family:var(--font-mono); font-size:10px; color:var(--text-dim); letter-spacing:3px; margin-top:-14px; }
+.boot-bar-wrap { width:360px; height:2px; background:rgba(0,245,255,0.09); border-radius:2px; overflow:hidden; }
+.boot-bar-fill { height:100%; width:0; background:linear-gradient(90deg,var(--cyan),#0088ff); box-shadow:0 0 7px var(--cyan); transition:width 0.45s ease; }
+#bootLog { width:440px; max-height:190px; overflow-y:auto; border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 16px; background:rgba(0,245,255,0.02); font-family:var(--font-mono); font-size:11px; color:var(--text-main); }
+#bootLog div { padding:2px 0; animation:logFade 0.3s ease; }
+#bootLog div::before { content:'> '; color:var(--cyan-mid); }
+#bootLog div.ok { color:var(--green); }
+
+.data-streams { position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:1; }
+.data-stream { position:absolute; top:-100%; width:1px; background:linear-gradient(to bottom,transparent,var(--cyan),transparent); animation:streamFall linear infinite; opacity:0; }
+@keyframes streamFall{0%{top:-100%;opacity:0}10%{opacity:0.55}90%{opacity:0.28}100%{top:110%;opacity:0}}
+
+@media(max-width:900px){
+  .health-layout, .power-controls { padding-left:18px; padding-right:18px; }
+}

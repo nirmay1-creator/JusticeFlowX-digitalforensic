@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JusticeFlowX — Facial Recognition</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="templates.css">
+  <!-- face-api.js for real browser-side face detection -->
+  <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+</head>
+<body>
+
+<!-- BACKGROUND LAYERS -->
+<div class="scanline-overlay"></div>
+<div class="noise-overlay"></div>
+<canvas id="hexCanvas"></canvas>
+<div class="data-streams" id="dataStreams"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-left">
+    <div class="brand-block">
+      <span class="brand">JusticeFlowX</span>
+      <span class="brand-sub">Facial Recognition Module v3.1</span>
+    </div>
+  </div>
+  <div class="nav-center">
+    <a href="index.html" class="nav-link"><i class='bx bx-grid-alt'></i><span>Dashboard</span></a>
+    <a href="criminal.html" class="nav-link"><i class='bx bx-user'></i><span>Criminal DB</span></a>
+    <a href="case.html" class="nav-link"><i class='bx bx-folder'></i><span>Case Control</span></a>
+    <a href="tempelates.html" class="nav-link active"><i class='bx bx-scan'></i><span>Face Scan</span></a>
+  </div>
+  <div class="nav-right">
+    <div class="status-cluster">
+      <div class="status-dot" id="systemStatusDot"></div>
+      <span class="system-status" id="systemStatusText">INITIALIZING</span>
+    </div>
+    <div class="clock-display" id="clockDisplay">00:00:00</div>
+  </div>
+</nav>
+
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+
+  <!-- LEFT PANEL: Controls -->
+  <div class="side-panel left-panel">
+    <div class="panel-header"><i class='bx bx-cog'></i> SCAN PARAMETERS</div>
+
+    <div class="param-group">
+      <label class="param-label">SUBJECT ID</label>
+      <div class="input-wrapper">
+        <i class='bx bx-id-card'></i>
+        <input id="user_id" type="text" placeholder="Enter subject ID..." autocomplete="off">
+        <div class="input-ping" id="inputPing"></div>
+      </div>
+    </div>
+
+    <div class="param-group">
+      <label class="param-label">SCAN MODE</label>
+      <div class="mode-tabs">
+        <button class="mode-tab active" data-mode="full">FULL BIOMETRIC</button>
+        <button class="mode-tab" data-mode="quick">QUICK MATCH</button>
+      </div>
+    </div>
+
+    <div class="param-group">
+      <label class="param-label">ANALYSIS DEPTH</label>
+      <div class="depth-slider-wrap">
+        <input type="range" id="depthSlider" min="1" max="5" value="3" class="depth-slider">
+        <div class="depth-labels"><span>LOW</span><span>MED</span><span>HIGH</span></div>
+      </div>
+    </div>
+
+    <div class="param-group">
+      <label class="param-label">ACTIVE MODULES</label>
+      <div class="module-list">
+        <div class="module-item active"><span class="mod-dot"></span>Landmark Detection (68pt)</div>
+        <div class="module-item active"><span class="mod-dot"></span>Expression Analysis</div>
+        <div class="module-item active"><span class="mod-dot"></span>Criminal DB Match</div>
+        <div class="module-item" id="modAgeGender"><span class="mod-dot inactive"></span>Age / Gender Estimation</div>
+        <div class="module-item" id="modLiveness"><span class="mod-dot inactive"></span>Liveness Detection</div>
+      </div>
+    </div>
+
+    <button id="scanBtn" class="scan-btn-main" disabled>
+      <i class='bx bx-scan'></i>
+      <span id="scanBtnText">LOADING MODELS...</span>
+      <div class="btn-loader" id="btnLoader"></div>
+    </button>
+
+    <button id="stopBtn" class="stop-btn" style="display:none;">
+      <i class='bx bx-stop'></i> STOP CAMERA
+    </button>
+
+    <a href="index.html" class="back-link"><i class='bx bx-arrow-back'></i> Back to Dashboard</a>
+  </div>
+
+  <!-- CENTER: Camera + Overlay -->
+  <div class="center-panel">
+    <div class="camera-frame" id="cameraFrame">
+      <!-- Corner brackets -->
+      <div class="cf-corner tl"></div>
+      <div class="cf-corner tr"></div>
+      <div class="cf-corner bl"></div>
+      <div class="cf-corner br"></div>
+
+      <!-- Target reticle lines -->
+      <div class="reticle-h"></div>
+      <div class="reticle-v"></div>
+
+      <!-- Standby / No face state -->
+      <div class="camera-standby" id="cameraStandby">
+        <div class="standby-icon">
+          <i class='bx bx-scan'></i>
+          <div class="standby-rings">
+            <div class="s-ring r1"></div>
+            <div class="s-ring r2"></div>
+            <div class="s-ring r3"></div>
+          </div>
+        </div>
+        <div class="standby-text" id="standbyText">AWAITING SUBJECT</div>
+        <div class="standby-sub" id="standbySub">Click "Initiate Scan" to activate camera</div>
+      </div>
+
+      <!-- Video feed -->
+      <video id="video" autoplay muted playsinline></video>
+
+      <!-- Face detection canvas overlay -->
+      <canvas id="faceCanvas"></canvas>
+
+      <!-- Scan sweep line -->
+      <div class="sweep-line" id="sweepLine" style="display:none;"></div>
+
+      <!-- Live face metrics HUD -->
+      <div class="face-hud" id="faceHud" style="display:none;">
+        <div class="hud-item"><span class="hud-key">POSE</span><span class="hud-val" id="hudPose">—</span></div>
+        <div class="hud-item"><span class="hud-key">EXPR</span><span class="hud-val" id="hudExpr">—</span></div>
+        <div class="hud-item"><span class="hud-key">CONF</span><span class="hud-val" id="hudConf">—</span></div>
+        <div class="hud-item"><span class="hud-key">LNMK</span><span class="hud-val" id="hudLnmk">—</span></div>
+      </div>
+
+      <!-- Bottom bar inside camera -->
+      <div class="camera-bottom-bar" id="cameraBottomBar" style="display:none;">
+        <div class="cbb-item"><i class='bx bx-radio-circle-marked bx-burst'></i> LIVE</div>
+        <div class="cbb-item" id="cbbFaceStatus">NO FACE DETECTED</div>
+        <div class="cbb-item" id="cbbFps">0 FPS</div>
+      </div>
+
+      <!-- Scanning progress overlay -->
+      <div class="scan-progress-overlay" id="scanProgressOverlay" style="display:none;">
+        <div class="spo-inner">
+          <div class="spo-title" id="spoTitle">INITIALIZING SCAN</div>
+          <div class="spo-bar-wrap"><div class="spo-bar" id="spoBar"></div></div>
+          <div class="spo-step" id="spoStep">Preparing systems...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress steps below camera -->
+    <div class="scan-steps" id="scanSteps">
+      <div class="step-item" id="step1"><div class="step-num">01</div><div class="step-info"><span>Face Detection</span><small>Locating subject</small></div><div class="step-status" id="ss1"><i class='bx bx-time'></i></div></div>
+      <div class="step-connector"></div>
+      <div class="step-item" id="step2"><div class="step-num">02</div><div class="step-info"><span>Landmark Map</span><small>68-point analysis</small></div><div class="step-status" id="ss2"><i class='bx bx-time'></i></div></div>
+      <div class="step-connector"></div>
+      <div class="step-item" id="step3"><div class="step-num">03</div><div class="step-info"><span>Feature Extract</span><small>Biometric vectors</small></div><div class="step-status" id="ss3"><i class='bx bx-time'></i></div></div>
+      <div class="step-connector"></div>
+      <div class="step-item" id="step4"><div class="step-num">04</div><div class="step-info"><span>DB Match</span><small>Criminal lookup</small></div><div class="step-status" id="ss4"><i class='bx bx-time'></i></div></div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL: Results -->
+  <div class="side-panel right-panel">
+    <div class="panel-header"><i class='bx bx-bar-chart-alt-2'></i> ANALYSIS OUTPUT</div>
+
+    <div id="resultsArea">
+      <!-- Default empty state -->
+      <div class="results-empty" id="resultsEmpty">
+        <i class='bx bx-data'></i>
+        <span>Awaiting scan data...</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM STATUS BAR -->
+<div class="status-bar">
+  <div class="status-bar-item"><i class='bx bx-cpu'></i> MODELS: <span id="modelStatus">Loading</span></div>
+  <div class="status-bar-item"><i class='bx bx-data'></i> DB Sync: <span class="ok">LIVE</span></div>
+  <div class="status-bar-item"><i class='bx bx-wifi'></i> Backend: <span id="backendStatus" class="warn">CHECKING</span></div>
+  <div class="status-bar-item"><i class='bx bx-shield-quarter'></i> Threat: <span class="warn">LOW</span></div>
+  <div class="status-bar-item marquee-wrap"><span class="marquee-text">⬢ JUSTICEFX FACIAL RECOGNITION LAYER 3.1 ACTIVE  ◆  FACE-API.JS LANDMARK ENGINE LOADED  ◆  128-POINT BIOMETRIC ANALYSIS  ◆  CRIMINAL DATABASE 14,217 RECORDS  ◆  LIVENESS DETECTION ENABLED</span></div>
+</div>
+
+<!-- TERMINAL LOGS -->
+<!-- <div id="terminalLogs">
+  <div class="terminal-header"><span>⬢ BIOMETRIC TERMINAL</span><span id="termTime"></span></div>
+  <div id="terminalBody"></div>
+</div> -->
+
+<script src="templates.js"></script>
+</body>
+</html>

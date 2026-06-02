@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>🛡️ Fingerprint Scanner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='finger_print.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="scanner-container">
+        <h1>🛡️ Fingerprint Scanner</h1>
+
+        <!-- Animated scanner circle -->
+        <div class="scanner">
+            <div class="fingerprint">
+                <div class="scan-line"></div>
+            </div>
+        </div>
+
+        <!-- Input fingerprint ID -->
+        <input type="text" id="fingerprint" placeholder="Enter fingerprint ID (e.g., fp_palaksha)">
+        <button onclick="startScan()">Scan Fingerprint</button>
+
+        <!-- Progress bar -->
+        <div class="progress-container" id="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <!-- Result display -->
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        function startScan() {
+            const fpInput = document.getElementById('fingerprint').value.trim();
+            const resultDiv = document.getElementById('result');
+            const progressBar = document.getElementById('progress-bar');
+            const progressContainer = document.getElementById('progress-container');
+
+            if (!fpInput) {
+                alert("Please enter a fingerprint ID!");
+                return;
+            }
+
+            resultDiv.innerHTML = "";
+            progressBar.style.width = "0%";
+            progressContainer.style.display = "block";
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 10) + 5;
+                if (progress > 100) progress = 100;
+                progressBar.style.width = progress + "%";
+
+                if (progress === 100) {
+                    clearInterval(interval);
+
+                    fetch("/scan", {
+                        method: "POST",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify({fingerprint: fpInput})
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        resultDiv.innerHTML = data.status === "found" 
+                        ? `
+                            <p><strong>Username:</strong> ${data.username}</p>
+                            <p><strong>DOB:</strong> ${data.dob}</p>
+                            <p><strong>Details:</strong> ${data.details}</p>
+                            <p><strong>Match Rate:</strong> ${data.match_rate}</p>
+                        ` 
+                        : `<p style="color:red;">No match found. Match Rate: ${data.match_rate}</p>`;
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        resultDiv.innerHTML = `<p style="color:red;">Error connecting to server.</p>`;
+                    });
+                }
+            }, 300);
+        }
+    </script>
+</body>
+</html>

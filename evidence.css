@@ -1,0 +1,133 @@
+body {
+  background: radial-gradient(circle at top, #00161f, #000);
+  color: #cfffff;
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+}
+
+.topbar {
+  padding: 16px 24px;
+ 
+  background: rgba(0,20,30,0.9);
+  border-bottom: 1px solid #00ffff55;
+  font-weight: 600;
+  align-content: center;
+}
+
+.back-btn {
+  background: transparent;
+  border: 1px solid #00ffff;
+  color: #00ffff;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.scene {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+  gap: 30px;
+  padding: 40px;
+  perspective: 1200px;
+}
+
+/* CARD 3D + GLASS */
+.card {
+  background: rgba(0,30,40,0.7);
+  border: 1px solid #00ffff33;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 0 30px #00ffff22;
+  transform-style: preserve-3d;
+  transition: transform 0.5s, box-shadow 0.5s;
+}
+
+.card:hover {
+  transform: rotateY(8deg) rotateX(6deg) scale(1.03);
+  box-shadow: 0 0 50px #00ffff66;
+}
+
+.card h2 {
+  margin-bottom: 14px;
+  color: #00ffff;
+}
+
+/* INPUTS */
+input, select, button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid #00ffff55;
+  color: #cfffff;
+}
+
+button:hover {
+  background: #00ffff22;
+}
+
+/* VAULT GRID */
+.vault-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
+  gap: 12px;
+}
+
+.vault-item {
+  background: rgba(0,0,0,0.3);
+  border-left: 4px solid #00ffff;
+  padding: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  border-radius: 8px;
+}
+
+.vault-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 12px #00ffff55;
+}
+
+/* AI BAR */
+.ai-bar {
+  width: 100%;
+  height: 10px;
+  background: #000;
+  margin-top: 10px;
+  border: 1px dashed #00ffff33;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+#aiMeter {
+  width: 0%;
+  height: 100%;
+  background: #00ffff;
+  transition: width 1s ease;
+}
+
+/* MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left:0; top:0;
+  width:100%; height:100%;
+  background: rgba(0,0,0,0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal .close {
+  position: absolute;
+  top: 20px; right: 30px;
+  font-size: 30px;
+  color: #00ffff;
+  cursor: pointer;
+}
+
+#previewContent {
+  max-width: 80%;
+  max-height: 80%;
+  border: 2px solid #00ffff;
+  border-radius: 12px;
+}

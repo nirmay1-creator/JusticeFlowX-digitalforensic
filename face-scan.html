@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Face Scan</title>
+
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="face-scan.css">
+</head>
+
+<body>
+
+    <div class="navbar">🧬 Face Scanner</div>
+
+    <div class="center">
+       <div class="scan-box">
+        <div class="face-frame">
+        <img 
+    id="scannedFace"
+    src="FHCJTG7BGZEC4Z93JMUA.png"
+    alt="Scanned Face"
+    style="display:none; width:200px; margin-top:20px; border-radius:8px;"
+/></div>
+   <i class='bx bx-scan'></i>
+    <div id="scanLine" class="scan-line"></div>
+</div>
+
+        <button class="btn" onclick="scan()">Start Scan</button>
+ 
+<div id="wanted" class="wanted" style="display:none;">
+    🚨 WANTED 🚨
+</div>
+
+<div id="confidence" class="confidence" style="display:none;">
+    🧠 AI Confidence: <span id="percent">0</span>%
+</div>
+
+<div id="biometrics" class="biometrics" style="display:none;">
+    <div class="bar"><span data-value="92"></span> Eye Match</div>
+    <div class="bar"><span data-value="88"></span> Jaw Structure</div>
+    <div class="bar"><span data-value="95"></span> Nose Geometry</div>
+</div>
+        <p id="status"></p>
+
+        <div id="identitycheck" class="status" style="display:none;">
+            ✅ Identity Verified — Wanted<br>
+            🏳️ Citizenship: Bangladeshi <br>
+            🆔 ID Verified: ID BD-449901
+        </div>
+
+        <br><br>
+        <a href="index.html" class="back-link">⬅ Rescan</a>
+    </div>
+
+ <script>
+function scan() {
+    const status = document.getElementById("status");
+    const identitycheck = document.getElementById("identitycheck");
+    const scannedFace = document.getElementById("scannedFace");
+
+    const scanLine = document.getElementById("scanLine");
+    const wanted = document.getElementById("wanted");
+    const confidence = document.getElementById("confidence");
+    const percent = document.getElementById("percent");
+    const biometrics = document.getElementById("biometrics");
+    const bars = document.querySelectorAll(".bar span");
+
+    
+    if (wanted) wanted.style.display = "none";
+    if (confidence) confidence.style.display = "none";
+    if (biometrics) biometrics.style.display = "none";
+    if (identitycheck) identitycheck.style.display = "none";
+
+    if (scannedFace) {
+        scannedFace.style.display = "none";
+        scannedFace.classList.remove("reveal");
+        scannedFace.style.opacity = 0;
+    }
+
+    if (percent) percent.innerText = 0;
+    bars.forEach(bar => bar.style.width = "0");
+
+    if (scanLine) scanLine.style.display = "block";
+    status.innerHTML = "🔍 Scanning face...";
+
+    setTimeout(() => {
+        status.innerHTML = "✔ Face Match Found";
+        if (scanLine) scanLine.style.display = "none";
+
+        
+        if (scannedFace) {
+            scannedFace.style.display = "block";
+            scannedFace.style.opacity = 1;
+            scannedFace.classList.add("reveal");
+        }
+
+        
+        if (wanted) {
+            setTimeout(() => {
+                wanted.style.display = "block";
+            }, 500);
+        }
+
+        
+        if (confidence && percent) {
+            setTimeout(() => {
+                confidence.style.display = "block";
+                let value = 0;
+                const interval = setInterval(() => {
+                    value++;
+                    percent.innerText = value;
+                    if (value >= 97) clearInterval(interval);
+                }, 20);
+            }, 800);
+        }
+
+       
+        if (biometrics) {
+            setTimeout(() => {
+                biometrics.style.display = "block";
+                bars.forEach(bar => {
+                    bar.style.width = bar.dataset.value + "%";
+                });
+            }, 1300);
+        }
+
+       
+        if (identitycheck) {
+            setTimeout(() => {
+                identitycheck.style.display = "block";
+                identitycheck.classList.add("status");
+            }, 2000);
+        }
+
+    }, 2500);
+}
+</script>
+
+      
+
+</body>
+</html>
