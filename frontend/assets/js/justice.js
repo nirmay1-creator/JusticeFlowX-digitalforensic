@@ -743,7 +743,7 @@ function startTerminal() {
       if (charIdx < text.length) {
         div.textContent += text.charAt(charIdx);
         charIdx++;
-        termBody.scrollTop = termBody.scrollHeight;
+        termBody.scrollTop = termBody.scrollHeight + 100;
       } else {
         clearInterval(typeInterval);
       }
