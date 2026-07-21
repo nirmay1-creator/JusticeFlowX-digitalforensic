@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Enum as SQLAlchemyEnum, DateTime, ForeignKey, Boolean
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import JSON
 from sqlalchemy.sql import func
 import enum
 from database import Base
@@ -32,7 +32,7 @@ class NetworkForensic(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     case_id = Column(Integer, ForeignKey("cases.id", ondelete="CASCADE"), nullable=False)
-    parsed_data = Column(JSONB, nullable=False)
+    parsed_data = Column(JSON, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 class IPReputationCache(Base):
@@ -69,5 +69,5 @@ class ThreatIntelCache(Base):
     indicator_type = Column(SQLAlchemyEnum(IndicatorTypeEnum), nullable=False)
     is_malicious = Column(Boolean, nullable=False, default=False)
     overall_score = Column(Integer, nullable=False, default=0)
-    raw_data = Column(JSONB, nullable=True)
+    raw_data = Column(JSON, nullable=True)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

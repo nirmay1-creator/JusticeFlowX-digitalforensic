@@ -14,7 +14,8 @@ if not DATABASE_URL:
     SessionLocal = None
 else:
     try:
-        engine = create_engine(DATABASE_URL)
+        connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
+        engine = create_engine(DATABASE_URL, connect_args=connect_args)
         SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     except Exception as e:
         print(f"Failed to configure database engine: {e}")

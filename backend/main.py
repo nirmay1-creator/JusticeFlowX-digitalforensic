@@ -49,13 +49,13 @@ app.add_middleware(SlowAPIMiddleware)
 allowed_origins = os.getenv("CORS_ORIGINS", "http://localhost").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-from routers import auth, cases, law, threat_intel, system
+from routers import auth, cases, law, threat_intel, system, threat_hunter
 
 # Include Routers
 app.include_router(auth.router)
@@ -63,6 +63,7 @@ app.include_router(cases.router)
 app.include_router(law.router)
 app.include_router(threat_intel.router)
 app.include_router(system.router, prefix="/api/system", tags=["System"])
+app.include_router(threat_hunter.router)
 
 # --- GLOBAL ROUTES ---
 

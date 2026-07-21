@@ -1094,6 +1094,96 @@ function showLawOverlay(onComplete) {
   requestAnimationFrame(updateProgress);
 }
 
+/* ----------- TYPE 10: THREAT HUNTER ----------- */
+function showThreatHunterOverlay(onComplete) {
+  const overlay = document.createElement("div");
+  overlay.className = "scan-overlay-full";
+  
+  const style = document.createElement("style");
+  style.id = "th-overlay-style";
+  style.textContent = `
+    .th-crosshair-wrap { position: relative; width: 150px; height: 150px; margin: 30px auto; display: flex; align-items: center; justify-content: center; }
+    .th-crosshair-icon { font-size: 80px; color: #00ff88; filter: drop-shadow(0 0 15px #00ff88); z-index: 2; animation: pulseTarget 1.5s infinite alternate; }
+    @keyframes pulseTarget { 0% { transform: scale(0.9); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 25px #00ff88); } }
+    .th-ring1 { position: absolute; width: 120%; height: 120%; border-radius: 50%; border: 2px dashed rgba(0,255,136,0.5); animation: spinRing 4s linear infinite; }
+    .th-ring2 { position: absolute; width: 140%; height: 140%; border-radius: 50%; border: 1px solid rgba(0,255,136,0.3); animation: pulseRing 2s infinite ease-out; }
+    @keyframes spinRing { 100% { transform: rotate(360deg); } }
+    @keyframes pulseRing { 0% { transform: scale(0.8); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+    .th-scanline { position: absolute; width: 150%; height: 2px; background: #00ff88; box-shadow: 0 0 15px #00ff88; top: -10%; left: -25%; animation: sweep 2s linear infinite; }
+    @keyframes sweep { 0% { top: -10%; } 100% { top: 110%; } }
+  `;
+  document.head.appendChild(style);
+
+  overlay.innerHTML = `
+    <div class="scan-animation-wrap" style="width: 340px;">
+      <div class="scan-title-overlay" style="color:#00ff88; letter-spacing: 2px; font-size: 13px;">AI THREAT HUNTER INITIALIZATION</div>
+      
+      <div class="th-crosshair-wrap">
+        <div class="th-ring1"></div>
+        <div class="th-ring2"></div>
+        <i class='bx bx-target-lock th-crosshair-icon'></i>
+        <div class="th-scanline"></div>
+      </div>
+
+      <div class="scan-progress-label" id="scanLabel" style="color:#00ff88; margin-top:10px;">Booting AI Models...</div>
+      <div class="scan-bar-wrap"><div class="scan-bar-fill" id="scanBarFill" style="background:linear-gradient(90deg, #00ff88, #00b8ff)"></div></div>
+      
+      <div id="thLog" style="width: 300px; height: 85px; margin: 15px auto 0; background: rgba(0,255,136,0.05); border: 1px solid rgba(0,255,136,0.2); border-radius: 4px; padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #a4fcda; overflow: hidden; text-align: left; line-height: 1.6; box-sizing: border-box;">
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const fill = overlay.querySelector("#scanBarFill");
+  const lbl = overlay.querySelector("#scanLabel");
+  const thLog = overlay.querySelector("#thLog");
+  
+  const steps = ["Booting AI Models...", "Loading ML Signatures...", "Calibrating Neural Net...", "Engaging Packet Interceptor..."];
+  const logs = [
+    "[+] Loading Isolation Forest models...",
+    "[*] Fetching heuristic signatures...",
+    "[!] Calibrating entropy thresholds...",
+    "[*] Syncing threat feeds...",
+    "[+] Neural net calibration complete",
+    "[+] Threat Hunter: READY"
+  ];
+  
+  const totalTime = 2500;
+  const start = performance.now();
+  let currentLogIdx = 0;
+
+  const logInterval = setInterval(() => {
+    if (currentLogIdx < logs.length) {
+      const p = document.createElement("div");
+      p.textContent = logs[currentLogIdx];
+      p.style.opacity = 0;
+      p.style.transition = "opacity 0.2s";
+      thLog.appendChild(p);
+      setTimeout(() => p.style.opacity = 1, 20);
+      thLog.scrollTop = thLog.scrollHeight;
+      currentLogIdx++;
+    }
+  }, 400);
+
+  function updateProgress(now) {
+    const elapsed = now - start;
+    const pct = Math.min((elapsed / totalTime) * 100, 100);
+    fill.style.width = pct + "%";
+    lbl.textContent = steps[Math.floor((pct/100) * 0.99 * steps.length)];
+
+    if (elapsed < totalTime) { 
+      requestAnimationFrame(updateProgress); 
+    } else {
+      clearInterval(logInterval);
+      overlay.remove(); 
+      const existingStyle = document.getElementById("th-overlay-style");
+      if (existingStyle) existingStyle.remove();
+      onComplete();
+    }
+  }
+  requestAnimationFrame(updateProgress);
+}
+
 function initScanButtons() {
   document.querySelectorAll(".scan-btn").forEach(btn => {
     btn.addEventListener("click", e => {
@@ -1114,6 +1204,7 @@ function initScanButtons() {
         case "chain_of_custody": showChainOfCustodyOverlay(afterScan);   break;
         case "threat_intel": showThreatIntelOverlay(afterScan); break;
         case "law": showLawOverlay(afterScan); break;
+        case "ai_threat": showThreatHunterOverlay(afterScan); break;
         default:         showFingerprintOverlay(afterScan); break;
       }
     });

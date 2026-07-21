@@ -13,3 +13,8 @@ PyPDF2>=3.0.0
 reportlab
 python-magic-bin
 pefile
+scapy>=2.5.0
+scikit-learn>=1.3.0
+psutil
+slowapi
+python-dotenv
