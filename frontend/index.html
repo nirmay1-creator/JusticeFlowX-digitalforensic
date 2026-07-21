@@ -408,6 +408,23 @@
           menuDropdown.classList.remove('show');
         }
       });
+
+      // Search functionality
+      const navSearchInput = document.getElementById('navSearchInput');
+      const scanBoxes = document.querySelectorAll('.scan-box');
+      if (navSearchInput && scanBoxes.length > 0) {
+        navSearchInput.addEventListener('input', function(e) {
+          const searchTerm = e.target.value.toLowerCase();
+          scanBoxes.forEach(box => {
+            const title = box.querySelector('h2');
+            if (title && title.innerText.toLowerCase().includes(searchTerm)) {
+              box.style.display = 'flex';
+            } else {
+              box.style.display = 'none';
+            }
+          });
+        });
+      }
     })();
   </script>
 </body>
