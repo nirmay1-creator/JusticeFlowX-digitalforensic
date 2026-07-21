@@ -78,56 +78,6 @@
         border: 1px solid rgba(0, 245, 255, 0.6);
         box-shadow: 0 0 20px rgba(0, 245, 255, 0.15);
     }
-    
-    /* Cyberpunk Grid Background */
-    .cyber-grid {
-        position: absolute;
-        bottom: -50%;
-        left: -50%;
-        width: 200%;
-        height: 150%;
-        background-image: 
-            linear-gradient(rgba(0, 245, 255, 0.15) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 245, 255, 0.15) 1px, transparent 1px);
-        background-size: 60px 60px;
-        transform: perspective(600px) rotateX(60deg);
-        animation: gridMove 4s linear infinite;
-        z-index: 0;
-        pointer-events: none;
-        mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%);
-        -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%);
-    }
-
-    @keyframes gridMove {
-        0% { transform: perspective(600px) rotateX(60deg) translateY(0); }
-        100% { transform: perspective(600px) rotateX(60deg) translateY(60px); }
-    }
-
-    .packet {
-        position: absolute;
-        width: 2px;
-        border-radius: 50%;
-        opacity: 0;
-        animation: packetDrop linear infinite;
-        z-index: 1;
-    }
-
-    @keyframes packetDrop {
-        0% { transform: translateY(-10vh); opacity: 0; }
-        10% { opacity: 1; }
-        90% { opacity: 1; }
-        100% { transform: translateY(110vh); opacity: 0; }
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-
-    @keyframes scaleUp {
-        from { transform: scale(0.95); opacity: 0; }
-        to { transform: scale(1); opacity: 1; }
-    }
   </style>
 </head>
 <body id="top">
@@ -241,44 +191,87 @@
     };
 
     const CyberBackground = () => {
-        // Generate random packets on component mount
-        const [packets, setPackets] = useState([]);
-        
+        const canvasRef = useRef(null);
+
         useEffect(() => {
-            const generatedPackets = Array.from({ length: 40 }).map((_, i) => ({
-                id: i,
-                left: `${Math.random() * 100}%`,
-                duration: `${Math.random() * 3 + 2}s`,
-                delay: `${Math.random() * 5}s`,
-                color: Math.random() > 0.5 ? '#00ff88' : '#00f5ff',
-                height: `${Math.random() * 30 + 10}px`
-            }));
-            setPackets(generatedPackets);
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext('2d');
+            let animationFrameId;
+            
+            const resize = () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            };
+            window.addEventListener('resize', resize);
+            resize();
+
+            const particles = [];
+            const numParticles = 100;
+            const connectionDistance = 150;
+
+            for (let i = 0; i < numParticles; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 1.2,
+                    vy: (Math.random() - 0.5) * 1.2,
+                    radius: Math.random() * 2 + 1,
+                    color: Math.random() > 0.5 ? '#00ff88' : '#00f5ff'
+                });
+            }
+
+            const draw = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw connections
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < connectionDistance) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(0, 245, 255, ${0.25 * (1 - distance / connectionDistance)})`;
+                            ctx.lineWidth = 1;
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                // Draw particles
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = p.color;
+                    ctx.fill();
+                    ctx.shadowBlur = 0; // Reset for lines
+                });
+
+                animationFrameId = requestAnimationFrame(draw);
+            };
+            draw();
+
+            return () => {
+                window.removeEventListener('resize', resize);
+                cancelAnimationFrame(animationFrameId);
+            };
         }, []);
 
         return (
             <div className="fixed inset-0 overflow-hidden pointer-events-none" style={{ zIndex: -1 }}>
-                {/* Radial dark gradient for depth */}
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#010613]/80 to-[#000000] z-0"></div>
-                
-                {/* 3D Cyber grid floor */}
-                <div className="cyber-grid"></div>
-
-                {/* Vertical data packet streams */}
-                {packets.map(p => (
-                    <div 
-                        key={p.id}
-                        className="packet"
-                        style={{
-                            left: p.left,
-                            animationDuration: p.duration,
-                            animationDelay: p.delay,
-                            backgroundColor: p.color,
-                            boxShadow: `0 0 10px ${p.color}, 0 0 20px ${p.color}`,
-                            height: p.height
-                        }}
-                    ></div>
-                ))}
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#010613]/90 to-[#000000] z-0"></div>
+                <canvas ref={canvasRef} className="absolute inset-0 z-10"></canvas>
             </div>
         );
     };
