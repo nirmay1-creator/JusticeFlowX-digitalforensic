@@ -295,7 +295,8 @@ body::after {
 }
 .nav-badge {
   position: absolute; top: -5px; right: -5px;
-  width: 16px; height: 16px; border-radius: 50%;
+  min-width: 16px; height: 16px; padding: 0 4px;
+  border-radius: 8px;
   background: var(--red);
   color: #fff; font-family: var(--font-head);
   font-size: 9px; font-weight: 700;
@@ -534,11 +535,11 @@ body::after {
 .scan-bar-wrap { width: 260px; height: 3px; background: rgba(0,245,255,0.1); border-radius: 2px; overflow: hidden; }
 .scan-bar-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--cyan), #00aaff); box-shadow: 0 0 8px var(--cyan); transition: width 2s linear; }
 
-#terminalLogs { position: fixed; bottom: 40px; right: 16px; width: 400px; height: 220px; background: rgba(1, 6, 13, 0.95); border: 1px solid rgba(0, 245, 255, 0.3); border-radius: 8px; overflow: hidden; z-index: 500; box-shadow: 0 0 30px rgba(0,0,0,0.7), inset 0 0 15px rgba(0, 245, 255, 0.05); backdrop-filter: blur(15px); font-family: var(--font-mono); transition: all 0.3s ease; }
+#terminalLogs { position: fixed; bottom: 50px; right: 20px; width: 400px; height: 220px; background: rgba(1, 6, 13, 0.95); border: 1px solid rgba(0, 245, 255, 0.3); border-radius: 8px; overflow: hidden; z-index: 500; box-shadow: 0 0 30px rgba(0,0,0,0.7), inset 0 0 15px rgba(0, 245, 255, 0.05); backdrop-filter: blur(15px); font-family: var(--font-mono); transition: all 0.3s ease; }
 #terminalLogs:hover { border-color: rgba(0, 245, 255, 0.6); box-shadow: 0 0 40px rgba(0,0,0,0.8), 0 0 20px rgba(0, 245, 255, 0.1), inset 0 0 20px rgba(0, 245, 255, 0.1); }
 .terminal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: linear-gradient(90deg, rgba(0, 245, 255, 0.15), transparent); border-bottom: 1px solid rgba(0, 245, 255, 0.2); font-family: var(--font-mono); font-size: 11px; color: #fff; letter-spacing: 2px; text-shadow: 0 0 8px var(--cyan); font-weight: 700; }
-#terminalBody { padding: 12px 14px; font-family: var(--font-mono); font-size: 12px; color: var(--cyan); overflow-y: auto; height: calc(100% - 37px); scroll-behavior: smooth; }
-#terminalBody div { padding: 3px 0; opacity: 0.9; position: relative; word-break: break-all; }
+#terminalBody { padding: 12px 14px; font-family: var(--font-mono); font-size: 12px; color: var(--cyan); overflow-y: auto; height: calc(100% - 37px); }
+#terminalBody div { padding: 3px 0; opacity: 0.9; position: relative; word-wrap: break-word; }
 #terminalBody div.warn { color: var(--warn); text-shadow: 0 0 5px rgba(255, 184, 0, 0.4); }
 #terminalBody div.alert { color: var(--red); text-shadow: 0 0 5px rgba(255, 43, 94, 0.4); font-weight: 600; }
 #terminalBody div.ok { color: var(--green); text-shadow: 0 0 5px rgba(0, 255, 136, 0.4); }
