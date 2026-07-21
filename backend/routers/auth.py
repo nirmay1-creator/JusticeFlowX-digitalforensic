@@ -44,3 +44,9 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
         data={"sub": user.username, "role": user.role}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+@router.delete("/me", status_code=status.HTTP_200_OK)
+def delete_user(current_user: models.User = Depends(auth.get_current_user), db: Session = Depends(get_db)):
+    db.delete(current_user)
+    db.commit()
+    return {"message": "User profile deleted successfully"}

@@ -1279,20 +1279,57 @@ function initMenu() {
   // Handled by inline script in index.html to avoid duplicate toggles
 }
 
-/* ========================= LOGOUT ========================= */
+/* ========================= AUTHENTICATION ========================= */
+function checkAuth() {
+  const token = localStorage.getItem("justiceToken");
+  if (!token) {
+    window.location.href = "auth.html";
+    return false;
+  }
+  return true;
+}
+
+function initDeleteProfile() {
+  const deleteBtn = document.getElementById("deleteProfileBtn");
+  if (!deleteBtn) return;
+  deleteBtn.addEventListener("click", async e => {
+    e.preventDefault();
+    if (!confirm("Are you sure you want to permanently delete your JusticeFlowX access profile? This action cannot be undone.")) return;
+    
+    const token = localStorage.getItem("justiceToken");
+    try {
+      const response = await fetch("http://localhost:8000/api/auth/me", {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (response.ok) {
+        localStorage.removeItem("justiceToken");
+        alert("Profile deleted successfully. Connection severed.");
+        window.location.href = "auth.html";
+      } else {
+        alert("Failed to delete profile.");
+      }
+    } catch (err) {
+      alert("System Error: Could not reach authorization server.");
+    }
+  });
+}
+
 function initLogout() {
   const logoutBtn = document.getElementById("logoutBtn");
   if (!logoutBtn) return;
   logoutBtn.addEventListener("click", e => {
     e.preventDefault();
-    window.close();
-    setTimeout(() => { alert("You have been logged out. Please close the tab manually if it didn't close automatically."); window.location.href = "about:blank"; }, 100);
+    localStorage.removeItem("justiceToken");
+    window.location.href = "auth.html";
   });
 }
 
 /* ========================= MAIN INIT ========================= */
 document.addEventListener("DOMContentLoaded", () => {
   console.log("[JusticeFlowX] DOM Ready — Launching boot sequence");
+  if (!checkAuth()) return; // Stop initialization if not authenticated
+
   initHexCanvas();
   initDataStreams();
   initParticles();
@@ -1304,6 +1341,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initHoverSound();
     initScanButtons();
     initMenu();
+    initDeleteProfile();
     initLogout();
     startTerminal();
     startRealTimeNotifications();

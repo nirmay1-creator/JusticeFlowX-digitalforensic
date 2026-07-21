@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JusticeFlowX - System Access</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #020813;
+      --bg-card: rgba(4, 16, 34, 0.6);
+      --cyan: #00f5ff;
+      --cyan-dim: rgba(0, 245, 255, 0.15);
+      --purple: #a200ff;
+      --red: #ff2b5e;
+      --text-main: #e2f1ff;
+      --text-dim: #8b9bb4;
+      --border: rgba(0, 245, 255, 0.2);
+      --border-bright: rgba(0, 245, 255, 0.5);
+      --font-mono: 'Share Tech Mono', monospace;
+      --font-head: 'Orbitron', sans-serif;
+      --font-body: 'Rajdhani', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Background Effects */
+    .bg-grid {
+      position: absolute; inset: 0;
+      background-image: 
+        linear-gradient(rgba(0, 245, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 245, 255, 0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: 0;
+      transform: perspective(500px) rotateX(60deg) translateY(-100px) scale(3);
+      animation: gridMove 20s linear infinite;
+    }
+    @keyframes gridMove { 0%{transform:perspective(500px) rotateX(60deg) translateY(0) scale(3);} 100%{transform:perspective(500px) rotateX(60deg) translateY(40px) scale(3);} }
+
+    .glow-orb {
+      position: absolute;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,245,255,0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Auth Container */
+    .auth-container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 440px;
+      padding: 40px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-bright);
+      border-radius: 20px;
+      backdrop-filter: blur(20px);
+      box-shadow: 
+        0 20px 50px rgba(0,0,0,0.5),
+        inset 0 0 20px var(--cyan-dim),
+        0 0 30px rgba(0, 245, 255, 0.1);
+      overflow: hidden;
+    }
+    .auth-container::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    }
+
+    .brand-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .brand-header h1 {
+      font-family: var(--font-head);
+      font-size: 24px;
+      color: #fff;
+      letter-spacing: 3px;
+      text-shadow: 0 0 10px var(--cyan);
+    }
+    .brand-header p {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--cyan);
+      margin-top: 5px;
+      letter-spacing: 2px;
+    }
+
+    /* Forms */
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .auth-form.hidden {
+      display: none;
+      opacity: 0;
+    }
+
+    .input-group {
+      position: relative;
+    }
+    .input-group i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--cyan);
+      font-size: 18px;
+    }
+    .auth-input {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px 14px 45px;
+      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+    .auth-input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 15px var(--cyan-dim);
+    }
+
+    .auth-btn {
+      background: linear-gradient(90deg, rgba(0,245,255,0.1), rgba(0,245,255,0.2));
+      border: 1px solid var(--cyan);
+      border-radius: 8px;
+      color: var(--cyan);
+      font-family: var(--font-head);
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 14px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-btn:hover {
+      background: var(--cyan);
+      color: #000;
+      box-shadow: 0 0 20px var(--cyan);
+    }
+    .auth-btn::before {
+      content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transition: left 0.5s ease;
+    }
+    .auth-btn:hover::before { left: 100%; }
+
+    .switch-mode {
+      text-align: center;
+      margin-top: 25px;
+      font-family: var(--font-body);
+      font-size: 15px;
+      color: var(--text-dim);
+    }
+    .switch-mode a {
+      color: var(--cyan);
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .switch-mode a:hover {
+      color: #fff;
+      text-shadow: 0 0 8px var(--cyan);
+    }
+
+    /* Alerts */
+    .alert-box {
+      display: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .alert-box.error {
+      display: block;
+      background: rgba(255, 43, 94, 0.1);
+      border: 1px solid var(--red);
+      color: var(--red);
+    }
+    .alert-box.success {
+      display: block;
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid #00ff88;
+      color: #00ff88;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+  <div class="glow-orb"></div>
+
+  <div class="auth-container">
+    <div class="brand-header">
+      <h1>JUSTICEFLOW<span style="color:var(--cyan)">X</span></h1>
+      <p>SECURE TERMINAL ACCESS</p>
+    </div>
+
+    <div id="alertBox" class="alert-box"></div>
+
+    <!-- Login Form -->
+    <form id="loginForm" class="auth-form">
+      <div class="input-group">
+        <i class='bx bx-user'></i>
+        <input type="text" id="loginUsername" class="auth-input" placeholder="Operator ID" required>
+      </div>
+      <div class="input-group">
+        <i class='bx bx-lock-alt'></i>
+        <input type="password" id="loginPassword" class="auth-input" placeholder="Passkey" required>
+      </div>
+      <button type="submit" class="auth-btn">INITIALIZE UPLINK</button>
+      <div class="switch-mode">
+        Unregistered operative? <a id="showRegister">Request Access</a>
+      </div>
+    </form>
+
+    <!-- Register Form -->
+    <form id="registerForm" class="auth-form hidden">
+      <div class="input-group">
+        <i class='bx bx-user-plus'></i>
+        <input type="text" id="regUsername" class="auth-input" placeholder="New Operator ID" required>
+      </div>
+      <div class="input-group">
+        <i class='bx bx-lock-alt'></i>
+        <input type="password" id="regPassword" class="auth-input" placeholder="Secure Passkey" required>
+      </div>
+      <div class="input-group">
+        <i class='bx bx-shield-quarter'></i>
+        <input type="password" id="regConfirmPassword" class="auth-input" placeholder="Confirm Passkey" required>
+      </div>
+      <button type="submit" class="auth-btn">REGISTER CLEARANCE</button>
+      <div class="switch-mode">
+        Existing clearance? <a id="showLogin">Initialize Uplink</a>
+      </div>
+    </form>
+  </div>
+
+  <script src="assets/js/auth.js"></script>
+</body>
+</html>
