@@ -1255,7 +1255,7 @@ function initScanButtons() {
       const href = btn.getAttribute("href");
 
       function afterScan() {
-        requestPassword(() => { if (href) window.location.href = href; });
+        showAccessPopup(true, () => { if (href) window.location.href = href; });
       }
 
       switch (type) {
