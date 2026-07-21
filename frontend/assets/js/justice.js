@@ -1276,11 +1276,7 @@ function initScanButtons() {
 
 /* ========================= MENU DROPDOWN ========================= */
 function initMenu() {
-  const menuBtn = document.getElementById("menuBtn");
-  const dropdown = document.getElementById("menuDropdown");
-  if (!menuBtn || !dropdown) return;
-  menuBtn.addEventListener("click", e => { e.stopPropagation(); dropdown.classList.toggle("show"); });
-  document.addEventListener("click", () => dropdown.classList.remove("show"));
+  // Handled by inline script in index.html to avoid duplicate toggles
 }
 
 /* ========================= LOGOUT ========================= */
