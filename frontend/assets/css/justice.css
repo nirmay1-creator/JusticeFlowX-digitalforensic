@@ -534,14 +534,15 @@ body::after {
 .scan-bar-wrap { width: 260px; height: 3px; background: rgba(0,245,255,0.1); border-radius: 2px; overflow: hidden; }
 .scan-bar-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--cyan), #00aaff); box-shadow: 0 0 8px var(--cyan); transition: width 2s linear; }
 
-#terminalLogs { position: fixed; bottom: 40px; right: 16px; width: 340px; height: 190px; background: rgba(2, 8, 16, 0.92); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; z-index: 500; box-shadow: 0 0 30px rgba(0,0,0,0.5), 0 0 20px rgba(0,245,255,0.06); backdrop-filter: blur(10px); }
-.terminal-header { display: flex; justify-content: space-between; align-items: center; padding: 7px 12px; background: rgba(0,245,255,0.05); border-bottom: 1px solid var(--border); font-family: var(--font-mono); font-size: 10px; color: var(--cyan-mid); letter-spacing: 1.5px; }
-#terminalBody { padding: 8px 12px; font-family: var(--font-mono); font-size: 11px; color: var(--cyan); overflow-y: auto; height: calc(100% - 33px); }
-#terminalBody div { padding: 2px 0; animation: logFade 0.3s ease; opacity: 0.85; }
-#terminalBody div.warn { color: var(--warn); }
-#terminalBody div.alert { color: var(--red); }
-#terminalBody div.ok { color: var(--green); }
-#terminalBody div::before { content: '▸ '; color: var(--text-dim); }
+#terminalLogs { position: fixed; bottom: 40px; right: 16px; width: 400px; height: 220px; background: rgba(1, 6, 13, 0.95); border: 1px solid rgba(0, 245, 255, 0.3); border-radius: 8px; overflow: hidden; z-index: 500; box-shadow: 0 0 30px rgba(0,0,0,0.7), inset 0 0 15px rgba(0, 245, 255, 0.05); backdrop-filter: blur(15px); font-family: var(--font-mono); transition: all 0.3s ease; }
+#terminalLogs:hover { border-color: rgba(0, 245, 255, 0.6); box-shadow: 0 0 40px rgba(0,0,0,0.8), 0 0 20px rgba(0, 245, 255, 0.1), inset 0 0 20px rgba(0, 245, 255, 0.1); }
+.terminal-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: linear-gradient(90deg, rgba(0, 245, 255, 0.15), transparent); border-bottom: 1px solid rgba(0, 245, 255, 0.2); font-family: var(--font-mono); font-size: 11px; color: #fff; letter-spacing: 2px; text-shadow: 0 0 8px var(--cyan); font-weight: 700; }
+#terminalBody { padding: 12px 14px; font-family: var(--font-mono); font-size: 12px; color: var(--cyan); overflow-y: auto; height: calc(100% - 37px); scroll-behavior: smooth; }
+#terminalBody div { padding: 3px 0; opacity: 0.9; position: relative; word-break: break-all; }
+#terminalBody div.warn { color: var(--warn); text-shadow: 0 0 5px rgba(255, 184, 0, 0.4); }
+#terminalBody div.alert { color: var(--red); text-shadow: 0 0 5px rgba(255, 43, 94, 0.4); font-weight: 600; }
+#terminalBody div.ok { color: var(--green); text-shadow: 0 0 5px rgba(0, 255, 136, 0.4); }
+#terminalBody div::before { content: '❯ '; color: var(--cyan); text-shadow: 0 0 8px var(--cyan); margin-right: 6px; }
 
 .status-bar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; align-items: center; gap: 24px; padding: 6px 20px; background: rgba(2, 8, 16, 0.95); border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); z-index: 600; backdrop-filter: blur(10px); }
 .status-bar-item { display: flex; align-items: center; gap: 6px; white-space: nowrap; }

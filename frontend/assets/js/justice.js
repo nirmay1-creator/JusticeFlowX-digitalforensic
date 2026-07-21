@@ -724,17 +724,80 @@ function startTerminal() {
     { text: "WARN: CPU spike — 78% peak", type: "warn" },
     { text: "Memory pool optimized", type: "ok" },
     { text: "Auth attempt from 192.168.1.44 — denied", type: "alert" },
+    { text: "Neural Net analyzing heuristic patterns", type: "" },
+    { text: "WARN: SSL certificate expiring in 12h", type: "warn" },
+    { text: "Packet interceptor active on eth0", type: "ok" },
+    { text: "ALERT: SQL Injection signature matched", type: "alert" }
   ];
+  
   setInterval(() => {
     const { text, type } = logs[Math.floor(Math.random() * logs.length)];
     const div = document.createElement("div");
-    div.textContent = text;
     if (type) div.classList.add(type);
     termBody.appendChild(div);
-    if (termBody.children.length > 20) termBody.removeChild(termBody.firstChild);
-    termBody.scrollTop = termBody.scrollHeight;
-  }, 1600);
+    
+    if (termBody.children.length > 25) termBody.removeChild(termBody.firstChild);
+    
+    let charIdx = 0;
+    const typeInterval = setInterval(() => {
+      if (charIdx < text.length) {
+        div.textContent += text.charAt(charIdx);
+        charIdx++;
+        termBody.scrollTop = termBody.scrollHeight;
+      } else {
+        clearInterval(typeInterval);
+      }
+    }, 15);
+    
+  }, 2200);
   setInterval(() => { if (termTime) termTime.textContent = new Date().toTimeString().slice(0, 8); }, 1000);
+}
+
+/* ========================= REAL-TIME NOTIFICATIONS ========================= */
+function startRealTimeNotifications() {
+  const notifList = document.getElementById("notifList");
+  const notifBadge = document.getElementById("notifBadge");
+  if (!notifList || !notifBadge) return;
+
+  const notifTypes = [
+    { type: 'critical', icon: 'bx-error-circle', title: 'Intrusion Attempt Blocked', desc: 'Multiple failed logins from IP 145.22.44.111 via SSH' },
+    { type: 'warning', icon: 'bx-shield-x', title: 'Anomaly Detected', desc: 'Unusual outbound data transfer (2.4 GB) to unknown host' },
+    { type: 'info', icon: 'bx-check-circle', title: 'Automated Defense Engaged', desc: 'IP range 185.0.0.0/8 temporarily blacklisted' },
+    { type: 'warning', icon: 'bx-shield-x', title: 'System Resource Alert', desc: 'CPU usage exceeded 90% in Threat Hunter Engine' },
+    { type: 'critical', icon: 'bx-error-circle', title: 'DDoS Mitigation Active', desc: 'Inbound traffic surge detected (140 Gbps) on port 443' },
+    { type: 'info', icon: 'bx-server', title: 'Database Sync Completed', desc: 'Global threat signatures updated successfully' }
+  ];
+
+  setInterval(() => {
+    const data = notifTypes[Math.floor(Math.random() * notifTypes.length)];
+    
+    let count = parseInt(notifBadge.textContent || "0");
+    notifBadge.textContent = count + 1;
+    notifBadge.style.display = 'flex';
+    notifBadge.style.animation = 'none';
+    setTimeout(() => notifBadge.style.animation = 'pulseTarget 1s ease', 10);
+    
+    if (notifList.innerHTML.includes('No new alerts')) {
+        notifList.innerHTML = '';
+    }
+
+    const item = document.createElement("div");
+    item.className = `notif-item notif-${data.type}`;
+    item.innerHTML = `
+      <div class="notif-icon-wrap ${data.type}"><i class='bx ${data.icon}'></i></div>
+      <div class="notif-content">
+        <span class="notif-title">${data.title}</span>
+        <span class="notif-desc">${data.desc}</span>
+        <span class="notif-time">Just now</span>
+      </div>
+    `;
+    
+    notifList.prepend(item);
+    
+    if (notifList.children.length > 10) {
+        notifList.removeChild(notifList.lastChild);
+    }
+  }, 12000);
 }
 
 /* ========================= STAT COUNTER ========================= */
@@ -1247,6 +1310,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initMenu();
     initLogout();
     startTerminal();
+    startRealTimeNotifications();
     animateStats();
     console.log("[JusticeFlowX] All systems online.");
   });
