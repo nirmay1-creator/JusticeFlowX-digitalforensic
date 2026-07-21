@@ -1,66 +1,480 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>JusticeFlowX | Evidence Vault</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JusticeFlowX | Evidence Vault</title>
+  
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/shared.css">
+  <link rel="stylesheet" href="../../assets/css/justice.css">
 
-<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-<link rel="stylesheet" href="evidence.css">
+  <style>
+    :root {
+      --ev-primary: #00ff88;
+      --ev-primary-dim: rgba(0,255,136,0.15);
+      --ev-border: rgba(0,255,136,0.25);
+    }
+
+    .evidence-page {
+      padding: 30px 20px 80px;
+      position: relative;
+      z-index: 2;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      border-bottom: 1px solid rgba(0,255,136,0.1);
+      padding-bottom: 20px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header h1 i {
+      color: var(--ev-primary);
+      font-size: 32px;
+      filter: drop-shadow(0 0 10px var(--ev-primary));
+    }
+
+    .header-btn {
+      padding: 10px 20px;
+      background: rgba(0,255,136, 0.05);
+      border: 1px solid rgba(0,255,136, 0.2);
+      color: var(--ev-primary);
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .header-btn:hover {
+      background: rgba(0,255,136, 0.15);
+      box-shadow: 0 0 15px rgba(0,255,136,0.2);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+    }
+
+    .panel {
+      background: rgba(10, 22, 40, 0.6);
+      border: 1px solid var(--ev-border);
+      border-radius: 12px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 0 30px rgba(0,255,136,0.05);
+      backdrop-filter: blur(10px);
+    }
+
+    .panel::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--ev-primary), transparent);
+      opacity: 0.5;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .panel-header i {
+      font-size: 24px;
+      color: var(--ev-primary);
+      filter: drop-shadow(0 0 8px var(--ev-primary));
+    }
+
+    .panel-header h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 1px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .form-control {
+      width: 100%;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(0,255,136,0.2);
+      border-radius: 6px;
+      padding: 12px 14px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--ev-primary);
+      box-shadow: 0 0 10px rgba(0,255,136,0.1);
+    }
+
+    select.form-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2300ff88%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px top 50%;
+      background-size: 10px auto;
+    }
+
+    .file-upload {
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .file-upload input[type="file"] {
+      position: absolute;
+      top: 0;
+      right: 0;
+      min-width: 100%;
+      min-height: 100%;
+      font-size: 100px;
+      text-align: right;
+      filter: alpha(opacity=0);
+      opacity: 0;
+      outline: none;
+      background: white;
+      cursor: pointer;
+      display: block;
+    }
+
+    .file-upload-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 12px;
+      background: rgba(0, 255, 136, 0.05);
+      border: 1px dashed rgba(0, 255, 136, 0.4);
+      color: var(--ev-primary);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .file-upload:hover .file-upload-btn {
+      background: rgba(0, 255, 136, 0.1);
+    }
+
+    .primary-btn {
+      width: 100%;
+      padding: 14px;
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid var(--ev-primary);
+      color: var(--ev-primary);
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .primary-btn:hover {
+      background: rgba(0, 255, 136, 0.2);
+      box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+    }
+
+    /* Vault List */
+    .vault-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      overflow-y: auto;
+      max-height: 400px;
+      padding-right: 8px;
+    }
+
+    .vault-grid::-webkit-scrollbar {
+      width: 6px;
+    }
+    .vault-grid::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.2);
+    }
+    .vault-grid::-webkit-scrollbar-thumb {
+      background: rgba(0,255,136,0.3);
+      border-radius: 10px;
+    }
+
+    .vault-item {
+      background: rgba(0, 0, 0, 0.4);
+      border-left: 3px solid var(--ev-primary);
+      padding: 16px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 1px solid rgba(0,255,136,0.1);
+      border-left: 4px solid var(--ev-primary);
+    }
+
+    .vault-item:hover {
+      background: rgba(0, 255, 136, 0.08);
+      transform: translateX(5px);
+    }
+
+    .vault-item strong {
+      display: block;
+      color: #fff;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    /* AI Status */
+    .ai-status-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+    }
+
+    .ai-icon-large {
+      font-size: 64px;
+      color: rgba(0, 255, 136, 0.2);
+      margin-bottom: 24px;
+      transition: all 0.5s ease;
+    }
+
+    .ai-status-panel.scanning .ai-icon-large {
+      color: var(--ev-primary);
+      filter: drop-shadow(0 0 20px var(--ev-primary));
+      animation: pulse 1.5s infinite;
+    }
+
+    .ai-status-text {
+      font-size: 16px;
+      color: var(--ev-primary);
+      margin-bottom: 8px;
+    }
+
+    .ai-progress-wrap {
+      width: 100%;
+      height: 6px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+
+    .ai-progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--ev-primary);
+      box-shadow: 0 0 10px var(--ev-primary);
+      transition: width 0.1s linear;
+    }
+
+    /* Modal overrides */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left:0; top:0;
+      width:100%; height:100%;
+      background: rgba(0,10,15,0.8);
+      backdrop-filter: blur(8px);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal .close {
+      position: absolute;
+      top: 20px; right: 30px;
+      font-size: 40px;
+      color: var(--ev-primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .modal .close:hover {
+      filter: drop-shadow(0 0 10px var(--ev-primary));
+      transform: scale(1.1);
+    }
+
+    #previewContent {
+      max-width: 500px;
+      width: 100%;
+      background: rgba(0,15,25,0.9);
+      border: 1px solid var(--ev-border);
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 0 40px rgba(0,255,136,0.15);
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+  </style>
 </head>
 <body>
+  <div class="scanline-overlay"></div>
+  <div class="noise-overlay"></div>
 
-<header class="topbar">
-  🧾 Evidence Management Vault
- 
-</header>
-
-<section class="scene">
-
-  <!-- UPLOAD -->
-  <div class="card upload">
-    <h2>🔐 Upload Evidence</h2>
-    <input id="evName" placeholder="Evidence Name">
-    <select id="evType">
-      <option>Image</option>
-      <option>Video</option>
-      <option>Audio</option>
-      <option>Document</option>
-    </select>
-    <input type="file" id="evFile">
-    <select id="roleSelect">
-      <option>Investigator</option>
-      <option>Supervisor</option>
-    </select>
-    <button onclick="uploadEvidence()">Secure Upload</button>
-  </div>
-
-  <!-- VAULT -->
-  <div class="card vault">
-    <h2>📦 Evidence Vault</h2>
-    <div id="vaultList" class="vault-grid"></div>
-  </div>
-
-  <!-- AI -->
-  <div class="card ai">
-    <h2>🧠 AI Integrity Scan</h2>
-    <div id="aiStatus">Awaiting Evidence…</div>
-    <div class="ai-bar">
-      <div id="aiMeter"></div>
+  <div class="evidence-page">
+    <div class="header">
+      <h1><i class='bx bx-archive-in'></i> Evidence Management Vault</h1>
+      <a href="../../index.html" class="header-btn">
+        <i class='bx bx-arrow-back'></i> Back to Dashboard
+      </a>
     </div>
-    <button onclick="runAI()">Run Scan</button>
+
+    <div class="grid">
+      <!-- UPLOAD PANEL -->
+      <div class="panel">
+        <div class="panel-header">
+          <i class='bx bx-lock-alt'></i>
+          <h2>Secure Upload</h2>
+        </div>
+        
+        <div class="form-group">
+          <label>Evidence Name</label>
+          <input type="text" id="evName" class="form-control" placeholder="e.g. Crime Scene Photo 01">
+        </div>
+
+        <div class="form-group">
+          <label>Evidence Type</label>
+          <select id="evType" class="form-control">
+            <option>Image</option>
+            <option>Video</option>
+            <option>Audio</option>
+            <option>Document</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>File Upload</label>
+          <div class="file-upload">
+            <div class="file-upload-btn">
+              <i class='bx bx-cloud-upload'></i> Select File
+            </div>
+            <input type="file" id="evFile" onchange="updateFileName(this)">
+          </div>
+          <div id="fileNameDisplay" style="font-size: 12px; color: rgba(255,255,255,0.6); text-align: center; margin-top: -8px; margin-bottom: 16px;"></div>
+        </div>
+
+        <div class="form-group">
+          <label>Authorized Role</label>
+          <select id="roleSelect" class="form-control">
+            <option>Investigator</option>
+            <option>Supervisor</option>
+          </select>
+        </div>
+
+        <button class="primary-btn" onclick="uploadEvidence()">
+          <i class='bx bx-shield-quarter'></i> Secure Upload
+        </button>
+      </div>
+
+      <!-- VAULT PANEL -->
+      <div class="panel">
+        <div class="panel-header">
+          <i class='bx bx-box'></i>
+          <h2>Evidence Vault</h2>
+        </div>
+        <div class="vault-grid" id="vaultList">
+          <!-- Items injected here via evidence.js -->
+        </div>
+      </div>
+
+      <!-- AI PANEL -->
+      <div class="panel">
+        <div class="panel-header">
+          <i class='bx bx-brain'></i>
+          <h2>AI Integrity Scan</h2>
+        </div>
+        
+        <div class="ai-status-panel" id="aiPanel">
+          <i class='bx bx-fingerprint ai-icon-large'></i>
+          <div class="ai-status-text" id="aiStatus">Awaiting Evidence...</div>
+          
+          <div class="ai-progress-wrap">
+            <div class="ai-progress-bar" id="aiMeter"></div>
+          </div>
+          
+          <button class="primary-btn" onclick="runAI()" style="margin-top: 20px;">
+            <i class='bx bx-play-circle'></i> Run AI Scan
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
-</section>
+  <!-- PREVIEW MODAL -->
+  <div id="previewModal" class="modal">
+    <span class="close" onclick="closePreview()">&times;</span>
+    <div id="previewContent"></div>
+  </div>
 
-<!-- PREVIEW MODAL -->
-<div id="previewModal" class="modal">
-  <span class="close" onclick="closePreview()">&times;</span>
-  <div id="previewContent"></div>
-</div>
+  <script src="../../assets/js/shared.js"></script>
+  <script src="evidence.js"></script>
+  <script>
+    function updateFileName(input) {
+      if (input.files && input.files[0]) {
+        document.getElementById('fileNameDisplay').textContent = input.files[0].name;
+      } else {
+        document.getElementById('fileNameDisplay').textContent = '';
+      }
+    }
 
-<script src="evidence.js"></script><div class="bottom-nav">
-    <div>
-  <button class="back-btn" onclick="goDashboard()">⬅ Back to Dashboard</button>
-</div>
+    // Wrap runAI to trigger CSS animation
+    const originalRunAI = runAI;
+    runAI = function() {
+      const panel = document.getElementById('aiPanel');
+      panel.classList.add('scanning');
+      originalRunAI();
+      
+      // Remove animation class after scan is done
+      setTimeout(() => {
+        panel.classList.remove('scanning');
+      }, 4000); // 400ms * 10 steps roughly
+    }
+  </script>
 </body>
 </html>

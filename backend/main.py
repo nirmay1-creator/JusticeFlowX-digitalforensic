@@ -1,8 +1,16 @@
 import logging
-from fastapi import FastAPI, Depends
+import os
+from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Local imports
 from database import engine, get_db
@@ -31,23 +39,30 @@ async def lifespan(app: FastAPI):
     
     # Optional shutdown logic can go here
 
+limiter = Limiter(key_func=get_remote_address, default_limits=["200/day", "50/hour"])
 app = FastAPI(title="JusticeFlowX API", version="3.0", lifespan=lifespan)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 # CORS Middleware (Allow requests from Nginx frontend)
+allowed_origins = os.getenv("CORS_ORIGINS", "http://localhost").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, change to the actual frontend domain (e.g., http://localhost)
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-from routers import auth, cases, law
+from routers import auth, cases, law, threat_intel, system
 
 # Include Routers
 app.include_router(auth.router)
 app.include_router(cases.router)
 app.include_router(law.router)
+app.include_router(threat_intel.router)
+app.include_router(system.router, prefix="/api/system", tags=["System"])
 
 # --- GLOBAL ROUTES ---
 

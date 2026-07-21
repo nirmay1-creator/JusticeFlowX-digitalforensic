@@ -776,6 +776,324 @@ function initHoverSound() {
 }
 
 /* ========================= SCAN BUTTONS — ROUTE BY TYPE ========================= */
+
+function showForensicsDbOverlay(onComplete) {
+  const overlay = document.createElement("div");
+  overlay.className = "scan-overlay-full";
+  overlay.innerHTML = `
+    <div class="scan-animation-wrap">
+      <div class="scan-title-overlay" style="color:#ff0055">INITIALIZING DEEP PACKET INSPECTION</div>
+      <div class="loader-radar" style="margin: 30px auto;"></div>
+      <div style="text-align:center;font-family:'Share Tech Mono',monospace;color:rgba(255,0,85,0.7)">
+        ESTABLISHING FORENSIC UPLINK...
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.classList.add("show"), 50);
+  setTimeout(() => overlay.classList.remove("show"), 2800);
+  setTimeout(() => { overlay.remove(); onComplete(); }, 3200);
+}
+
+
+function showChainOfCustodyOverlay(onComplete) {
+  const overlay = document.createElement("div");
+  overlay.className = "scan-overlay-full";
+  overlay.innerHTML = `
+    <div class="scan-animation-wrap">
+      <div class="scan-title-overlay" style="color:#ffd700">VERIFYING IMMUTABLE LEDGER</div>
+      <div style="font-size: 60px; color: #ffd700; margin: 30px auto; animation: pulse 1s infinite;"><i class='bx bx-link'></i></div>
+      <div style="text-align:center;font-family:'Share Tech Mono',monospace;color:rgba(255,215,0,0.7)">
+        AUTHENTICATING AGENT CREDENTIALS...
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.classList.add("show"), 50);
+  setTimeout(() => overlay.classList.remove("show"), 2800);
+  setTimeout(() => { overlay.remove(); onComplete(); }, 3200);
+}
+
+/* ----------- TYPE 6: MALWARE — Threat Radar ----------- */
+function showMalwareOverlay(onComplete) {
+  const overlay = document.createElement("div");
+  overlay.className = "scan-overlay-full";
+  
+  const style = document.createElement("style");
+  style.id = "malware-overlay-style";
+  style.textContent = `
+    .malware-radar { position: relative; width: 180px; height: 180px; margin: 15px auto; }
+    .m-ring { position: absolute; border-radius: 50%; border: 1px solid rgba(162, 0, 255, 0.2); left: 50%; top: 50%; transform: translate(-50%, -50%); }
+    .m-r1 { width: 50px; height: 50px; border-color: rgba(162, 0, 255, 0.6); }
+    .m-r2 { width: 90px; height: 90px; border-color: rgba(162, 0, 255, 0.4); animation: mPulse 2s infinite; }
+    .m-r3 { width: 130px; height: 130px; border-color: rgba(162, 0, 255, 0.2); animation: mPulse 2s 0.5s infinite; }
+    .m-r4 { width: 180px; height: 180px; border-color: rgba(162, 0, 255, 0.1); animation: mPulse 2s 1s infinite; }
+    @keyframes mPulse { 0% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.15); opacity: 0; } }
+    .m-beam { position: absolute; top: 50%; left: 50%; width: 50%; height: 2px; transform-origin: 0 50%; background: linear-gradient(90deg, rgba(162,0,255,0.9), transparent); animation: mSweep 1.5s linear infinite; box-shadow: 0 0 15px rgba(162,0,255,0.6); }
+    .m-beam::before { content: ''; position: absolute; top: -30px; left: 0; width: 100%; height: 60px; background: conic-gradient(from -10deg, transparent 0deg, rgba(162,0,255,0.15) 30deg, transparent 45deg); transform-origin: 0 50%; }
+    @keyframes mSweep { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .m-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 44px; height: 44px; background: rgba(162,0,255,0.15); border: 2px solid rgba(162,0,255,0.6); border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 5; }
+    .m-blip { position: absolute; width: 6px; height: 6px; background: #ff3366; border-radius: 50%; box-shadow: 0 0 10px #ff3366; opacity: 0; animation: mBlip 2s infinite; }
+    @keyframes mBlip { 0%,20%{opacity:0;transform:scale(0);} 30%{opacity:1;transform:scale(1.5);} 50%{opacity:0.8;transform:scale(1);} 80%,100%{opacity:0;} }
+  `;
+  document.head.appendChild(style);
+
+  overlay.innerHTML = `
+    <div class="scan-animation-wrap" style="width: 320px;">
+      <div class="scan-title-overlay" style="color:#a200ff; letter-spacing: 2px; font-size: 13px;">MALWARE SANDBOX DETONATION</div>
+      
+      <div class="malware-radar">
+        <div class="m-ring m-r1"></div>
+        <div class="m-ring m-r2"></div>
+        <div class="m-ring m-r3"></div>
+        <div class="m-ring m-r4"></div>
+        <div class="m-beam"></div>
+        <div class="m-center">
+          <i class='bx bx-bug' style="color:#a200ff; font-size: 22px; filter: drop-shadow(0 0 8px #a200ff)"></i>
+        </div>
+        <div class="m-blip" style="top: 25%; left: 70%; animation-delay: 0.5s;"></div>
+        <div class="m-blip" style="top: 65%; left: 20%; animation-delay: 1.2s; background:#ffaa00; box-shadow:0 0 10px #ffaa00"></div>
+        <div class="m-blip" style="top: 15%; left: 35%; animation-delay: 1.8s;"></div>
+      </div>
+
+      <div class="scan-progress-label" id="scanLabel" style="color:#a200ff; margin-top:10px;">Initializing Virtual Machine...</div>
+      <div class="scan-bar-wrap"><div class="scan-bar-fill" id="scanBarFill" style="background:linear-gradient(90deg, #a200ff, #d064ff)"></div></div>
+      
+      <div id="mLog" style="width: 280px; height: 75px; margin: 15px auto 0; background: rgba(162,0,255,0.05); border: 1px solid rgba(162,0,255,0.2); border-radius: 4px; padding: 6px 10px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #8fa4b5; overflow: hidden; text-align: left; line-height: 1.5; box-sizing: border-box;">
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const fill = overlay.querySelector("#scanBarFill");
+  const lbl = overlay.querySelector("#scanLabel");
+  const mLog = overlay.querySelector("#mLog");
+  
+  const steps = ["Loading YARA rules...", "Analyzing PE headers...", "Intercepting C2 beacons...", "Executing Sandboxed Payload..."];
+  const logs = [
+    "[+] Sandbox Environment: ISOLATED",
+    "[*] Injecting memory hooks...",
+    "[!] Warning: 3 obsolete signatures detected",
+    "[+] Entropy analysis: HIGH",
+    "[*] Tracing network calls...",
+    "[+] Threat classification: COMPLETE"
+  ];
+  
+  const totalTime = 3200;
+  const start = performance.now();
+  let currentLogIdx = 0;
+
+  const logInterval = setInterval(() => {
+    if (currentLogIdx < logs.length) {
+      const p = document.createElement("div");
+      p.textContent = logs[currentLogIdx];
+      p.style.opacity = 0;
+      p.style.transition = "opacity 0.2s";
+      mLog.appendChild(p);
+      setTimeout(() => p.style.opacity = 1, 20);
+      mLog.scrollTop = mLog.scrollHeight;
+      currentLogIdx++;
+    }
+  }, 450);
+
+  function updateProgress(now) {
+    const elapsed = now - start;
+    const pct = Math.min((elapsed / totalTime) * 100, 100);
+    fill.style.width = pct + "%";
+    lbl.textContent = steps[Math.floor((pct/100) * 0.99 * steps.length)];
+
+    if (elapsed < totalTime) { 
+      requestAnimationFrame(updateProgress); 
+    } else {
+      clearInterval(logInterval);
+      overlay.remove(); 
+      const existingStyle = document.getElementById("malware-overlay-style");
+      if (existingStyle) existingStyle.remove();
+      onComplete();
+    }
+  }
+  requestAnimationFrame(updateProgress);
+}
+/* ----------- TYPE 8: THREAT INTEL ----------- */
+function showThreatIntelOverlay(onComplete) {
+  const overlay = document.createElement("div");
+  overlay.className = "scan-overlay-full";
+  
+  const style = document.createElement("style");
+  style.id = "ti-overlay-style";
+  style.textContent = `
+    .ti-globe-wrap { position: relative; width: 160px; height: 160px; margin: 20px auto; perspective: 1000px; }
+    .ti-globe { position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 2px solid rgba(0,212,255,0.3); box-shadow: inset 0 0 40px rgba(0,212,255,0.2), 0 0 20px rgba(0,212,255,0.1); animation: pulseGlobe 2s infinite; display: flex; align-items: center; justify-content: center; }
+    @keyframes pulseGlobe { 0%, 100% { box-shadow: inset 0 0 40px rgba(0,212,255,0.2), 0 0 20px rgba(0,212,255,0.1); } 50% { box-shadow: inset 0 0 60px rgba(0,212,255,0.4), 0 0 35px rgba(0,212,255,0.3); } }
+    .ti-orbit { position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; border-radius: 50%; border: 1px dashed rgba(0,212,255,0.5); animation: spinOrbit 4s linear infinite; }
+    .ti-orbit2 { position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border-radius: 50%; border: 1px dotted rgba(0,212,255,0.8); animation: spinOrbit 3s linear infinite reverse; }
+    @keyframes spinOrbit { from { transform: rotate(0deg) rotateX(60deg) rotateY(0deg); } to { transform: rotate(360deg) rotateX(60deg) rotateY(360deg); } }
+    .ti-scanner { position: absolute; width: 100%; height: 2px; background: #00d4ff; box-shadow: 0 0 10px #00d4ff; top: 0; left: 0; animation: scanDown 1.5s linear infinite alternate; }
+    @keyframes scanDown { from { top: 10%; } to { top: 90%; } }
+  `;
+  document.head.appendChild(style);
+
+  overlay.innerHTML = `
+    <div class="scan-animation-wrap" style="width: 340px;">
+      <div class="scan-title-overlay" style="color:#00d4ff; letter-spacing: 2px; font-size: 13px;">GLOBAL THREAT INTELLIGENCE LINK</div>
+      
+      <div class="ti-globe-wrap">
+        <div class="ti-orbit"></div>
+        <div class="ti-orbit2"></div>
+        <div class="ti-globe">
+          <i class='bx bx-world' style="font-size: 60px; color: #00d4ff; filter: drop-shadow(0 0 10px #00d4ff)"></i>
+          <div class="ti-scanner"></div>
+        </div>
+      </div>
+
+      <div class="scan-progress-label" id="scanLabel" style="color:#00d4ff; margin-top:10px;">Establishing Secure Uplink...</div>
+      <div class="scan-bar-wrap"><div class="scan-bar-fill" id="scanBarFill" style="background:linear-gradient(90deg, #00d4ff, #00f5ff)"></div></div>
+      
+      <div id="tiLog" style="width: 300px; height: 85px; margin: 15px auto 0; background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.2); border-radius: 4px; padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #8fa4b5; overflow: hidden; text-align: left; line-height: 1.6; box-sizing: border-box;">
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const fill = overlay.querySelector("#scanBarFill");
+  const lbl = overlay.querySelector("#scanLabel");
+  const tiLog = overlay.querySelector("#tiLog");
+  
+  const steps = ["Connecting to Global Nodes...", "Querying VirusTotal...", "Cross-referencing AlienVault...", "Fetching IP Reputation..."];
+  const logs = [
+    "[+] Uplink: SECURE",
+    "[*] Handshake with OSINT nodes...",
+    "[!] Querying hash databases...",
+    "[+] Cross-referencing signatures...",
+    "[*] Aggregating threat feeds...",
+    "[+] Intelligence report: READY"
+  ];
+  
+  const totalTime = 3500;
+  const start = performance.now();
+  let currentLogIdx = 0;
+
+  const logInterval = setInterval(() => {
+    if (currentLogIdx < logs.length) {
+      const p = document.createElement("div");
+      p.textContent = logs[currentLogIdx];
+      p.style.opacity = 0;
+      p.style.transition = "opacity 0.2s";
+      tiLog.appendChild(p);
+      setTimeout(() => p.style.opacity = 1, 20);
+      tiLog.scrollTop = tiLog.scrollHeight;
+      currentLogIdx++;
+    }
+  }, 480);
+
+  function updateProgress(now) {
+    const elapsed = now - start;
+    const pct = Math.min((elapsed / totalTime) * 100, 100);
+    fill.style.width = pct + "%";
+    lbl.textContent = steps[Math.floor((pct/100) * 0.99 * steps.length)];
+
+    if (elapsed < totalTime) { 
+      requestAnimationFrame(updateProgress); 
+    } else {
+      clearInterval(logInterval);
+      overlay.remove(); 
+      const existingStyle = document.getElementById("ti-overlay-style");
+      if (existingStyle) existingStyle.remove();
+      onComplete();
+    }
+  }
+  requestAnimationFrame(updateProgress);
+}
+
+/* ----------- TYPE 9: LEGAL ED ----------- */
+function showLawOverlay(onComplete) {
+  const overlay = document.createElement("div");
+  overlay.className = "scan-overlay-full";
+  
+  const style = document.createElement("style");
+  style.id = "law-overlay-style";
+  style.textContent = `
+    .law-book-wrap { position: relative; width: 140px; height: 140px; margin: 30px auto; perspective: 1000px; display: flex; align-items: center; justify-content: center; }
+    .law-book-icon { font-size: 80px; color: #ff9f43; filter: drop-shadow(0 0 15px #ff9f43); animation: floatBook 3s ease-in-out infinite; z-index: 2; }
+    @keyframes floatBook { 0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 15px #ff9f43); } 50% { transform: translateY(-15px); filter: drop-shadow(0 0 30px #ff9f43); } }
+    .law-circle { position: absolute; width: 120%; height: 120%; border-radius: 50%; border: 2px dashed rgba(255,159,67,0.3); animation: spinLaw 6s linear infinite; }
+    .law-circle2 { position: absolute; width: 140%; height: 140%; border-radius: 50%; border: 1px dotted rgba(255,159,67,0.5); animation: spinLaw 4s linear infinite reverse; }
+    @keyframes spinLaw { 100% { transform: rotate(360deg); } }
+    .law-page { position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); width: 80px; height: 2px; background: rgba(255,159,67,0.8); box-shadow: 0 0 10px #ff9f43; animation: scanPage 1.5s ease-in-out infinite alternate; }
+    @keyframes scanPage { 0% { width: 40px; opacity: 0.5; } 100% { width: 120px; opacity: 1; } }
+  `;
+  document.head.appendChild(style);
+
+  overlay.innerHTML = `
+    <div class="scan-animation-wrap" style="width: 340px;">
+      <div class="scan-title-overlay" style="color:#ff9f43; letter-spacing: 2px; font-size: 13px;">LEGAL DIRECTORY ACCESS</div>
+      
+      <div class="law-book-wrap">
+        <div class="law-circle"></div>
+        <div class="law-circle2"></div>
+        <i class='bx bxs-book-reader law-book-icon'></i>
+        <div class="law-page"></div>
+      </div>
+
+      <div class="scan-progress-label" id="scanLabel" style="color:#ff9f43; margin-top:10px;">Querying Penal Codes...</div>
+      <div class="scan-bar-wrap"><div class="scan-bar-fill" id="scanBarFill" style="background:linear-gradient(90deg, #ff9f43, #ffc048)"></div></div>
+      
+      <div id="lawLog" style="width: 300px; height: 85px; margin: 15px auto 0; background: rgba(255,159,67,0.05); border: 1px solid rgba(255,159,67,0.2); border-radius: 4px; padding: 8px 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #dcdde1; overflow: hidden; text-align: left; line-height: 1.6; box-sizing: border-box;">
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const fill = overlay.querySelector("#scanBarFill");
+  const lbl = overlay.querySelector("#scanLabel");
+  const lawLog = overlay.querySelector("#lawLog");
+  
+  const steps = ["Querying Penal Codes...", "Loading Constitutional References...", "Synchronizing Statutes...", "Accessing Jurisprudence..."];
+  const logs = [
+    "[*] Connecting to central legal archive...",
+    "[+] Authorizing access credentials...",
+    "[!] Fetching criminal statutes...",
+    "[*] Cross-referencing case law...",
+    "[+] Decrypting legal precedents...",
+    "[+] Legal Directory: ONLINE"
+  ];
+  
+  const totalTime = 3000;
+  const start = performance.now();
+  let currentLogIdx = 0;
+
+  const logInterval = setInterval(() => {
+    if (currentLogIdx < logs.length) {
+      const p = document.createElement("div");
+      p.textContent = logs[currentLogIdx];
+      p.style.opacity = 0;
+      p.style.transition = "opacity 0.2s";
+      lawLog.appendChild(p);
+      setTimeout(() => p.style.opacity = 1, 20);
+      lawLog.scrollTop = lawLog.scrollHeight;
+      currentLogIdx++;
+    }
+  }, 400);
+
+  function updateProgress(now) {
+    const elapsed = now - start;
+    const pct = Math.min((elapsed / totalTime) * 100, 100);
+    fill.style.width = pct + "%";
+    lbl.textContent = steps[Math.floor((pct/100) * 0.99 * steps.length)];
+
+    if (elapsed < totalTime) { 
+      requestAnimationFrame(updateProgress); 
+    } else {
+      clearInterval(logInterval);
+      overlay.remove(); 
+      const existingStyle = document.getElementById("law-overlay-style");
+      if (existingStyle) existingStyle.remove();
+      onComplete();
+    }
+  }
+  requestAnimationFrame(updateProgress);
+}
+
 function initScanButtons() {
   document.querySelectorAll(".scan-btn").forEach(btn => {
     btn.addEventListener("click", e => {
@@ -788,10 +1106,14 @@ function initScanButtons() {
       }
 
       switch (type) {
-        case "finger":   showFingerprintOverlay(afterScan); break;
         case "face":     showFacialOverlay(afterScan);      break;
         case "forensic": showForensicsOverlay(afterScan);   break;
         case "network":  showNetworkOverlay(afterScan);     break;
+        case "malware":  showMalwareOverlay(afterScan);     break;
+        case "forensics_db": showForensicsDbOverlay(afterScan);   break;
+        case "chain_of_custody": showChainOfCustodyOverlay(afterScan);   break;
+        case "threat_intel": showThreatIntelOverlay(afterScan); break;
+        case "law": showLawOverlay(afterScan); break;
         default:         showFingerprintOverlay(afterScan); break;
       }
     });

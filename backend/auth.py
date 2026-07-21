@@ -10,8 +10,15 @@ from database import get_db
 import models
 import schemas
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # Security Configuration
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "super-secret-justiceflowx-key-change-me")
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("FATAL ERROR: JWT_SECRET_KEY is missing from environment or .env file.")
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

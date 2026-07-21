@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>JusticeFlowX</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="forensics.css">
+</head>
+
+<body id="top">
+  
+
+  <div class="scanline-overlay"></div>
+  <div class="noise-overlay"></div>
+  <canvas id="hexCanvas"></canvas>
+  <div class="data-streams" id="dataStreams"></div>
+
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="logo-wrapper">
+        <img src="../../assets/images/WhatsApp Image 2026-01-07 at 9.59.21 PM.jpeg" class="logo" alt="logo">
+        <div class="logo-ping"></div>
+      </div>
+      <div class="brand-block">
+        <span class="brand" data-text="JusticeFlowX">JusticeFlowX</span>
+        <span class="brand-sub">Network Forensics v4.0</span>
+      </div>
+    </div>
+
+    <div class="nav-center">
+      <a href="../../index.html" class="nav-link active">
+        <i class='bx bx-grid-alt'></i><span>Dashboard</span>
+      </a>
+      <a href="../live_capture/live_capture.html" class="nav-link">
+        <i class='bx bx-broadcast'></i><span>Live Capture</span>
+      </a>
+      <a href="../packet_analyzer/packet_analyzer.html" class="nav-link">
+        <i class='bx bx-search-alt'></i><span>Packet Analyzer</span>
+      </a>
+      <a href="../threat_intel/threat_intel.html" class="nav-link">
+        <i class='bx bx-shield-quarter'></i><span>Threat Intel</span>
+      </a>
+      <a href="../network_forensics/forensics.html" class="nav-link">
+        <i class='bx bx-network-chart'></i><span>Traffic Analysis</span>
+      </a>
+      <a href="../case/case.html" class="nav-link">
+        <i class='bx bx-folder'></i><span>Case Control</span>
+      </a>
+    </div>
+
+    <div class="nav-right">
+      <div class="status-cluster">
+        <div class="status-dot"></div>
+        <span class="system-status">SYSTEMS ONLINE</span>
+      </div>
+      <div class="clock-display" id="clockDisplay">00:00:00</div>
+      <div class="menu">
+        <button class="menu-trigger" id="menuBtn" aria-label="Menu">
+          <i class='bx bx-dots-vertical-rounded'></i>
+        </button>
+        <div class="dropdown" id="menuDropdown">
+          <div class="dropdown-header">QUICK ACCESS</div>
+          <a href="../live_capture/live_capture.html"><i class='bx bx-broadcast'></i> Live Sniffer</a>
+          <a href="../threat_intel/threat_intel.html"><i class='bx bx-shield'></i> Threat Engine</a>
+          <a href="../system/infraction.html"><i class='bx bx-list-ul'></i> System Logs</a>
+          <a href="../packet_analyzer/packet_analyzer.html"><i class='bx bx-search-alt'></i> DPI Inspector</a>
+          <a href="../case/case-report.html"><i class='bx bx-file'></i> Export Reports</a>
+          <div class="dropdown-divider"></div>
+          <a href="#" id="logoutBtn" class="logout-link"><i class='bx bx-log-out'></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="hero-section">
+    <div class="hero-text">
+      <div class="hero-badge">⬡ PACKET INTERCEPTION MODULE</div>
+      <h1 class="hero-title">Network <span class="accent">Forensics</span></h1>
+      <p class="hero-sub">Deep Packet Inspection and Threat Intelligence for Cyber Crime Investigation</p>
+      <div class="export-controls" style="display:flex;gap:15px;margin-top:25px;justify-content:center;z-index:20;position:relative;">
+        <button class="scan-btn" onclick="exportData('pcap')" style="padding:12px 24px;font-size:14px;min-height:unset;width:auto;"><i class='bx bx-download'></i> Export PCAP</button>
+        <button class="scan-btn" onclick="exportData('pdf')" style="padding:12px 24px;font-size:14px;min-height:unset;width:auto;border-color:#ff9f43;color:#ff9f43;background:rgba(255,159,67,0.1)"><i class='bx bxs-file-pdf'></i> Export PDF Report</button>
+        <button class="scan-btn" onclick="exportData('csv')" style="padding:12px 24px;font-size:14px;min-height:unset;width:auto;border-color:#00ff88;color:#00ff88;background:rgba(0,255,136,0.1)"><i class='bx bx-table'></i> Export CSV</button>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item"><span class="stat-val" data-count="8420">0</span><span class="stat-unit"> PKT/S</span><span
+          class="stat-label">Capture Rate</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><span class="stat-val" data-count="1.2">0</span><span class="stat-unit"> Gbps</span><span
+          class="stat-label">Bandwidth</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat-item"><span class="stat-val" data-count="14">0</span><span class="stat-unit">K+</span><span
+          class="stat-label">Active Conns</span></div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- LIVE CAPTURE CARD -->
+    <div class="scan-box" id="scanBox1">
+      <div class="card-glow glow-purple"></div>
+      <div class="card-corner tl"></div>
+      <div class="card-corner tr"></div>
+      <div class="card-corner bl"></div>
+      <div class="card-corner br"></div>
+      <div class="scan-line-anim"></div>
+      <div class="card-badge badge-alt">METHOD 01</div>
+      <div class="icon-wrapper">
+        <i class='bx bx-broadcast'></i>
+        <div class="icon-rings">
+          <div class="ring r1" style="border-style:dashed"></div>
+          <div class="ring r2" style="border-style:dashed"></div>
+          <div class="ring r3" style="border-style:dashed"></div>
+        </div>
+      </div>
+      <h2>Live Packet Capture</h2>
+      <p>Intercept and analyze live network traffic across physical and virtual interfaces in real-time</p>
+      <div class="card-divider"></div>
+      <div class="card-meta">
+        <span><i class='bx bx-check-shield'></i> Promiscuous Mode</span>
+        <span><i class='bx bx-time'></i> Live Stream</span>
+      </div>
+      <a href="../live_capture/live_capture.html" class="scan-btn scan-btn-alt" data-type="capture">
+        <span class="btn-text">Start Capture</span>
+        <span class="btn-arrow"><i class='bx bx-right-arrow-alt'></i></span>
+        <div class="btn-shine"></div>
+      </a>
+    </div>
+
+    <!-- PACKET ANALYZER CARD -->
+    <div class="scan-box" id="scanBox2">
+      <div class="card-glow" style="background: radial-gradient(circle, rgba(0,255,136,0.1) 0%, transparent 70%)"></div>
+      <div class="card-corner tl"></div>
+      <div class="card-corner tr"></div>
+      <div class="card-corner bl"></div>
+      <div class="card-corner br"></div>
+      <div class="scan-line-anim"
+        style="animation-delay: 1.5s; background: linear-gradient(90deg, transparent, var(--green), transparent); box-shadow: 0 0 12px var(--green);">
+      </div>
+      <div class="card-badge"
+        style="color:rgba(0,255,136,0.7);border-color:rgba(0,255,136,0.2);background:rgba(0,255,136,0.05)">METHOD 02
+      </div>
+      <div class="icon-wrapper">
+        <i class='bx bx-search-alt' style="color:var(--green);filter:drop-shadow(0 0 16px var(--green))"></i>
+        <div class="icon-rings">
+          <div class="ring r1" style="border-color:rgba(0,255,136,0.25)"></div>
+          <div class="ring r2" style="border-color:rgba(0,255,136,0.2)"></div>
+          <div class="ring r3" style="border-color:rgba(0,255,136,0.15)"></div>
+        </div>
+      </div>
+      <h2>Packet Analyzer</h2>
+      <p>Deep Packet Inspection (DPI) with Hex and ASCII views. Analyze PCAP files for malicious payloads</p>
+      <div class="card-divider"></div>
+      <div class="card-meta">
+        <span><i class='bx bx-check-shield'></i> Protocol Decoding</span>
+        <span><i class='bx bx-time'></i> Layer 7 Analysis</span>
+      </div>
+      <a href="../packet_analyzer/packet_analyzer.html" class="scan-btn" data-type="analyzer"
+        style="border-color:var(--green);color:var(--green);background:linear-gradient(135deg,rgba(0,255,136,0.08),rgba(0,255,136,0.03))">
+        <span class="btn-text">Open Analyzer</span>
+        <span class="btn-arrow"><i class='bx bx-right-arrow-alt'></i></span>
+        <div class="btn-shine"></div>
+      </a>
+    </div>
+
+    <!-- THREAT INTELLIGENCE CARD -->
+    <div class="scan-box" id="scanBox3">
+      <div class="card-glow" style="background: radial-gradient(circle, rgba(0,191,255,0.1) 0%, transparent 70%)"></div>
+      <div class="card-corner tl"></div>
+      <div class="card-corner tr"></div>
+      <div class="card-corner bl"></div>
+      <div class="card-corner br"></div>
+      <div class="scan-line-anim"
+        style="animation-delay: 3s; background: linear-gradient(90deg, transparent, #00bfff, transparent); box-shadow: 0 0 12px #00bfff;">
+      </div>
+      <div class="card-badge"
+        style="color:rgba(0,191,255,0.7);border-color:rgba(0,191,255,0.2);background:rgba(0,191,255,0.05)">METHOD 03
+      </div>
+      <div class="icon-wrapper">
+        <i class='bx bx-shield-quarter' style="color:#00bfff;filter:drop-shadow(0 0 16px #00bfff)"></i>
+        <div class="icon-rings">
+          <div class="ring r1" style="border-color:rgba(0,191,255,0.25)"></div>
+          <div class="ring r2" style="border-color:rgba(0,191,255,0.2)"></div>
+          <div class="ring r3" style="border-color:rgba(0,191,255,0.15)"></div>
+        </div>
+      </div>
+      <h2>Threat Intelligence</h2>
+      <p>Automated IOC matching against global threat feeds, WHOIS lookups, and malicious domain detection</p>
+      <div class="card-divider"></div>
+      <div class="card-meta">
+        <span><i class='bx bx-check-shield'></i> MITRE ATT&CK</span>
+        <span><i class='bx bx-time'></i> Live Feeds</span>
+      </div>
+      <a href="../threat_intel/threat_intel.html" class="scan-btn" data-type="threat"
+        style="border-color:#00bfff;color:#00bfff;background:linear-gradient(135deg,rgba(0,191,255,0.08),rgba(0,191,255,0.03))">
+        <span class="btn-text">Launch Engine</span>
+        <span class="btn-arrow"><i class='bx bx-right-arrow-alt'></i></span>
+        <div class="btn-shine"></div>
+      </a>
+    </div>
+    <!-- TRAFFIC ANALYSIS CARD -->
+    <div class="scan-box" id="scanBox4">
+      <div class="card-glow" style="background: radial-gradient(circle, rgba(255,159,67,0.1) 0%, transparent 70%)"></div>
+      <div class="card-corner tl"></div>
+      <div class="card-corner tr"></div>
+      <div class="card-corner bl"></div>
+      <div class="card-corner br"></div>
+      <div class="scan-line-anim"
+        style="animation-delay: 4.5s; background: linear-gradient(90deg, transparent, #ff9f43, transparent); box-shadow: 0 0 12px #ff9f43;">
+      </div>
+      <div class="card-badge"
+        style="color:rgba(255,159,67,0.7);border-color:rgba(255,159,67,0.2);background:rgba(255,159,67,0.05)">METHOD 04
+      </div>
+      <div class="icon-wrapper">
+        <i class='bx bx-line-chart' style="color:#ff9f43;filter:drop-shadow(0 0 16px #ff9f43)"></i>
+        <div class="icon-rings">
+          <div class="ring r1" style="border-color:rgba(255,159,67,0.25)"></div>
+          <div class="ring r2" style="border-color:rgba(255,159,67,0.2)"></div>
+          <div class="ring r3" style="border-color:rgba(255,159,67,0.15)"></div>
+        </div>
+      </div>
+      <h2>Traffic Analysis</h2>
+      <p>Analyze protocol distributions, bandwidth consumption, and reconstruct TCP streams for intrusion detection</p>
+      <div class="card-divider"></div>
+      <div class="card-meta">
+        <span><i class='bx bx-check-shield'></i> Flow Analysis</span>
+        <span><i class='bx bx-time'></i> Historical View</span>
+      </div>
+      <a href="../network_forensics/forensics.html" class="scan-btn" data-type="forensics"
+        style="border-color:#ff9f43;color:#ff9f43;background:linear-gradient(135deg,rgba(255,159,67,0.08),rgba(255,159,67,0.03))">
+        <span class="btn-text">Open Directory</span>
+        <span class="btn-arrow"><i class='bx bx-right-arrow-alt'></i></span>
+        <div class="btn-shine"></div>
+      </a>
+    </div>
+
+  </div>
+
+  <div class="status-bar">
+    <div class="status-bar-item"><i class='bx bx-broadcast'></i> Sniffer Active: <span class="ok">YES</span></div>
+    <div class="status-bar-item"><i class='bx bx-data'></i> Database: <span class="ok">CONNECTED</span></div>
+    <div class="status-bar-item"><i class='bx bx-shield'></i> Firewall: <span class="ok">SECURE</span></div>
+    <div class="status-bar-item"><i class='bx bx-shield-quarter'></i> IDS Enabled: <span class="warn">YES</span></div>
+    <div class="status-bar-item marquee-wrap"><span class="marquee-text" id="marqueeText"></span></div>
+  </div>
+
+  <div id="terminalLogs">
+    <div class="terminal-header"><span>⬢ SYSTEM TERMINAL</span><span id="termTime"></span></div>
+    <div id="terminalBody"></div>
+  </div>
+
+  <script src="forensics.js"></script>
+</body>
+
+</html>
+

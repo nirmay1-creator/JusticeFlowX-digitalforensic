@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <link rel="stylesheet" href="../../assets/css/shared.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Threat Intelligence - JusticeFlowX</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/justice.css">
+  <style>
+    :root {
+      --ti-primary: #00d4ff;
+      --ti-primary-dim: rgba(0,212,255,0.15);
+      --ti-danger: #ff4757;
+      --ti-safe: #2ed573;
+      --ti-warn: #ffa502;
+      --ti-bg: #060b14;
+      --ti-card: #0a1628;
+      --ti-border: rgba(0,212,255,0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    .ti-page {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      padding: 30px 20px 80px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .ti-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* ── HEADER ── */
+    .ti-header {
+      text-align: center;
+      padding: 35px 25px;
+      margin-bottom: 30px;
+      background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(0,100,200,0.04));
+      border: 1px solid var(--ti-border);
+      border-radius: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ti-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 50%, rgba(0,212,255,0.06) 0%, transparent 50%);
+      animation: headerPulse 8s ease-in-out infinite;
+    }
+
+    @keyframes headerPulse {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 1; }
+    }
+
+    .ti-header h1 {
+      color: var(--ti-primary);
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      position: relative;
+    }
+
+    .ti-header h1 i {
+      margin-right: 10px;
+      vertical-align: middle;
+      font-size: 2.4rem;
+    }
+
+    .ti-header p {
+      color: #8899aa;
+      font-size: 1rem;
+      margin-top: 8px;
+      position: relative;
+    }
+
+    /* ── SEARCH PANEL ── */
+    .ti-search-panel {
+      background: var(--ti-card);
+      border: 1px solid var(--ti-border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 28px;
+    }
+
+    .ti-search-row {
+      display: flex;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .ti-search-input {
+      flex: 1;
+      padding: 16px 20px;
+      background: rgba(0,212,255,0.04);
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1.05rem;
+      font-family: 'JetBrains Mono', monospace;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .ti-search-input:focus {
+      border-color: var(--ti-primary);
+      box-shadow: 0 0 20px rgba(0,212,255,0.15);
+    }
+
+    .ti-search-input::placeholder { color: #4a6070; }
+
+    .ti-type-select {
+      padding: 16px 18px;
+      background: rgba(0,212,255,0.06);
+      border: 1px solid rgba(0,212,255,0.3);
+      border-radius: 12px;
+      color: var(--ti-primary);
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      cursor: pointer;
+      min-width: 130px;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300d4ff'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 20px;
+    }
+
+    .ti-type-select option {
+      background: #0a1628;
+      color: #fff;
+    }
+
+    .ti-scan-btn {
+      padding: 16px 32px;
+      background: linear-gradient(135deg, #00d4ff, #0088cc);
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+      white-space: nowrap;
+    }
+
+    .ti-scan-btn:hover {
+      background: linear-gradient(135deg, #33ddff, #00aaee);
+      box-shadow: 0 4px 25px rgba(0,212,255,0.35);
+      transform: translateY(-1px);
+    }
+
+    .ti-scan-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .ti-quick-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .ti-chip {
+      padding: 6px 14px;
+      background: rgba(0,212,255,0.06);
+      border: 1px solid rgba(0,212,255,0.2);
+      border-radius: 20px;
+      color: var(--ti-primary);
+      font-size: 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ti-chip:hover {
+      background: rgba(0,212,255,0.15);
+      transform: translateY(-1px);
+    }
+
+    /* ── LOADING ANIMATION ── */
+    .ti-loading {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .ti-scanner {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 25px;
+      position: relative;
+    }
+
+    .ti-scanner .scanner-ring {
+      position: absolute;
+      border: 2px solid transparent;
+      border-radius: 50%;
+      animation: scannerSpin 2s linear infinite;
+    }
+
+    .ti-scanner .ring-1 {
+      width: 120px; height: 120px;
+      top: 0; left: 0;
+      border-top-color: var(--ti-primary);
+      border-right-color: rgba(0,212,255,0.3);
+    }
+
+    .ti-scanner .ring-2 {
+      width: 90px; height: 90px;
+      top: 15px; left: 15px;
+      border-bottom-color: var(--ti-primary);
+      border-left-color: rgba(0,212,255,0.3);
+      animation-direction: reverse;
+      animation-duration: 1.5s;
+    }
+
+    .ti-scanner .ring-3 {
+      width: 60px; height: 60px;
+      top: 30px; left: 30px;
+      border-top-color: var(--ti-primary);
+      animation-duration: 1s;
+    }
+
+    .ti-scanner .scanner-core {
+      position: absolute;
+      width: 30px; height: 30px;
+      top: 45px; left: 45px;
+      background: var(--ti-primary);
+      border-radius: 50%;
+      animation: corePulse 1s ease-in-out infinite;
+      box-shadow: 0 0 20px var(--ti-primary), 0 0 40px rgba(0,212,255,0.3);
+    }
+
+    @keyframes scannerSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes corePulse {
+      0%, 100% { transform: scale(0.8); opacity: 0.6; }
+      50% { transform: scale(1.2); opacity: 1; }
+    }
+
+    .ti-loading-text {
+      color: var(--ti-primary);
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    .ti-loading-sub {
+      color: #5a7080;
+      font-size: 0.85rem;
+      margin-top: 6px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── RESULTS ── */
+    .ti-results { display: none; }
+
+    /* Verdict Banner */
+    .ti-verdict {
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      animation: resultSlide 0.5s ease;
+    }
+
+    @keyframes resultSlide {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .ti-verdict.safe {
+      background: rgba(46,213,115,0.08);
+      border: 1px solid rgba(46,213,115,0.3);
+    }
+
+    .ti-verdict.malicious {
+      background: rgba(255,71,87,0.08);
+      border: 1px solid rgba(255,71,87,0.3);
+    }
+
+    .ti-verdict-icon {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .ti-verdict.safe .ti-verdict-icon {
+      background: rgba(46,213,115,0.15);
+      color: var(--ti-safe);
+      box-shadow: 0 0 20px rgba(46,213,115,0.2);
+    }
+
+    .ti-verdict.malicious .ti-verdict-icon {
+      background: rgba(255,71,87,0.15);
+      color: var(--ti-danger);
+      box-shadow: 0 0 20px rgba(255,71,87,0.2);
+      animation: dangerPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes dangerPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(255,71,87,0.2); }
+      50% { box-shadow: 0 0 35px rgba(255,71,87,0.4); }
+    }
+
+    .ti-verdict-info h2 {
+      font-size: 1.4rem;
+      margin-bottom: 4px;
+    }
+
+    .ti-verdict.safe .ti-verdict-info h2 { color: var(--ti-safe); }
+    .ti-verdict.malicious .ti-verdict-info h2 { color: var(--ti-danger); }
+
+    .ti-verdict-info p { color: #99aabb; font-size: 0.95rem; }
+
+    .ti-score-badge {
+      margin-left: auto;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 1.8rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+    }
+
+    .ti-verdict.safe .ti-score-badge {
+      background: rgba(46,213,115,0.12);
+      color: var(--ti-safe);
+      border: 1px solid rgba(46,213,115,0.3);
+    }
+
+    .ti-verdict.malicious .ti-score-badge {
+      background: rgba(255,71,87,0.12);
+      color: var(--ti-danger);
+      border: 1px solid rgba(255,71,87,0.3);
+    }
+
+    /* Provider Cards */
+    .ti-providers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .ti-provider-card {
+      background: var(--ti-card);
+      border: 1px solid var(--ti-border);
+      border-radius: 14px;
+      padding: 22px;
+      animation: resultSlide 0.5s ease;
+    }
+
+    .ti-provider-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .ti-provider-name {
+      color: var(--ti-primary);
+      font-weight: 700;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ti-provider-name i { font-size: 1.2rem; }
+
+    .ti-status-pill {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .ti-status-pill.success {
+      background: rgba(46,213,115,0.15);
+      color: var(--ti-safe);
+      border: 1px solid rgba(46,213,115,0.3);
+    }
+
+    .ti-status-pill.mock {
+      background: rgba(255,165,2,0.15);
+      color: var(--ti-warn);
+      border: 1px solid rgba(255,165,2,0.3);
+    }
+
+    .ti-status-pill.error, .ti-status-pill.timeout {
+      background: rgba(255,71,87,0.15);
+      color: var(--ti-danger);
+      border: 1px solid rgba(255,71,87,0.3);
+    }
+
+    .ti-status-pill.skipped, .ti-status-pill.not_applicable, .ti-status-pill.no_api_key {
+      background: rgba(100,120,140,0.15);
+      color: #8899aa;
+      border: 1px solid rgba(100,120,140,0.3);
+    }
+
+    .ti-provider-detail {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(0,212,255,0.08);
+      color: #99aabb;
+      font-size: 0.9rem;
+    }
+
+    .ti-provider-detail:last-child { border-bottom: none; }
+
+    .ti-provider-detail .label { color: #667788; }
+
+    .ti-provider-detail .value {
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      color: #ddeeff;
+    }
+
+    .ti-provider-detail .value.detected { color: var(--ti-danger); }
+    .ti-provider-detail .value.clean { color: var(--ti-safe); }
+
+    /* Raw JSON Toggle */
+    .ti-raw-toggle {
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .ti-raw-btn {
+      padding: 10px 24px;
+      background: rgba(0,212,255,0.06);
+      border: 1px solid var(--ti-border);
+      border-radius: 10px;
+      color: var(--ti-primary);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .ti-raw-btn:hover { background: rgba(0,212,255,0.12); }
+
+    .ti-raw-json {
+      display: none;
+      margin-top: 14px;
+      background: #050d18;
+      border: 1px solid var(--ti-border);
+      border-radius: 10px;
+      padding: 18px;
+      color: var(--ti-primary);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 400px;
+      overflow-y: auto;
+      text-align: left;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      .ti-search-row { flex-direction: column; }
+      .ti-verdict { flex-direction: column; text-align: center; }
+      .ti-score-badge { margin-left: 0; }
+      .ti-providers-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body id="top">
+  <div class="scanline-overlay"></div>
+  <div class="noise-overlay"></div>
+
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="logo-wrapper">
+        <img src="../../assets/images/WhatsApp Image 2026-01-07 at 9.59.21 PM.jpeg" class="logo" alt="logo" width="40" height="40">
+        <div class="logo-ping"></div>
+      </div>
+      <div class="brand-block">
+        <span class="brand" data-text="JusticeFlowX">JusticeFlowX</span>
+        <span class="brand-sub">Verification System v2.4</span>
+      </div>
+    </div>
+
+    <div class="nav-center">
+      <a href="../../index.html" class="nav-link"><i class='bx bx-grid-alt'></i><span>Dashboard</span></a>
+      <a href="../forensics/forensic.html" class="nav-link"><i class='bx bx-search-alt'></i><span>Forensics</span></a>
+      <a href="../network_forensics/forensics_dashboard.html" class="nav-link"><i class='bx bx-network-chart'></i><span>Network Forensics</span></a>
+      <a href="../threat_intel/threat_intel.html" class="nav-link"><i class='bx bx-shield-quarter'></i><span>Threat Intel</span></a>
+      <a href="../law/law.html" class="nav-link"><i class='bx bxs-book-reader'></i><span>Law</span></a>
+      <a href="../system/system.html" class="nav-link"><i class='bx bx-server'></i><span>System</span></a>
+    </div>
+
+    <div class="nav-right">
+      <div class="status-cluster">
+        <div class="status-dot"></div>
+        <span class="system-status">SYSTEMS ONLINE</span>
+      </div>
+      <div class="clock-display" id="clockDisplay">00:00:00</div>
+      <div class="menu">
+        <button class="menu-trigger" id="menuBtn" aria-label="Menu">
+          <i class='bx bx-dots-vertical-rounded'></i>
+        </button>
+        <div class="dropdown" id="menuDropdown">
+          <div class="dropdown-header">QUICK ACCESS</div>
+          <a href="../system/infraction.html"><i class='bx bx-list-ul'></i> System Logs</a>
+          <a href="../system/system.html"><i class='bx bx-shield'></i> System Health</a>
+          <a href="../forensics/forensic.html"><i class='bx bx-search-alt'></i> Document Forensics</a>
+          <div class="dropdown-divider"></div>
+          <a href="#" id="logoutBtn" class="logout-link"><i class='bx bx-log-out'></i> Logout</a>
+        </div>
+      </div>
+    </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const navLinks = document.querySelectorAll('.nav-center .nav-link');
+      navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+          const targetHref = this.getAttribute('href');
+          if (targetHref && !targetHref.includes('index.html') && targetHref !== '#') {
+            e.preventDefault();
+            showGlobalAuthModal(targetHref, this.querySelector('span').innerText);
+          }
+        });
+      });
+
+      function showGlobalAuthModal(redirectUrl, moduleName) {
+        let modalColor = '#00f5ff';
+        let modalGlow = 'rgba(0,245,255,0.15)';
+        let iconClass = 'bx-shield-quarter';
+        let badgeText = 'SECURE CHANNEL';
+        
+        let type = moduleName.toLowerCase();
+        if (type.includes('criminal')) { modalColor = '#ff2b5e'; modalGlow = 'rgba(255,43,94,0.15)'; iconClass = 'bx-user'; badgeText = 'CLASS-A RESTRICTED'; }
+        else if (type.includes('case')) { modalColor = '#00ff88'; modalGlow = 'rgba(0,255,136,0.15)'; iconClass = 'bx-folder'; badgeText = 'ACTIVE CASE CONTROL'; }
+        else if (type.includes('evidence')) { modalColor = '#ffb800'; modalGlow = 'rgba(255,184,0,0.15)'; iconClass = 'bx-archive'; badgeText = 'CHAIN OF CUSTODY'; }
+        else if (type.includes('biometric')) { modalColor = '#7b2fff'; modalGlow = 'rgba(123,47,255,0.15)'; iconClass = 'bx-fingerprint'; badgeText = 'BIOMETRIC INDEX'; }
+        else if (type.includes('network')) { modalColor = '#ff4757'; modalGlow = 'rgba(255,71,87,0.15)'; iconClass = 'bx-network-chart'; badgeText = 'LIVE TRAFFIC DEEP'; }
+        else if (type.includes('threat')) { modalColor = '#ff4757'; modalGlow = 'rgba(255,71,87,0.15)'; iconClass = 'bx-error-alt'; badgeText = 'CRITICAL INTELLIGENCE'; }
+        else if (type.includes('forensic')) { modalColor = '#ff9f43'; modalGlow = 'rgba(255,159,67,0.15)'; iconClass = 'bx-line-chart'; badgeText = 'FORENSICS PORTAL'; }
+        else if (type.includes('law')) { modalColor = '#ff9f43'; modalGlow = 'rgba(255,159,67,0.15)'; iconClass = 'bxs-book-reader'; badgeText = 'PUBLIC LEGAL INDEX'; }
+        else if (type.includes('system')) { modalColor = '#00d4ff'; modalGlow = 'rgba(0,212,255,0.15)'; iconClass = 'bx-server'; badgeText = 'CORE SYSTEM CONTROL'; }
+
+        if (!document.getElementById('global-auth-styles')) {
+          const style = document.createElement('style');
+          style.id = 'global-auth-styles';
+          style.innerHTML = `
+            .g-auth-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(2, 6, 12, 0.88); backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; z-index: 9998; opacity: 0; pointer-events: none; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); padding-top: 50px; }
+            .g-auth-overlay.show { opacity: 1; pointer-events: auto; }
+            .g-auth-modal { position: relative; background: rgba(5,15,32,0.96); border-radius: 20px; padding: 48px 40px; width: 90%; max-width: 420px; text-align: center; transform: translateY(30px) scale(0.95); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2); overflow: hidden; }
+            .g-auth-overlay.show .g-auth-modal { transform: translateY(0) scale(1); }
+            
+            /* Sweep Animation line */
+            .g-auth-modal::after { content: ''; position: absolute; top: 0; left: -100%; width: 200%; height: 3px; background: linear-gradient(90deg, transparent, var(--m-color, #00f5ff), transparent); animation: borderSweep 3.5s infinite linear; }
+            @keyframes borderSweep { 0% { left: -100%; } 100% { left: 100%; } }
+
+            /* Header Bar */
+            .g-auth-header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding: 16px 24px; margin: -48px -40px 30px -40px; background: rgba(1, 6, 15, 0.4); }
+            .g-auth-title { font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 700; color: var(--m-color, #00f5ff); text-transform: uppercase; letter-spacing: 1.5px; }
+            .g-auth-close { background: rgba(255,255,255,0.03) !important; border: 1px solid rgba(255,255,255,0.08) !important; color: #8fa0b5 !important; font-size: 18px !important; cursor: pointer; display: flex !important; align-items: center; justify-content: center; width: 28px !important; height: 28px !important; border-radius: 6px !important; transition: all 0.2s; padding: 0 !important; }
+            .g-auth-close:hover { background: rgba(255,71,87,0.1) !important; border-color: #ff4757 !important; color: #ff4757 !important; }
+
+            .g-auth-badge { display: inline-flex; font-family: 'Share Tech Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 2px; color: var(--m-color, #00f5ff); background: var(--m-glow, rgba(0,245,255,0.06)); border: 1px solid var(--m-color, #00f5ff); padding: 4px 12px; border-radius: 4px; margin-bottom: 20px; text-transform: uppercase; text-shadow: 0 0 10px var(--m-glow); }
+
+            .g-auth-icon { width: 68px; height: 68px; margin: 0 auto 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 34px; border: 1px solid var(--m-color, #00f5ff); background: var(--m-glow, rgba(0,245,255,0.1)); color: var(--m-color, #00f5ff); box-shadow: 0 0 25px var(--m-glow, rgba(0,245,255,0.2)); transition: all 0.3s ease; }
+            .g-auth-modal:hover .g-auth-icon { transform: scale(1.05) rotate(5deg); }
+
+            .g-auth-modal h2 { font-family: 'Rajdhani', sans-serif; font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+            .g-auth-modal p { color: #8fa0b5; font-size: 14px; margin-bottom: 28px; font-family: 'Exo 2', sans-serif; }
+            
+            .g-auth-input-wrap { position: relative; margin-bottom: 24px; }
+            .g-auth-modal input { width: 100%; padding: 16px 20px; background: rgba(1, 6, 15, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: #fff; font-size: 18px; font-family: 'Share Tech Mono', monospace; text-align: center; outline: none; transition: all 0.3s ease; letter-spacing: 4px; }
+            .g-auth-modal input:focus { border-color: var(--m-color, #00f5ff) !important; box-shadow: 0 0 20px var(--m-glow, rgba(0,245,255,0.15)), inset 0 0 10px rgba(0,0,0,0.5) !important; }
+            
+            .g-auth-submit-btn { width: 100% !important; padding: 16px !important; border-radius: 10px !important; font-family: 'Rajdhani', sans-serif !important; font-size: 16px !important; font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: 1px !important; cursor: pointer !important; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important; background: var(--m-glow, rgba(0,245,255,0.1)) !important; color: var(--m-color, #00f5ff) !important; border: 1px solid var(--m-color, #00f5ff) !important; box-shadow: 0 4px 15px rgba(0,0,0,0.3) !important; }
+            .g-auth-submit-btn:hover { background: var(--m-color, #00f5ff) !important; color: #020810 !important; box-shadow: 0 0 25px var(--m-glow, rgba(0,245,255,0.45)) !important; transform: translateY(-1px); }
+            .g-auth-submit-btn:active { transform: translateY(1px) scale(0.98); }
+
+            .g-auth-error { display: none; color: #ff4757; font-size: 13px; margin-top: 16px; font-family: 'Share Tech Mono', monospace; letter-spacing: 1.5px; animation: shake 0.3s ease-in-out; }
+            @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
+          `;
+          document.head.appendChild(style);
+        }
+
+        let overlay = document.getElementById('global-auth-overlay');
+        if (!overlay) {
+          overlay = document.createElement('div');
+          overlay.id = 'global-auth-overlay';
+          overlay.className = 'g-auth-overlay';
+          document.body.appendChild(overlay);
+        }
+
+        overlay.style.setProperty('--m-color', modalColor);
+        overlay.style.setProperty('--m-glow', modalGlow);
+
+        overlay.innerHTML = `
+          <div class="g-auth-modal" style="border: 1px solid ${modalColor}; box-shadow: 0 20px 60px rgba(0,0,0,0.65), 0 0 40px ${modalGlow}, inset 0 1px 1px rgba(255,255,255,0.04);">
+            <div class="g-auth-header">
+              <span class="g-auth-title">${moduleName} Terminal</span>
+              <button class="g-auth-close" onclick="document.getElementById('global-auth-overlay').classList.remove('show')">&times;</button>
+            </div>
+            <div class="g-auth-badge">${badgeText}</div>
+            <div class="g-auth-icon"><i class='bx ${iconClass}'></i></div>
+            <h2>Authentication</h2>
+            <p>Clearance level required to initialize terminal link</p>
+            <div class="g-auth-input-wrap">
+              <input type="password" id="gAuthInput" placeholder="CLEARANCE CODE" autocomplete="off">
+            </div>
+            <button class="g-auth-submit-btn" id="gAuthBtn">AUTHENTICATE SYSTEM</button>
+            <div class="g-auth-error" id="gAuthError"><i class='bx bx-error-alt'></i> INVALID SECURITY CODE</div>
+          </div>
+        `;
+
+        document.getElementById('gAuthInput').addEventListener('focus', function() { this.style.borderColor = modalColor; });
+        document.getElementById('gAuthInput').addEventListener('blur', function() { this.style.borderColor = 'rgba(255,255,255,0.1)'; });
+
+        const btn = document.getElementById('gAuthBtn');
+        btn.addEventListener('mouseenter', function() { this.style.background = modalColor; this.style.color = '#000'; });
+        btn.addEventListener('mouseleave', function() { this.style.background = modalGlow; this.style.color = modalColor; });
+
+        setTimeout(() => overlay.classList.add('show'), 10);
+        const input = document.getElementById('gAuthInput');
+        setTimeout(() => input.focus(), 100);
+
+        const checkAuth = () => {
+          if (input.value === 'justice123') {
+            window.location.href = redirectUrl;
+          } else {
+            const errDiv = document.getElementById('gAuthError');
+            errDiv.style.display = 'block';
+            errDiv.style.animation = 'none';
+            void errDiv.offsetWidth; // trigger reflow
+            errDiv.style.animation = 'shake 0.3s ease-in-out';
+            input.value = '';
+          }
+        };
+        btn.addEventListener('click', checkAuth);
+        input.addEventListener('keypress', (e) => { if (e.key === 'Enter') checkAuth(); });
+      }
+    });
+  </script>
+</nav>
+
+  <!-- SECONDARY NAVBAR (Injected by Script) -->
+  <div class="secondary-navbar" id="secondaryNavbar" style="display: none;"></div>
+
+  <div class="ti-page">
+    <div class="ti-container">
+
+      <!-- HEADER -->
+      <div class="ti-header">
+        <h1><i class='bx bx-shield-quarter'></i> Threat Intelligence</h1>
+        <p>Multi-provider threat lookup engine. Query IPs, domains, URLs, and file hashes against VirusTotal, AbuseIPDB, and AlienVault OTX.</p>
+      </div>
+
+      <!-- SEARCH PANEL -->
+      <div class="ti-search-panel">
+        <div class="ti-search-row">
+          <input class="ti-search-input" id="indicatorInput" type="text" placeholder="Enter IP, domain, URL, or file hash...">
+          <select class="ti-type-select" id="typeSelect">
+            <option value="IP">🌐 IP Address</option>
+            <option value="DOMAIN">🏷️ Domain</option>
+            <option value="URL">🔗 URL</option>
+            <option value="HASH">🔑 File Hash</option>
+          </select>
+          <button class="ti-scan-btn" id="scanBtn"><i class='bx bx-radar'></i> Scan</button>
+        </div>
+        <div class="ti-quick-chips">
+          <span class="ti-chip" onclick="quickLookup('8.8.8.8','IP')">8.8.8.8</span>
+          <span class="ti-chip" onclick="quickLookup('1.1.1.1','IP')">1.1.1.1</span>
+          <span class="ti-chip" onclick="quickLookup('google.com','DOMAIN')">google.com</span>
+          <span class="ti-chip" onclick="quickLookup('example.com','DOMAIN')">example.com</span>
+          <span class="ti-chip" onclick="quickLookup('d41d8cd98f00b204e9800998ecf8427e','HASH')">MD5: empty file</span>
+        </div>
+      </div>
+
+      <!-- LOADING ANIMATION -->
+      <div class="ti-loading" id="loadingArea">
+        <div class="ti-scanner">
+          <div class="scanner-ring ring-1"></div>
+          <div class="scanner-ring ring-2"></div>
+          <div class="scanner-ring ring-3"></div>
+          <div class="scanner-core"></div>
+        </div>
+        <div class="ti-loading-text">SCANNING THREAT DATABASES</div>
+        <div class="ti-loading-sub" id="loadingSub">Querying VirusTotal, AbuseIPDB, AlienVault OTX...</div>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="ti-results" id="resultsArea">
+        <div id="verdictBanner"></div>
+        <div class="ti-providers-grid" id="providersGrid"></div>
+        <div class="ti-raw-toggle">
+          <button class="ti-raw-btn" onclick="toggleRawJSON()"><i class='bx bx-code-alt'></i> Toggle Raw JSON</button>
+          <pre class="ti-raw-json" id="rawJson"></pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const indicatorInput = document.getElementById('indicatorInput');
+    const typeSelect = document.getElementById('typeSelect');
+    const scanBtn = document.getElementById('scanBtn');
+    const loadingArea = document.getElementById('loadingArea');
+    const loadingSub = document.getElementById('loadingSub');
+    const resultsArea = document.getElementById('resultsArea');
+    const verdictBanner = document.getElementById('verdictBanner');
+    const providersGrid = document.getElementById('providersGrid');
+    const rawJson = document.getElementById('rawJson');
+
+    const API_BASE = 'http://localhost:8001';
+
+    scanBtn.addEventListener('click', performLookup);
+    indicatorInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') performLookup();
+    });
+
+    function quickLookup(indicator, type) {
+      indicatorInput.value = indicator;
+      typeSelect.value = type;
+      performLookup();
+    }
+
+    async function performLookup() {
+      const indicator = indicatorInput.value.trim();
+      const type = typeSelect.value;
+      if (!indicator) return;
+
+      // Reset UI
+      resultsArea.style.display = 'none';
+      loadingArea.style.display = 'block';
+      scanBtn.disabled = true;
+
+      // Animate loading sub-text
+      const providers = ['VirusTotal', 'AbuseIPDB', 'AlienVault OTX'];
+      let provIdx = 0;
+      const loadingInterval = setInterval(() => {
+        loadingSub.textContent = `Querying ${providers[provIdx % providers.length]}...`;
+        provIdx++;
+      }, 800);
+
+      try {
+        const resp = await fetch(`${API_BASE}/api/v1/threat-intel/lookup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ indicator, type })
+        });
+
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+
+        clearInterval(loadingInterval);
+        loadingArea.style.display = 'none';
+        renderResults(data);
+
+      } catch (err) {
+        clearInterval(loadingInterval);
+        loadingArea.style.display = 'none';
+        alert(`Lookup failed: ${err.message}\n\nMake sure the backend is running at ${API_BASE}`);
+      } finally {
+        scanBtn.disabled = false;
+      }
+    }
+
+    function renderResults(data) {
+      // Verdict banner
+      const isMal = data.is_malicious;
+      const score = data.malicious_confidence_score;
+      const cls = isMal ? 'malicious' : 'safe';
+      const icon = isMal ? 'bx-shield-x' : 'bx-shield-quarter';
+      const label = isMal ? 'THREAT DETECTED' : 'CLEAN';
+      const desc = isMal
+        ? `This ${data.type.toLowerCase()} indicator has been flagged as potentially malicious by threat intelligence providers.`
+        : `No significant threats detected for this ${data.type.toLowerCase()} indicator across queried providers.`;
+
+      verdictBanner.innerHTML = `
+        <div class="ti-verdict ${cls}">
+          <div class="ti-verdict-icon"><i class='bx ${icon}'></i></div>
+          <div class="ti-verdict-info">
+            <h2>${label}</h2>
+            <p>${data.indicator}</p>
+            <p style="font-size:0.82rem; margin-top:4px;">${desc}</p>
+          </div>
+          <div class="ti-score-badge">${score}</div>
+        </div>`;
+
+      // Provider cards
+      providersGrid.innerHTML = '';
+      const breakdown = data.provider_breakdown || {};
+      const providerIcons = {
+        virustotal: 'bx-analyse',
+        abuseipdb: 'bx-globe',
+        alienvault: 'bx-planet'
+      };
+
+      for (const [name, info] of Object.entries(breakdown)) {
+        const card = document.createElement('div');
+        card.className = 'ti-provider-card';
+        card.style.animationDelay = `${Object.keys(breakdown).indexOf(name) * 0.1}s`;
+
+        const statusClass = info.status || 'skipped';
+        const detectedClass = info.detected ? 'detected' : 'clean';
+        const detectedLabel = info.detected ? '⚠ DETECTED' : '✓ CLEAN';
+        const icon = providerIcons[name] || 'bx-server';
+
+        let detailsHTML = '';
+        if (info.details && typeof info.details === 'object') {
+          for (const [dk, dv] of Object.entries(info.details)) {
+            if (dk === 'mock') continue;
+            detailsHTML += `<div class="ti-provider-detail"><span class="label">${dk.replace(/_/g, ' ')}</span><span class="value">${dv}</span></div>`;
+          }
+        }
+
+        card.innerHTML = `
+          <div class="ti-provider-header">
+            <span class="ti-provider-name"><i class='bx ${icon}'></i> ${name}</span>
+            <span class="ti-status-pill ${statusClass}">${statusClass}</span>
+          </div>
+          <div class="ti-provider-detail">
+            <span class="label">Detection</span>
+            <span class="value ${detectedClass}">${detectedLabel}</span>
+          </div>
+          <div class="ti-provider-detail">
+            <span class="label">Score</span>
+            <span class="value">${info.score || 0}/100</span>
+          </div>
+          ${detailsHTML}`;
+
+        providersGrid.appendChild(card);
+      }
+
+      // Raw JSON
+      rawJson.textContent = JSON.stringify(data, null, 2);
+      rawJson.style.display = 'none';
+
+      resultsArea.style.display = 'block';
+    }
+
+    function toggleRawJSON() {
+      rawJson.style.display = rawJson.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Initialize System Clock
+    setInterval(() => {
+      const el = document.getElementById("clockDisplay");
+      if (el) el.textContent = new Date().toTimeString().slice(0, 8);
+    }, 1000);
+
+  </script>
+</body>
+</html>

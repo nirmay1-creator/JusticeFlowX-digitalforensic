@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JusticeFlowX — Live Capture</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&amp;family=Rajdhani:wght@400;500;600;700&amp;family=Exo+2:wght@300;400;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/justice.css">
+  <style>
+    .main-layout { display: flex; gap: 20px; padding: 20px; height: calc(100vh - 70px); position: relative; z-index: 2; }
+    .side-panel { width: 300px; background: rgba(5, 20, 40, 0.88); border: 1px solid rgba(0, 245, 255, 0.18); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+    .center-panel { flex: 1; background: rgba(5, 20, 40, 0.88); border: 1px solid rgba(0, 245, 255, 0.18); border-radius: 8px; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+    .panel-header { font-family: 'Rajdhani', sans-serif; font-size: 16px; color: var(--cyan); border-bottom: 1px solid rgba(0,245,255,0.2); padding-bottom: 10px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+    .param-group { display: flex; flex-direction: column; gap: 5px; }
+    .param-label { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: rgba(180, 220, 240, 0.6); }
+    .select-box, .input-box { background: rgba(0, 20, 40, 0.6); border: 1px solid rgba(0, 245, 255, 0.3); color: var(--cyan); padding: 8px; border-radius: 4px; font-family: 'Share Tech Mono', monospace; width: 100%; outline: none; }
+    .scan-btn-main { background: rgba(0, 245, 255, 0.1); border: 1px solid var(--cyan); color: var(--cyan); padding: 12px; border-radius: 4px; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-weight: bold; font-size: 16px; transition: all 0.3s; margin-top: auto; }
+    .scan-btn-main:hover { background: rgba(0, 245, 255, 0.2); box-shadow: 0 0 15px rgba(0, 245, 255, 0.3); }
+    .stop-btn { background: rgba(255, 43, 94, 0.1); border: 1px solid var(--red); color: var(--red); padding: 12px; border-radius: 4px; cursor: pointer; font-family: 'Rajdhani', sans-serif; font-weight: bold; font-size: 16px; transition: all 0.3s; margin-top: auto; display: none; }
+    .stop-btn:hover { background: rgba(255, 43, 94, 0.2); box-shadow: 0 0 15px rgba(255, 43, 94, 0.3); }
+    
+    .packet-table-wrapper { flex: 1; overflow-y: auto; border: 1px solid rgba(0, 245, 255, 0.1); background: rgba(0, 0, 0, 0.3); }
+    .packet-table { width: 100%; border-collapse: collapse; font-family: 'Share Tech Mono', monospace; font-size: 12px; }
+    .packet-table th { position: sticky; top: 0; background: rgba(0, 245, 255, 0.1); padding: 8px; text-align: left; color: var(--cyan); border-bottom: 1px solid rgba(0, 245, 255, 0.3); }
+    .packet-table td { padding: 6px 8px; border-bottom: 1px solid rgba(0, 245, 255, 0.05); color: rgba(255, 255, 255, 0.8); }
+    .packet-row:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+    .packet-row.alert td { color: var(--red); }
+    .packet-row.warn td { color: var(--warn); }
+    
+    .metric-card { background: rgba(0, 245, 255, 0.05); border: 1px solid rgba(0, 245, 255, 0.2); border-radius: 6px; padding: 15px; text-align: center; }
+    .metric-value { font-family: 'Rajdhani', sans-serif; font-size: 32px; font-weight: bold; color: var(--cyan); margin: 5px 0; }
+    .metric-label { font-family: 'Share Tech Mono', monospace; font-size: 11px; color: rgba(180, 220, 240, 0.6); }
+    .metric-card.danger .metric-value { color: var(--red); }
+    .metric-card.danger { border-color: rgba(255, 43, 94, 0.3); }
+  </style>
+</head>
+<body>
+  
+  
+  <div class="scanline-overlay"></div>
+  <div class="noise-overlay"></div>
+  <canvas id="hexCanvas"></canvas>
+
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="brand-block">
+        <span class="brand">JusticeFlowX</span>
+        <span class="brand-sub">Live Capture Module v4.0</span>
+      </div>
+    </div>
+    <div class="nav-center">
+      <a href="../../index.html" class="nav-link"><i class='bx bx-grid-alt'></i><span>Dashboard</span></a>
+      <a href="live_capture.html" class="nav-link active"><i class='bx bx-broadcast'></i><span>Live Capture</span></a>
+      <a href="../packet_analyzer/packet_analyzer.html" class="nav-link"><i class='bx bx-search-alt'></i><span>Packet Analyzer</span></a>
+      <a href="../threat_intel/threat_intel.html" class="nav-link"><i class='bx bx-shield-quarter'></i><span>Threat Intel</span></a>
+      <a href="../network_forensics/forensics.html" class="nav-link"><i class='bx bx-network-chart'></i><span>Traffic Analysis</span></a>
+    </div>
+    <div class="nav-right">
+      <div class="clock-display" id="clockDisplay">00:00:00</div>
+    </div>
+  </nav>
+
+  <div class="main-layout">
+    <!-- LEFT PANEL: Controls -->
+    <div class="side-panel">
+      <div class="panel-header"><i class='bx bx-cog'></i> CAPTURE SETTINGS</div>
+      
+      <div class="param-group">
+        <label class="param-label">INTERFACE</label>
+        <select class="select-box" id="interfaceSelect">
+          <option value="wlan0">wlan0 (Wireless)</option>
+          <option value="eth0">eth0 (Ethernet)</option>
+          <option value="lo">lo (Loopback)</option>
+          <option value="tun0">tun0 (VPN)</option>
+        </select>
+      </div>
+
+      <div class="param-group">
+        <label class="param-label">BPF FILTER</label>
+        <input class="input-box" type="text" id="bpfFilter" placeholder="e.g., tcp port 80" value="ip and tcp">
+      </div>
+
+      <div class="param-group">
+        <label class="param-label">PROMISCUOUS MODE</label>
+        <select class="select-box">
+          <option value="on">Enabled</option>
+          <option value="off">Disabled</option>
+        </select>
+      </div>
+      
+      <button id="startBtn" class="scan-btn-main"><i class='bx bx-play'></i> START CAPTURE</button>
+      <button id="stopBtn" class="stop-btn"><i class='bx bx-stop'></i> STOP CAPTURE</button>
+    </div>
+
+    <!-- CENTER PANEL: Terminal/Table -->
+    <div class="center-panel">
+      <div class="panel-header"><i class='bx bx-list-ul'></i> LIVE PACKET STREAM</div>
+      <div class="packet-table-wrapper">
+        <table class="packet-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Source</th>
+              <th>Destination</th>
+              <th>Protocol</th>
+              <th>Length</th>
+              <th>Info</th>
+            </tr>
+          </thead>
+          <tbody id="packetTableBody">
+            <!-- Packets injected via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL: Metrics -->
+    <div class="side-panel">
+      <div class="panel-header"><i class='bx bx-line-chart'></i> TELEMETRY</div>
+      
+      <div class="metric-card">
+        <div class="metric-label">PACKETS CAPTURED</div>
+        <div class="metric-value" id="valPackets">0</div>
+      </div>
+      
+      <div class="metric-card">
+        <div class="metric-label">BANDWIDTH (Kbps)</div>
+        <div class="metric-value" id="valBandwidth">0.0</div>
+      </div>
+
+      <div class="metric-card danger">
+        <div class="metric-label">THREAT ALERTS</div>
+        <div class="metric-value" id="valAlerts">0</div>
+      </div>
+      
+      <div class="metric-card">
+        <div class="metric-label">DROPPED PACKETS</div>
+        <div class="metric-value" id="valDropped" style="color:var(--warn)">0</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="live_capture.js"></script>
+<script src="../../assets/js/justice.js"></script>
+</body>
+</html>
+
+

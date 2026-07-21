@@ -75,7 +75,7 @@ batchBtn.addEventListener('click', () => {
 // DB nodes
 const dbNodes = ['GOV-DB-01', 'INTERPOL', 'NATIONAL', 'INTL-REG', 'REVOC-LIST'];
 
-function runVerification(serial, docType) {
+async function runVerification(serial, docType) {
   srpWaiting.style.display = 'none';
   srpResult.style.display = 'none';
   batchResults.style.display = 'none';
@@ -106,66 +106,45 @@ function runVerification(serial, docType) {
   let nodeIdx = 0;
   const nodeEls = nodesEl.querySelectorAll('.ssa-node');
 
-  const logInterval = setInterval(() => {
-    if (i < logMessages.length) {
-      const div = document.createElement('div');
-      div.textContent = logMessages[i];
-      queryLog.appendChild(div);
-      queryLog.scrollTop = queryLog.scrollHeight;
-      textEl.textContent = logMessages[i];
+  try {
+      const response = await fetch('http://localhost:5001/api/doc/serial_verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ serial, docType })
+      });
+      const data = await response.json();
 
-      if (nodeIdx < nodeEls.length) {
-        if (nodeIdx > 0) nodeEls[nodeIdx - 1].classList.remove('querying');
-        if (nodeIdx > 0) nodeEls[nodeIdx - 1].classList.add('done');
-        nodeEls[nodeIdx].classList.add('querying');
-        nodeIdx++;
-      }
-      i++;
-    } else {
-      clearInterval(logInterval);
-      nodeEls.forEach(n => { n.classList.remove('querying'); n.classList.add('done'); });
-      setTimeout(() => showSerialResult(serial, docType), 500);
-    }
-  }, 350);
+      const logInterval = setInterval(() => {
+        if (i < logMessages.length) {
+          const div = document.createElement('div');
+          div.textContent = logMessages[i];
+          queryLog.appendChild(div);
+          queryLog.scrollTop = queryLog.scrollHeight;
+          textEl.textContent = logMessages[i];
+
+          if (nodeIdx < nodeEls.length) {
+            if (nodeIdx > 0) nodeEls[nodeIdx - 1].classList.remove('querying');
+            if (nodeIdx > 0) nodeEls[nodeIdx - 1].classList.add('done');
+            nodeEls[nodeIdx].classList.add('querying');
+            nodeIdx++;
+          }
+          i++;
+        } else {
+          clearInterval(logInterval);
+          nodeEls.forEach(n => { n.classList.remove('querying'); n.classList.add('done'); });
+          setTimeout(() => showSerialResult(serial, docType, data), 500);
+        }
+      }, 350);
+  } catch (err) {
+      console.error(err);
+      textEl.textContent = "SERVER CONNECTION ERROR";
+  }
 }
 
-function analyzeSerial(serial, docType) {
-  // Deterministic scoring from serial string
-  const hash = serial.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-  const seed = hash % 100;
-
-  const formatValid = validateFormat(serial, docType);
-  const yearInRange = (() => {
-    const match = serial.match(/\d{4}/);
-    if (!match) return true;
-    const y = parseInt(match[0]);
-    return y >= 1990 && y <= 2026;
-  })();
-
-  const isRevoked = seed > 90;
-  const isDuplicate = seed > 85 && seed <= 90;
-  const notFound = seed > 80 && seed <= 85;
-  const isClean = formatValid && yearInRange && !isRevoked && !isDuplicate && !notFound;
-
-  return { seed, formatValid, yearInRange, isRevoked, isDuplicate, notFound, isClean };
-}
-
-function validateFormat(serial, docType) {
-  if (!serial || serial.length < 5) return false;
-  const patterns = {
-    national_id: /^[A-Z]{2,3}[-_]?\d{2,4}[-_]?[A-Z0-9]{4,10}$/,
-    passport: /^[A-Z]{2,3}\d{6,9}$/,
-    drivers_license: /^[A-Z]{2}[-_]?\d{2,4}[-_]?\d{6,12}$/,
-    visa: /^[A-Z]{2,3}[-_]?[A-Z0-9]{2,4}[-_]?\d{6,12}$/
-  };
-  return (patterns[docType] || /.+/).test(serial);
-}
-
-function showSerialResult(serial, docType) {
+function showSerialResult(serial, docType, r) {
   srpScanning.style.display = 'none';
   srpResult.style.display = 'block';
 
-  const r = analyzeSerial(serial, docType);
   const banner = document.getElementById('srVerdictBanner');
 
   if (r.isClean) {
@@ -267,7 +246,7 @@ function showSerialResult(serial, docType) {
 }
 
 // Batch verification
-function runBatchVerification(serials) {
+async function runBatchVerification(serials) {
   srpWaiting.style.display = 'none';
   srpScanning.style.display = 'none';
   srpResult.style.display = 'none';
@@ -275,38 +254,48 @@ function runBatchVerification(serials) {
 
   const summary = document.getElementById('brSummary');
   const tbody = document.getElementById('brTableBody');
-  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:16px;font-family:var(--font-mono);font-size:11px">Scanning...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:16px;font-family:var(--font-mono);font-size:11px">Scanning Server Database...</td></tr>';
 
-  let valid = 0, invalid = 0, revoked = 0;
+  try {
+      const response = await fetch('http://localhost:5001/api/doc/serial_batch_verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ serials, docType: selectedType })
+      });
+      const data = await response.json();
+      
+      let valid = 0, invalid = 0, revoked = 0;
+      
+      const rows = data.results.map((r, i) => {
+        let status, statusCls, risk;
+        if (r.isClean) { status = 'VALID'; statusCls = 'verdict-clean'; risk = Math.floor(Math.random() * 15); valid++; }
+        else if (r.isRevoked) { status = 'REVOKED'; statusCls = 'verdict-forged'; risk = 90 + Math.floor(Math.random() * 10); revoked++; }
+        else if (r.isDuplicate) { status = 'DUPLICATE'; statusCls = 'verdict-forged'; risk = 80 + Math.floor(Math.random() * 15); invalid++; }
+        else if (r.notFound) { status = 'NOT FOUND'; statusCls = 'verdict-forged'; risk = 75 + Math.floor(Math.random() * 20); invalid++; }
+        else { status = 'FORMAT ERR'; statusCls = 'verdict-suspect'; risk = 50 + Math.floor(Math.random() * 30); invalid++; }
+        const riskCls = risk < 30 ? 'check-pass' : risk < 60 ? 'check-warn' : 'check-fail';
+        return `<tr>
+          <td style="color:var(--text-dim)">${i + 1}</td>
+          <td style="font-family:var(--font-mono);color:var(--cyan-mid)">${r.serial}</td>
+          <td class="${statusCls}">${status}</td>
+          <td class="${riskCls}" style="font-family:var(--font-head);font-weight:700">${risk}%</td>
+          <td style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">${r.formatValid ? 'Format OK' : 'Bad format'}</td>
+        </tr>`;
+      });
 
-  setTimeout(() => {
-    const rows = serials.map((serial, i) => {
-      const r = analyzeSerial(serial, selectedType);
-      let status, statusCls, risk;
-      if (r.isClean) { status = 'VALID'; statusCls = 'verdict-clean'; risk = Math.floor(Math.random() * 15); valid++; }
-      else if (r.isRevoked) { status = 'REVOKED'; statusCls = 'verdict-forged'; risk = 90 + Math.floor(Math.random() * 10); revoked++; }
-      else if (r.isDuplicate) { status = 'DUPLICATE'; statusCls = 'verdict-forged'; risk = 80 + Math.floor(Math.random() * 15); invalid++; }
-      else if (r.notFound) { status = 'NOT FOUND'; statusCls = 'verdict-forged'; risk = 75 + Math.floor(Math.random() * 20); invalid++; }
-      else { status = 'FORMAT ERR'; statusCls = 'verdict-suspect'; risk = 50 + Math.floor(Math.random() * 30); invalid++; }
-      const riskCls = risk < 30 ? 'check-pass' : risk < 60 ? 'check-warn' : 'check-fail';
-      return `<tr>
-        <td style="color:var(--text-dim)">${i + 1}</td>
-        <td style="font-family:var(--font-mono);color:var(--cyan-mid)">${serial}</td>
-        <td class="${statusCls}">${status}</td>
-        <td class="${riskCls}" style="font-family:var(--font-head);font-weight:700">${risk}%</td>
-        <td style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim)">${r.formatValid ? 'Format OK' : 'Bad format'}</td>
-      </tr>`;
-    });
+      tbody.innerHTML = rows.join('');
 
-    tbody.innerHTML = rows.join('');
+      summary.innerHTML = `
+        <div class="brs-item"><span class="brs-val">${serials.length}</span><span class="brs-lbl">TOTAL SCANNED</span></div>
+        <div class="brs-item"><span class="brs-val" style="color:var(--green)">${valid}</span><span class="brs-lbl">VALID</span></div>
+        <div class="brs-item"><span class="brs-val" style="color:var(--red)">${invalid}</span><span class="brs-lbl">INVALID / FAKE</span></div>
+        <div class="brs-item"><span class="brs-val" style="color:var(--warn)">${revoked}</span><span class="brs-lbl">REVOKED</span></div>
+      `;
 
-    summary.innerHTML = `
-      <div class="brs-item"><span class="brs-val">${serials.length}</span><span class="brs-lbl">TOTAL SCANNED</span></div>
-      <div class="brs-item"><span class="brs-val" style="color:var(--green)">${valid}</span><span class="brs-lbl">VALID</span></div>
-      <div class="brs-item"><span class="brs-val" style="color:var(--red)">${invalid}</span><span class="brs-lbl">INVALID / FAKE</span></div>
-      <div class="brs-item"><span class="brs-val" style="color:var(--warn)">${revoked}</span><span class="brs-lbl">REVOKED</span></div>
-    `;
-  }, 1200);
+  } catch (err) {
+      console.error(err);
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--red);">Server Connection Error</td></tr>';
+  }
 }
 
 // Init DB last sync time

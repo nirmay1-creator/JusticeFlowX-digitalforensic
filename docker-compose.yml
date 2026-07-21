@@ -43,5 +43,17 @@ services:
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
 
+  dfir-engine:
+    build: 
+      context: ./backend
+      dockerfile: dfir_engine/Dockerfile
+    container_name: justiceflowx-dfir-engine
+    restart: always
+    ports:
+      - "5003:5003"
+    volumes:
+      - ./backend/dfir_uploads:/app/dfir_uploads
+      - ./backend/dfir_reports:/app/dfir_reports
+
 volumes:
   postgres_data:

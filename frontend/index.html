@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <title>JusticeFlowX</title>
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/justice.css">
+  <link rel="stylesheet" href="assets/css/justice.css?v=4.0">
 </head>
 
 <body id="top">
@@ -20,10 +20,15 @@
       <div class="logo-wrapper">
         <img src="assets/images/WhatsApp Image 2026-01-07 at 9.59.21 PM.jpeg" class="logo" alt="logo">
         <div class="logo-ping"></div>
+        <div class="logo-ring"></div>
       </div>
+      <div class="nav-separator-v"></div>
       <div class="brand-block">
         <span class="brand" data-text="JusticeFlowX">JusticeFlowX</span>
-        <span class="brand-sub">Verification System v2.4</span>
+        <span class="brand-sub">
+          <span class="brand-sub-dot"></span>
+          Cyber Verification System v2.4
+        </span>
       </div>
     </div>
 
@@ -31,41 +36,91 @@
       <a href="index.html" class="nav-link active">
         <i class='bx bx-grid-alt'></i><span>Dashboard</span>
       </a>
-      <a href="modules/criminal/criminal.html" class="nav-link">
-        <i class='bx bx-user'></i><span>Criminal DB</span>
-      </a>
-      <a href="modules/case/case.html" class="nav-link">
-        <i class='bx bx-folder'></i><span>Case Control</span>
-      </a>
       <a href="modules/evidence/evidence.html" class="nav-link">
         <i class='bx bx-archive'></i><span>Evidence</span>
       </a>
       <a href="modules/forensics/forensic.html" class="nav-link">
         <i class='bx bx-search-alt'></i><span>Forensics</span>
       </a>
-      <a href="modules/network/network.html" class="nav-link">
-        <i class='bx bx-network-chart'></i><span>Network</span>
+      <a href="modules/network_forensics/forensics_dashboard.html" class="nav-link">
+        <i class='bx bx-shield-quarter'></i><span>Forensics DB</span>
+      </a>
+      <a href="modules/chain_of_custody/index.html" class="nav-link">
+        <i class='bx bx-link'></i><span>Chain of Custody</span>
+      </a>
+      <a href="modules/malware/dashboard.html" class="nav-link">
+        <i class='bx bx-bug'></i><span>DFIR Engine</span>
       </a>
     </div>
 
     <div class="nav-right">
+      <div class="nav-search" id="navSearch">
+        <i class='bx bx-search nav-search-icon'></i>
+        <input type="text" class="nav-search-input" placeholder="Search modules..." id="navSearchInput">
+      </div>
+      <div class="nav-separator-v"></div>
+      <div class="threat-level-badge">
+        <div class="threat-level-dot"></div>
+        <span class="threat-level-text">THREAT LEVEL</span>
+        <span class="threat-level-value">LOW</span>
+      </div>
+      <div class="nav-separator-v"></div>
       <div class="status-cluster">
         <div class="status-dot"></div>
         <span class="system-status">SYSTEMS ONLINE</span>
       </div>
       <div class="clock-display" id="clockDisplay">00:00:00</div>
+      <div class="notif-wrapper" id="notifWrapper">
+        <button class="nav-icon-btn" id="notifBtn" aria-label="Notifications">
+          <i class='bx bx-bell'></i>
+          <span class="nav-badge" id="notifBadge">3</span>
+        </button>
+        <div class="notif-panel" id="notifPanel">
+          <div class="notif-panel-header">
+            <span class="notif-panel-title"><i class='bx bx-bell'></i> ALERTS</span>
+            <button class="notif-clear-btn" id="notifClearBtn">Clear All</button>
+          </div>
+          <div class="notif-list" id="notifList">
+            <div class="notif-item notif-critical">
+              <div class="notif-icon-wrap critical"><i class='bx bx-error-circle'></i></div>
+              <div class="notif-content">
+                <span class="notif-title">Suspicious IP Detected</span>
+                <span class="notif-desc">IP 185.220.101.34 flagged by threat intel — known C2 server</span>
+                <span class="notif-time">2 min ago</span>
+              </div>
+            </div>
+            <div class="notif-item notif-warning">
+              <div class="notif-icon-wrap warning"><i class='bx bx-shield-x'></i></div>
+              <div class="notif-content">
+                <span class="notif-title">Evidence Integrity Alert</span>
+                <span class="notif-desc">SHA-256 hash mismatch on evidence file #EV-2026-0471</span>
+                <span class="notif-time">18 min ago</span>
+              </div>
+            </div>
+            <div class="notif-item notif-info">
+              <div class="notif-icon-wrap info"><i class='bx bx-check-circle'></i></div>
+              <div class="notif-content">
+                <span class="notif-title">System Scan Complete</span>
+                <span class="notif-desc">Full disk forensic scan completed — 0 threats found</span>
+                <span class="notif-time">1 hr ago</span>
+              </div>
+            </div>
+          </div>
+          <div class="notif-panel-footer">
+            <a href="modules/system/infraction.html">View All Logs <i class='bx bx-right-arrow-alt'></i></a>
+          </div>
+        </div>
+      </div>
       <div class="menu">
         <button class="menu-trigger" id="menuBtn" aria-label="Menu">
           <i class='bx bx-dots-vertical-rounded'></i>
         </button>
         <div class="dropdown" id="menuDropdown">
           <div class="dropdown-header">QUICK ACCESS</div>
-          <a href="modules/case/case-report.html"><i class='bx bx-file'></i> Case Reports</a>
           <a href="modules/system/infraction.html"><i class='bx bx-list-ul'></i> System Logs</a>
           <a href="modules/system/system.html"><i class='bx bx-shield'></i> System Health</a>
-          <a href="modules/case/case-analysis.html"><i class='bx bx-brain'></i> AI Decision Support</a>
           <a href="modules/forensics/forensic.html"><i class='bx bx-search-alt'></i> Document Forensics</a>
-          <a href="modules/network/network.html"><i class='bx bx-network-chart'></i> Network Detection</a>
+          <a href="modules/live_capture/live_capture.html"><i class='bx bx-broadcast'></i> Live Capture</a>
           <div class="dropdown-divider"></div>
           <a href="#" id="logoutBtn" class="logout-link"><i class='bx bx-log-out'></i> Logout</a>
         </div>
@@ -75,9 +130,9 @@
 
   <div class="hero-section">
     <div class="hero-text">
-      <div class="hero-badge">⬡ BIOMETRIC AUTHENTICATION MODULE</div>
-      <h1 class="hero-title">Identity <span class="accent">Verification</span></h1>
-      <p class="hero-sub">Select a biometric scan method to authenticate and proceed into the secured system</p>
+      <div class="hero-badge">⬡ DIGITAL FORENSICS MODULE</div>
+      <h1 class="hero-title">Digital <span class="accent">Forensics</span></h1>
+      <p class="hero-sub">Select an investigative module to analyze evidence and proceed with forensics</p>
     </div>
     <div class="hero-stats">
       <div class="stat-item"><span class="stat-val" data-count="99.7">0</span><span class="stat-unit">%</span><span
@@ -85,75 +140,12 @@
       <div class="stat-divider"></div>
       <div class="stat-item"><span class="stat-val" data-count="1240">0</span><span class="stat-unit">ms</span><span
           class="stat-label">Avg. Scan</span></div>
-      <div class="stat-divider"></div>
-      <div class="stat-item"><span class="stat-val" data-count="14">0</span><span class="stat-unit">K+</span><span
-          class="stat-label">Records</span></div>
     </div>
   </div>
 
   <div class="container">
 
-    <!-- FINGERPRINT CARD -->
-    <div class="scan-box" id="scanBox1">
-      <div class="card-glow"></div>
-      <div class="card-corner tl"></div>
-      <div class="card-corner tr"></div>
-      <div class="card-corner bl"></div>
-      <div class="card-corner br"></div>
-      <div class="scan-line-anim"></div>
-      <div class="card-badge">METHOD 01</div>
-      <div class="icon-wrapper">
-        <i class='bx bx-fingerprint'></i>
-        <div class="icon-rings">
-          <div class="ring r1"></div>
-          <div class="ring r2"></div>
-          <div class="ring r3"></div>
-        </div>
-      </div>
-      <h2>Fingerprint Scan</h2>
-      <p>Place finger on the biometric reader to verify identity via ridge pattern analysis</p>
-      <div class="card-divider"></div>
-      <div class="card-meta">
-        <span><i class='bx bx-check-shield'></i> 256-bit Encrypted</span>
-        <span><i class='bx bx-time'></i> ~1.2s Response</span>
-      </div>
-      <a href="modules/biometrics/finger2.html" class="scan-btn" data-type="finger">
-        <span class="btn-text">Initiate Scan</span>
-        <span class="btn-arrow"><i class='bx bx-right-arrow-alt'></i></span>
-        <div class="btn-shine"></div>
-      </a>
-    </div>
 
-    <!-- FACE SCAN CARD -->
-    <div class="scan-box" id="scanBox2">
-      <div class="card-glow glow-purple"></div>
-      <div class="card-corner tl"></div>
-      <div class="card-corner tr"></div>
-      <div class="card-corner bl"></div>
-      <div class="card-corner br"></div>
-      <div class="scan-line-anim" style="animation-delay: 1.5s"></div>
-      <div class="card-badge badge-alt">METHOD 02</div>
-      <div class="icon-wrapper">
-        <i class='bx bx-scan'></i>
-        <div class="icon-rings">
-          <div class="ring r1" style="border-style:dashed"></div>
-          <div class="ring r2" style="border-style:dashed"></div>
-          <div class="ring r3" style="border-style:dashed"></div>
-        </div>
-      </div>
-      <h2>Facial Recognition</h2>
-      <p>Align face with sensor grid for AI-powered facial geometry verification</p>
-      <div class="card-divider"></div>
-      <div class="card-meta">
-        <span><i class='bx bx-check-shield'></i> 128-point Map</span>
-        <span><i class='bx bx-time'></i> ~0.8s Response</span>
-      </div>
-      <a href="modules/biometrics/tempelates.html" class="scan-btn scan-btn-alt" data-type="face">
-        <span class="btn-text">Initiate Scan</span>
-        <span class="btn-arrow"><i class='bx bx-right-arrow-alt'></i></span>
-        <div class="btn-shine"></div>
-      </a>
-    </div>
 
     <!-- FORENSICS CARD -->
     <div class="scan-box" id="scanBox3">
@@ -166,7 +158,7 @@
         style="animation-delay: 3s; background: linear-gradient(90deg, transparent, var(--green), transparent); box-shadow: 0 0 12px var(--green);">
       </div>
       <div class="card-badge"
-        style="color:rgba(0,255,136,0.7);border-color:rgba(0,255,136,0.2);background:rgba(0,255,136,0.05)">METHOD 03
+        style="color:rgba(0,255,136,0.7);border-color:rgba(0,255,136,0.2);background:rgba(0,255,136,0.05)">METHOD 01
       </div>
       <div class="icon-wrapper">
         <i class='bx bx-search-alt' style="color:var(--green);filter:drop-shadow(0 0 16px var(--green))"></i>
@@ -183,53 +175,18 @@
         <span><i class='bx bx-check-shield'></i> 3-Layer Analysis</span>
         <span><i class='bx bx-time'></i> ~2.4s Deep Scan</span>
       </div>
-      <a href="modules/forensics/forensic.html" class="scan-btn" data-type="forensic"
-        style="border-color:var(--green);color:var(--green);background:linear-gradient(135deg,rgba(0,255,136,0.08),rgba(0,255,136,0.03))">
+      <a href="modules/forensics/forensic.html" class="scan-btn" data-type="forensic">
         <span class="btn-text">Launch Forensics</span>
         <span class="btn-arrow"><i class='bx bx-right-arrow-alt'></i></span>
         <div class="btn-shine"></div>
       </a>
     </div>
 
-    <!-- NETWORK DETECTION CARD -->
-    <div class="scan-box" id="scanBox4">
-      <div class="card-glow" style="background: radial-gradient(circle, rgba(0,191,255,0.1) 0%, transparent 70%)"></div>
-      <div class="card-corner tl"></div>
-      <div class="card-corner tr"></div>
-      <div class="card-corner bl"></div>
-      <div class="card-corner br"></div>
-      <div class="scan-line-anim"
-        style="animation-delay: 4.5s; background: linear-gradient(90deg, transparent, #00bfff, transparent); box-shadow: 0 0 12px #00bfff;">
-      </div>
-      <div class="card-badge"
-        style="color:rgba(0,191,255,0.7);border-color:rgba(0,191,255,0.2);background:rgba(0,191,255,0.05)">METHOD 04
-      </div>
-      <div class="icon-wrapper">
-        <i class='bx bx-network-chart' style="color:#00bfff;filter:drop-shadow(0 0 16px #00bfff)"></i>
-        <div class="icon-rings">
-          <div class="ring r1" style="border-color:rgba(0,191,255,0.25)"></div>
-          <div class="ring r2" style="border-color:rgba(0,191,255,0.2)"></div>
-          <div class="ring r3" style="border-color:rgba(0,191,255,0.15)"></div>
-        </div>
-      </div>
-      <h2>Network Detection</h2>
-      <p>Three-layer network intelligence — social graph analysis, location contradiction detection, and physical
-        document aging forensics to expose hidden criminal identities</p>
-      <div class="card-divider"></div>
-      <div class="card-meta">
-        <span><i class='bx bx-check-shield'></i> 3-Layer Intel</span>
-        <span><i class='bx bx-time'></i> ~2.8s Deep Scan</span>
-      </div>
-      <a href="modules/network/network.html" class="scan-btn" data-type="network"
-        style="border-color:#00bfff;color:#00bfff;background:linear-gradient(135deg,rgba(0,191,255,0.08),rgba(0,191,255,0.03))">
-        <span class="btn-text">Launch Network</span>
-        <span class="btn-arrow"><i class='bx bx-right-arrow-alt'></i></span>
-        <div class="btn-shine"></div>
-      </a>
-    </div>
+
     <!-- LEGAL EDUCATION CARD -->
     <div class="scan-box" id="scanBox5">
-      <div class="card-glow" style="background: radial-gradient(circle, rgba(255,159,67,0.1) 0%, transparent 70%)"></div>
+      <div class="card-glow" style="background: radial-gradient(circle, rgba(255,159,67,0.1) 0%, transparent 70%)">
+      </div>
       <div class="card-corner tl"></div>
       <div class="card-corner tr"></div>
       <div class="card-corner bl"></div>
@@ -238,7 +195,7 @@
         style="animation-delay: 6s; background: linear-gradient(90deg, transparent, #ff9f43, transparent); box-shadow: 0 0 12px #ff9f43;">
       </div>
       <div class="card-badge"
-        style="color:rgba(255,159,67,0.7);border-color:rgba(255,159,67,0.2);background:rgba(255,159,67,0.05)">METHOD 05
+        style="color:rgba(255,159,67,0.7);border-color:rgba(255,159,67,0.2);background:rgba(255,159,67,0.05)">METHOD 02
       </div>
       <div class="icon-wrapper">
         <i class='bx bxs-book-reader' style="color:#ff9f43;filter:drop-shadow(0 0 16px #ff9f43)"></i>
@@ -255,15 +212,148 @@
         <span><i class='bx bx-check-shield'></i> Objective</span>
         <span><i class='bx bx-time'></i> Instant Search</span>
       </div>
-      <a href="modules/law/law.html" class="scan-btn" data-type="law"
-        style="border-color:#ff9f43;color:#ff9f43;background:linear-gradient(135deg,rgba(255,159,67,0.08),rgba(255,159,67,0.03))">
+      <a href="modules/law/law.html" class="scan-btn" data-type="law">
         <span class="btn-text">Open Directory</span>
         <span class="btn-arrow"><i class='bx bx-right-arrow-alt'></i></span>
         <div class="btn-shine"></div>
       </a>
     </div>
+    <div class="scan-box" id="scanBox7">
+      <div class="card-glow" style="background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%)"></div>
+      <div class="card-corner tl"></div>
+      <div class="card-corner tr"></div>
+      <div class="card-corner bl"></div>
+      <div class="card-corner br"></div>
+      <div class="scan-line-anim"
+        style="animation-delay: 8.5s; background: linear-gradient(90deg, transparent, #ffd700, transparent); box-shadow: 0 0 12px #ffd700;">
+      </div>
+      <div class="card-badge"
+        style="color:rgba(255,215,0,0.7);border-color:rgba(255,215,0,0.2);background:rgba(255,215,0,0.05)">METHOD 03
+      </div>
+      <div class="icon-wrapper">
+        <i class='bx bx-link' style="color:#ffd700;filter:drop-shadow(0 0 16px #ffd700)"></i>
+        <div class="icon-rings">
+          <div class="ring r1" style="border-color:rgba(255,215,0,0.25)"></div>
+          <div class="ring r2" style="border-color:rgba(255,215,0,0.2)"></div>
+          <div class="ring r3" style="border-color:rgba(255,215,0,0.15)"></div>
+        </div>
+      </div>
+      <h2>Chain of Custody</h2>
+      <p>Cryptographically secured immutable ledger for evidence tracking and handover</p>
+      <div class="card-divider"></div>
+      <div class="card-meta">
+        <span><i class='bx bx-check-shield'></i> SHA-256 Secured</span>
+      </div>
+      <a href="modules/chain_of_custody/index.html" class="scan-btn" data-type="chain_of_custody">
+        <span class="btn-text">OPEN LEDGER</span>
+        <span class="btn-arrow"><i class='bx bx-right-arrow-alt'></i></span>
+        <div class="btn-shine"></div>
+      </a>
+    </div>
 
+    <div class="scan-box" id="scanBox6">
+      <div class="card-glow" style="background: radial-gradient(circle, rgba(255,0,85,0.1) 0%, transparent 70%)"></div>
+      <div class="card-corner tl"></div>
+      <div class="card-corner tr"></div>
+      <div class="card-corner bl"></div>
+      <div class="card-corner br"></div>
+      <div class="scan-line-anim"
+        style="animation-delay: 7.5s; background: linear-gradient(90deg, transparent, #ff0055, transparent); box-shadow: 0 0 12px #ff0055;">
+      </div>
+      <div class="card-badge"
+        style="color:rgba(255,0,85,0.7);border-color:rgba(255,0,85,0.2);background:rgba(255,0,85,0.05)">METHOD 04
+      </div>
+      <div class="icon-wrapper">
+        <i class='bx bx-radar' style="color:#ff0055;filter:drop-shadow(0 0 16px #ff0055)"></i>
+        <div class="icon-rings">
+          <div class="ring r1" style="border-color:rgba(255,0,85,0.25)"></div>
+          <div class="ring r2" style="border-color:rgba(255,0,85,0.2)"></div>
+          <div class="ring r3" style="border-color:rgba(255,0,85,0.15)"></div>
+        </div>
+      </div>
+      <h2>Network Forensics Module</h2>
+      <p>Advanced real-time packet inspection, threat intelligence, and AI-driven analysis</p>
+      <div class="card-divider"></div>
+      <div class="card-meta">
+        <span><i class='bx bx-pulse'></i> Real-time PCAP</span>
+        <span><i class='bx bx-globe'></i> Threat Intel</span>
+      </div>
+      <a href="modules/packet_analyzer/packet_analyzer.html" class="scan-btn" data-type="network">
+        <span class="btn-text">INTERCEPT</span>
+        <span class="btn-arrow"><i class='bx bx-right-arrow-alt'></i></span>
+        <div class="btn-shine"></div>
+      </a>
+    </div>
+
+    <!-- MALWARE DFIR CARD -->
+    <div class="scan-box" id="scanBox8">
+      <div class="card-glow" style="background: radial-gradient(circle, rgba(162,0,255,0.1) 0%, transparent 70%)"></div>
+      <div class="card-corner tl"></div>
+      <div class="card-corner tr"></div>
+      <div class="card-corner bl"></div>
+      <div class="card-corner br"></div>
+      <div class="scan-line-anim"
+        style="animation-delay: 9.5s; background: linear-gradient(90deg, transparent, #a200ff, transparent); box-shadow: 0 0 12px #a200ff;">
+      </div>
+      <div class="card-badge"
+        style="color:rgba(162,0,255,0.7);border-color:rgba(162,0,255,0.2);background:rgba(162,0,255,0.05)">METHOD 05
+      </div>
+      <div class="icon-wrapper">
+        <i class='bx bx-bug' style="color:#a200ff;filter:drop-shadow(0 0 16px #a200ff)"></i>
+        <div class="icon-rings">
+          <div class="ring r1" style="border-color:rgba(162,0,255,0.25)"></div>
+          <div class="ring r2" style="border-color:rgba(162,0,255,0.2)"></div>
+          <div class="ring r3" style="border-color:rgba(162,0,255,0.15)"></div>
+        </div>
+      </div>
+      <h2>Malware & Threat Intel</h2>
+      <p>Analyze PCAPs and Executables for static PE features, C2 beacons, IOC extraction, and MITRE mapping</p>
+      <div class="card-divider"></div>
+      <div class="card-meta">
+        <span><i class='bx bx-check-shield'></i> PE & PCAP</span>
+      </div>
+      <a href="modules/malware/dashboard.html" class="scan-btn" data-type="malware">
+        <span class="btn-text">LAUNCH ENGINE</span>
+        <span class="btn-arrow"><i class='bx bx-right-arrow-alt'></i></span>
+        <div class="btn-shine"></div>
+      </a>
+    </div>
+    <!-- THREAT INTEL CARD -->
+    <div class="scan-box" id="scanBox9">
+      <div class="card-glow" style="background: radial-gradient(circle, rgba(0,212,255,0.1) 0%, transparent 70%)"></div>
+      <div class="card-corner tl"></div>
+      <div class="card-corner tr"></div>
+      <div class="card-corner bl"></div>
+      <div class="card-corner br"></div>
+      <div class="scan-line-anim"
+        style="animation-delay: 10.5s; background: linear-gradient(90deg, transparent, #00d4ff, transparent); box-shadow: 0 0 12px #00d4ff;">
+      </div>
+      <div class="card-badge"
+        style="color:rgba(0,212,255,0.7);border-color:rgba(0,212,255,0.2);background:rgba(0,212,255,0.05)">METHOD 06
+      </div>
+      <div class="icon-wrapper">
+        <i class='bx bx-shield-quarter' style="color:#00d4ff;filter:drop-shadow(0 0 16px #00d4ff)"></i>
+        <div class="icon-rings">
+          <div class="ring r1" style="border-color:rgba(0,212,255,0.25)"></div>
+          <div class="ring r2" style="border-color:rgba(0,212,255,0.2)"></div>
+          <div class="ring r3" style="border-color:rgba(0,212,255,0.15)"></div>
+        </div>
+      </div>
+      <h2>Threat Intelligence</h2>
+      <p>Multi-provider threat lookup querying VirusTotal, AbuseIPDB, and AlienVault OTX for real-time analysis</p>
+      <div class="card-divider"></div>
+      <div class="card-meta">
+        <span><i class='bx bx-check-shield'></i> 3 Providers</span>
+        <span><i class='bx bx-time'></i> Async Scan</span>
+      </div>
+      <a href="modules/threat_intel/threat_intel.html" class="scan-btn" data-type="threat_intel">
+        <span class="btn-text">Launch Scanner</span>
+        <span class="btn-arrow"><i class='bx bx-right-arrow-alt'></i></span>
+        <div class="btn-shine"></div>
+      </a>
+    </div>
   </div>
+
 
   <div class="status-bar">
     <div class="status-bar-item"><i class='bx bx-cpu'></i> CPU: <span id="cpuVal">34%</span></div>
@@ -278,7 +368,52 @@
     <div id="terminalBody"></div>
   </div>
 
-  <script src="assets/js/justice.js"></script>
+  <script src="assets/js/justice.js?v=3.0"></script>
+  <script>
+    /* ========================= NOTIFICATION PANEL ========================= */
+    (function() {
+      const notifBtn = document.getElementById('notifBtn');
+      const notifPanel = document.getElementById('notifPanel');
+      const notifBadge = document.getElementById('notifBadge');
+      const notifClearBtn = document.getElementById('notifClearBtn');
+      const notifList = document.getElementById('notifList');
+      const menuBtn = document.getElementById('menuBtn');
+      const menuDropdown = document.getElementById('menuDropdown');
+
+      if (notifBtn && notifPanel) {
+        notifBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          notifPanel.classList.toggle('show');
+          if (menuDropdown) menuDropdown.classList.remove('show');
+        });
+      }
+
+      if (menuBtn && menuDropdown) {
+        menuBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          menuDropdown.classList.toggle('show');
+          if (notifPanel) notifPanel.classList.remove('show');
+        });
+      }
+
+      if (notifClearBtn) {
+        notifClearBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          notifList.innerHTML = '<div style="padding:30px 18px;text-align:center;color:var(--text-dim);font-family:var(--font-mono);font-size:11px;letter-spacing:1px;">No new alerts</div>';
+          if (notifBadge) notifBadge.style.display = 'none';
+        });
+      }
+
+      document.addEventListener('click', function(e) {
+        if (notifPanel && !notifPanel.contains(e.target) && !notifBtn.contains(e.target)) {
+          notifPanel.classList.remove('show');
+        }
+        if (menuDropdown && !menuDropdown.contains(e.target) && !menuBtn.contains(e.target)) {
+          menuDropdown.classList.remove('show');
+        }
+      });
+    })();
+  </script>
 </body>
 
 </html>

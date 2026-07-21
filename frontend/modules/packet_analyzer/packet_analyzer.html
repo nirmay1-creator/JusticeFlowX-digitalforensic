@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JusticeFlowX — Packet Analyzer</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&amp;family=Rajdhani:wght@400;500;600;700&amp;family=Exo+2:wght@300;400;600;700&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/justice.css">
+  <style>
+    .analyzer-layout { display: flex; flex-direction: column; gap: 20px; padding: 20px; height: calc(100vh - 70px); position: relative; z-index: 2; }
+    .top-panel, .bottom-panel { background: rgba(5, 20, 40, 0.88); border: 1px solid rgba(0, 245, 255, 0.18); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+    .top-panel { flex: 1.5; overflow: hidden; }
+    .bottom-panel { flex: 1; flex-direction: row; gap: 20px; overflow: hidden; padding: 0; background: transparent; border: none; }
+    .details-panel, .hex-panel { flex: 1; background: rgba(5, 20, 40, 0.88); border: 1px solid rgba(0, 245, 255, 0.18); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+    
+    .panel-header { font-family: 'Rajdhani', sans-serif; font-size: 16px; color: var(--cyan); border-bottom: 1px solid rgba(0,245,255,0.2); padding-bottom: 8px; font-weight: bold; display: flex; align-items: center; justify-content: space-between; }
+    .panel-header-title { display: flex; align-items: center; gap: 8px; }
+    .btn-small { background: rgba(0, 245, 255, 0.1); border: 1px solid var(--cyan); color: var(--cyan); padding: 4px 10px; border-radius: 4px; cursor: pointer; font-family: 'Share Tech Mono', monospace; font-size: 11px; transition: all 0.3s; }
+    .btn-small:hover { background: rgba(0, 245, 255, 0.2); }
+
+    .packet-table-wrapper { flex: 1; overflow-y: auto; border: 1px solid rgba(0, 245, 255, 0.1); background: rgba(0, 0, 0, 0.3); }
+    .packet-table { width: 100%; border-collapse: collapse; font-family: 'Share Tech Mono', monospace; font-size: 12px; }
+    .packet-table th { position: sticky; top: 0; background: rgba(0, 245, 255, 0.1); padding: 6px; text-align: left; color: var(--cyan); border-bottom: 1px solid rgba(0, 245, 255, 0.3); }
+    .packet-table td { padding: 4px 6px; border-bottom: 1px solid rgba(0, 245, 255, 0.05); color: rgba(255, 255, 255, 0.8); cursor: pointer; }
+    .packet-row:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+    .packet-row:hover { background: rgba(0, 245, 255, 0.1); }
+    .packet-row.selected { background: rgba(0, 245, 255, 0.2); border-left: 3px solid var(--cyan); }
+    
+    .proto-tcp { color: #a4b5ff; }
+    .proto-udp { color: #5bc0de; }
+    .proto-http { color: #5cb85c; }
+    .proto-dns { color: #f0ad4e; }
+    .proto-icmp { color: #ff2b5e; }
+
+    .tree-view { font-family: 'Share Tech Mono', monospace; font-size: 12px; color: rgba(255,255,255,0.7); overflow-y: auto; flex: 1; }
+    .tree-item { margin-bottom: 4px; }
+    .tree-item-title { display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--cyan); }
+    .tree-item-title:hover { text-decoration: underline; }
+    .tree-children { padding-left: 20px; display: none; margin-top: 4px; }
+    .tree-children.open { display: block; }
+    .tree-leaf { margin-bottom: 2px; }
+    .tree-leaf strong { color: rgba(180, 220, 240, 0.9); font-weight: normal; }
+
+    .hex-view { font-family: 'Share Tech Mono', monospace; font-size: 11.5px; color: rgba(255,255,255,0.6); overflow-y: auto; flex: 1; white-space: pre; line-height: 1.4; }
+    .hex-offset { color: var(--cyan); margin-right: 15px; }
+    .hex-ascii { color: rgba(0,255,136,0.8); margin-left: 15px; }
+  </style>
+</head>
+<body>
+  
+  
+  <div class="scanline-overlay"></div>
+  <div class="noise-overlay"></div>
+  <canvas id="hexCanvas"></canvas>
+
+  <nav class="navbar">
+    <div class="nav-left">
+      <div class="brand-block">
+        <span class="brand">JusticeFlowX</span>
+        <span class="brand-sub">Packet Analyzer v4.0</span>
+      </div>
+    </div>
+    <div class="nav-center">
+      <a href="../../index.html" class="nav-link"><i class='bx bx-grid-alt'></i><span>Dashboard</span></a>
+      <a href="../live_capture/live_capture.html" class="nav-link"><i class='bx bx-broadcast'></i><span>Live Capture</span></a>
+      <a href="packet_analyzer.html" class="nav-link active"><i class='bx bx-search-alt'></i><span>Packet Analyzer</span></a>
+      <a href="../threat_intel/threat_intel.html" class="nav-link"><i class='bx bx-shield-quarter'></i><span>Threat Intel</span></a>
+      <a href="../network_forensics/forensics.html" class="nav-link"><i class='bx bx-network-chart'></i><span>Traffic Analysis</span></a>
+    </div>
+    <div class="nav-right">
+      <div class="clock-display" id="clockDisplay">00:00:00</div>
+    </div>
+  </nav>
+
+  <div class="analyzer-layout">
+    <div class="top-panel">
+      <div class="panel-header">
+        <div class="panel-header-title"><i class='bx bx-table'></i> PCAP TRACE (CAPTURED)</div>
+        <button class="btn-small" id="loadBtn"><i class='bx bx-folder-open'></i> LOAD PCAP</button>
+      </div>
+      <div class="packet-table-wrapper">
+        <table class="packet-table">
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Time</th>
+              <th>Source</th>
+              <th>Destination</th>
+              <th>Protocol</th>
+              <th>Length</th>
+              <th>Info</th>
+            </tr>
+          </thead>
+          <tbody id="pcapBody">
+            <!-- Populated via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="bottom-panel">
+      <div class="details-panel">
+        <div class="panel-header"><i class='bx bx-menu-alt-left'></i> PACKET DETAILS</div>
+        <div class="tree-view" id="treeView">
+          Select a packet to view details.
+        </div>
+      </div>
+      <div class="hex-panel">
+        <div class="panel-header"><i class='bx bx-code-block'></i> HEX DUMP</div>
+        <div class="hex-view" id="hexView">
+          Select a packet to view hexadecimal dump.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="packet_analyzer.js"></script>
+<script src="../../assets/js/justice.js"></script>
+</body>
+</html>
+
+

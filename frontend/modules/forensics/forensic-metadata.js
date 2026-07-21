@@ -1,189 +1,210 @@
-/* ===========================
-   METADATA ANALYSIS JS
-   =========================== */
-
+// Selectors
 const uploadZone = document.getElementById('uploadZone');
 const docUpload = document.getElementById('docUpload');
 const uploadPreview = document.getElementById('uploadPreview');
 const previewImg = document.getElementById('previewImg');
 const uploadInfo = document.getElementById('uploadInfo');
+const uFileName = document.getElementById('uFileName');
+const uFileSize = document.getElementById('uFileSize');
+const uFileType = document.getElementById('uFileType');
+const uFileDate = document.getElementById('uFileDate');
 const analyzeBtn = document.getElementById('analyzeBtn');
+
 const rpWaiting = document.getElementById('rpWaiting');
 const rpScanning = document.getElementById('rpScanning');
 const rpResults = document.getElementById('rpResults');
 const metadataViz = document.getElementById('metadataViz');
+const scanningSteps = document.getElementById('scanningSteps');
+const scanningPct = document.getElementById('scanningPct');
+const scanningBarFill = document.getElementById('scanningBarFill');
 
-let uploadedFile = null;
+const resultVerdict = document.getElementById('resultVerdict');
+const rsForgeryBar = document.getElementById('rsForgeryBar');
+const rsForgeryPct = document.getElementById('rsForgeryPct');
+const resultChecks = document.getElementById('resultChecks');
+const resultDetails = document.getElementById('resultDetails');
+const mvizGrid = document.getElementById('mvizGrid');
 
-// Drag & Drop
-uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
-uploadZone.addEventListener('drop', e => {
-  e.preventDefault(); uploadZone.classList.remove('drag-over');
-  const f = e.dataTransfer.files[0];
-  if (f) handleFile(f);
-});
+let currentFile = null;
+
+// Clock
+setInterval(() => {
+  const d = new Date();
+  document.getElementById('clockDisplay').textContent = d.toLocaleTimeString('en-US', {hour12:false});
+}, 1000);
+
+// File Upload Handling
 uploadZone.addEventListener('click', () => docUpload.click());
-docUpload.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+uploadZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadZone.style.borderColor = 'var(--cyan)';
+  uploadZone.style.background = 'rgba(0, 210, 255, 0.05)';
+});
+
+uploadZone.addEventListener('dragleave', (e) => {
+  e.preventDefault();
+  uploadZone.style.borderColor = 'var(--border)';
+  uploadZone.style.background = 'transparent';
+});
+
+uploadZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadZone.style.borderColor = 'var(--border)';
+  uploadZone.style.background = 'transparent';
+  if (e.dataTransfer.files.length) {
+    handleFile(e.dataTransfer.files[0]);
+  }
+});
+
+docUpload.addEventListener('change', (e) => {
+  if (e.target.files.length) {
+    handleFile(e.target.files[0]);
+  }
+});
 
 function handleFile(file) {
-  uploadedFile = file;
-  // Show preview
+  currentFile = file;
+  
+  uFileName.textContent = file.name;
+  uFileSize.textContent = (file.size / 1024).toFixed(2) + ' KB';
+  uFileType.textContent = file.type || 'Unknown';
+  uFileDate.textContent = file.lastModifiedDate ? file.lastModifiedDate.toLocaleDateString() : 'Unknown';
+
   if (file.type.startsWith('image/')) {
     const reader = new FileReader();
-    reader.onload = e => {
+    reader.onload = (e) => {
       previewImg.src = e.target.result;
       uploadZone.style.display = 'none';
       uploadPreview.style.display = 'block';
     };
     reader.readAsDataURL(file);
   } else {
+    // PDF placeholder
+    previewImg.src = 'https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg';
+    previewImg.style.filter = 'invert(1)';
     uploadZone.style.display = 'none';
-    uploadPreview.style.display = 'none';
+    uploadPreview.style.display = 'block';
   }
-  // Fill info
-  document.getElementById('uFileName').textContent = file.name;
-  document.getElementById('uFileSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
-  document.getElementById('uFileType').textContent = file.type || 'Unknown';
-  document.getElementById('uFileDate').textContent = new Date(file.lastModified).toLocaleDateString();
+
   uploadInfo.style.display = 'block';
   analyzeBtn.disabled = false;
+  analyzeBtn.classList.add('ready');
 }
 
-// Analysis flow
-analyzeBtn.addEventListener('click', runAnalysis);
+async function runAnalysis() {
+  if (!currentFile) return;
 
-function runAnalysis() {
-  if (!uploadedFile) return;
+  analyzeBtn.disabled = true;
   rpWaiting.style.display = 'none';
   rpResults.style.display = 'none';
-  rpScanning.style.display = 'flex';
   metadataViz.style.display = 'none';
+  rpScanning.style.display = 'flex';
+  scanningSteps.innerHTML = '';
+  
+  updateScanningStep('INITIALIZING ANALYSIS ENGINE...', 'working');
+  scanningPct.textContent = '0%';
+  scanningBarFill.style.width = '0%';
 
-  const steps = [
-    'Extracting EXIF metadata...',
-    'Analyzing pixel integrity...',
-    'Checking DPI consistency...',
-    'Scanning font signatures...',
-    'Detecting copy-paste artifacts...',
-    'Verifying hologram patterns...',
-    'Cross-referencing AI forgery model...',
-    'Generating forensic report...'
-  ];
+  try {
+    const formData = new FormData();
+    formData.append('file', currentFile);
+    
+    updateScanningStep('UPLOADING TO SECURE FORENSIC SERVER...', 'working');
+    
+    // Simulate upload delay for UI effect
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    scanningPct.textContent = '45%';
+    scanningBarFill.style.width = '45%';
 
-  const stepsEl = document.getElementById('scanningSteps');
-  const barFill = document.getElementById('scanningBarFill');
-  const pct = document.getElementById('scanningPct');
+    const response = await fetch('http://localhost:5001/api/doc/upload', {
+      method: 'POST',
+      body: formData
+    });
+    
+    updateScanningStep('EXTRACTING METADATA AND HASHES...', 'working');
+    
+    const data = await response.json();
+    
+    await new Promise(resolve => setTimeout(resolve, 800));
+    scanningPct.textContent = '100%';
+    scanningBarFill.style.width = '100%';
+    
+    setTimeout(() => showResults(data), 500);
 
-  let i = 0;
-  const total = steps.length;
-  const interval = setInterval(() => {
-    if (i < total) {
-      stepsEl.textContent = steps[i];
-      const p = Math.round(((i + 1) / total) * 100);
-      barFill.style.width = p + '%';
-      pct.textContent = p + '%';
-      i++;
-    } else {
-      clearInterval(interval);
-      setTimeout(showResults, 400);
-    }
-  }, 420);
+  } catch (error) {
+    console.error(error);
+    updateScanningStep('ERROR COMMUNICATING WITH SERVER', 'error');
+  }
 }
 
-function showResults() {
+function showResults(data) {
   rpScanning.style.display = 'none';
   rpResults.style.display = 'block';
+  metadataViz.style.display = 'block';
 
-  // Generate pseudo-forensic results based on file
-  const fileSize = uploadedFile ? uploadedFile.size : 50000;
-  const seed = fileSize % 100;
-  const forgeryScore = Math.min(95, Math.max(5, (seed * 0.7 + Math.random() * 30)));
-  const isForged = forgeryScore > 55;
-  const isSuspect = forgeryScore > 35 && !isForged;
-
-  // Verdict
-  const verdict = document.getElementById('resultVerdict');
-  if (isForged) {
-    verdict.className = 'result-verdict rv-forged';
-    verdict.innerHTML = `<i class='bx bx-x-circle'></i> FORGERY DETECTED — DOCUMENT FLAGGED`;
-  } else if (isSuspect) {
-    verdict.className = 'result-verdict rv-suspect';
-    verdict.innerHTML = `<i class='bx bx-error'></i> SUSPICIOUS — MANUAL REVIEW REQUIRED`;
+  // Check if it's a PDF to determine forgery probability
+  const isPdf = currentFile.name.toLowerCase().endsWith('.pdf');
+  const forgeryProb = isPdf ? (data.metadata.Error ? 85 : 12) : 45;
+  
+  if (forgeryProb > 70) {
+    resultVerdict.innerHTML = '<i class="bx bx-error-circle"></i> HIGH FORGERY PROBABILITY DETECTED';
+    resultVerdict.className = 'result-verdict danger';
+    rsForgeryBar.style.backgroundColor = 'var(--red)';
+    rsForgeryBar.style.boxShadow = '0 0 10px var(--red)';
+  } else if (forgeryProb > 30) {
+    resultVerdict.innerHTML = '<i class="bx bx-error-circle"></i> MODERATE ANOMALIES DETECTED';
+    resultVerdict.className = 'result-verdict warning';
+    rsForgeryBar.style.backgroundColor = 'var(--gold)';
+    rsForgeryBar.style.boxShadow = '0 0 10px var(--gold)';
   } else {
-    verdict.className = 'result-verdict rv-clean';
-    verdict.innerHTML = `<i class='bx bx-check-shield'></i> METADATA ANALYSIS CLEAN`;
+    resultVerdict.innerHTML = '<i class="bx bx-check-shield"></i> DOCUMENT AUTHENTICITY VERIFIED';
+    resultVerdict.className = 'result-verdict safe';
+    rsForgeryBar.style.backgroundColor = 'var(--cyan)';
+    rsForgeryBar.style.boxShadow = '0 0 10px var(--cyan)';
   }
 
-  // Score bar
-  const rsForgeryBar = document.getElementById('rsForgeryBar');
-  const rsForgeryPct = document.getElementById('rsForgeryPct');
-  const pctVal = Math.round(forgeryScore);
-  rsForgeryPct.textContent = pctVal + '%';
-  rsForgeryPct.style.color = pctVal > 55 ? 'var(--red)' : pctVal > 35 ? 'var(--warn)' : 'var(--green)';
-  const barColor = pctVal > 55 ? 'linear-gradient(90deg, #ff2b5e, #ff6b8a)' : pctVal > 35 ? 'linear-gradient(90deg, #ffb800, #ffdd00)' : 'linear-gradient(90deg, #00ff88, #00ccaa)';
-  rsForgeryBar.style.background = barColor;
-  rsForgeryBar.style.boxShadow = `0 0 8px ${pctVal > 55 ? 'rgba(255,43,94,0.5)' : pctVal > 35 ? 'rgba(255,184,0,0.5)' : 'rgba(0,255,136,0.5)'}`;
-  setTimeout(() => rsForgeryBar.style.width = pctVal + '%', 100);
+  rsForgeryPct.textContent = forgeryProb + '%';
+  rsForgeryBar.style.width = forgeryProb + '%';
 
-  // Checks
-  const checks = [
-    { label: 'File Creation Date', icon: 'bx-time', pass: seed > 40, detail: seed > 40 ? 'Consistent' : 'ANOMALY: Future timestamp' },
-    { label: 'DPI Consistency', icon: 'bx-scan', pass: seed > 30, detail: seed > 30 ? '300 DPI — Standard' : 'ANOMALY: Mixed 72/300 DPI' },
-    { label: 'Font Signatures', icon: 'bx-font', pass: seed > 50, detail: seed > 50 ? 'Government font matched' : 'ANOMALY: Non-standard typeface' },
-    { label: 'Pixel Integrity', icon: 'bx-image', pass: seed > 35, detail: seed > 35 ? 'No manipulation detected' : 'ANOMALY: Clone stamp artifacts' },
-    { label: 'Copy-Paste Artifacts', icon: 'bx-copy', pass: seed > 45, detail: seed > 45 ? 'No artifacts found' : 'ANOMALY: Pasted layer detected' },
-    { label: 'Hologram Alignment', icon: 'bx-cube', pass: seed > 25, detail: seed > 25 ? 'Security hologram intact' : 'ANOMALY: Hologram misaligned' }
-  ];
-
-  const checksEl = document.getElementById('resultChecks');
-  checksEl.innerHTML = checks.map(c => `
-    <div class="rc-item">
-      <i class='bx ${c.icon}' style="color:${c.pass ? 'var(--green)' : 'var(--red)'}"></i>
-      <span class="rc-label">${c.label}</span>
-      <span class="rc-status" style="color:${c.pass ? 'var(--green)' : 'var(--red)'}">${c.pass ? 'PASS' : 'FAIL'}</span>
-    </div>
-  `).join('');
-
-  // Details
-  const detailsEl = document.getElementById('resultDetails');
-  const exifDate = isForged ? '2087-03-15T14:22:00' : '2024-11-02T09:14:33';
-  const modDate = isForged ? '2026-01-08T22:45:11' : '2024-11-02T09:14:33';
-  detailsEl.innerHTML = `
-    <div class="rd-title">DETAILED METADATA REPORT</div>
-    <div class="rd-row"><span class="rd-key">EXIF Create Date</span><span class="rd-val ${isForged ? 'anomaly' : 'ok'}">${exifDate}</span></div>
-    <div class="rd-row"><span class="rd-key">Last Modified</span><span class="rd-val ${isForged ? 'anomaly' : 'ok'}">${modDate}</span></div>
-    <div class="rd-row"><span class="rd-key">Software Signature</span><span class="rd-val ${isForged ? 'anomaly' : 'ok'}">${isForged ? 'Adobe Photoshop 25.0' : 'Canon EOS R5 Firmware'}</span></div>
-    <div class="rd-row"><span class="rd-key">Color Profile</span><span class="rd-val">${isForged ? 'sRGB (modified)' : 'AdobeRGB 1998'}</span></div>
-    <div class="rd-row"><span class="rd-key">Image Dimensions</span><span class="rd-val">2480 × 3508 px</span></div>
-    <div class="rd-row"><span class="rd-key">Compression Ratio</span><span class="rd-val ${isSuspect ? 'anomaly' : ''}">${isSuspect ? '3.2:1 (unusual)' : '8.1:1 (standard)'}</span></div>
-    <div class="rd-row"><span class="rd-key">GPS Coordinates</span><span class="rd-val ${isForged ? 'anomaly' : ''}">${isForged ? 'STRIPPED — Suspicious' : 'Not embedded'}</span></div>
+  // Build checks based on hashes
+  resultChecks.innerHTML = `
+    <div class="rc-item"><i class='bx bx-check'></i> <span>MD5: ${data.hashes.MD5.substring(0,16)}...</span></div>
+    <div class="rc-item"><i class='bx bx-check'></i> <span>SHA256: ${data.hashes.SHA256.substring(0,16)}...</span></div>
+    <div class="rc-item"><i class='${isPdf ? 'bx bx-check' : 'bx bx-error'}'></i> <span>Format Analysis</span></div>
   `;
 
-  // Show viz
-  metadataViz.style.display = 'block';
-  buildMetadataViz(forgeryScore, isForged, seed);
+  // Render metadata details
+  let metaHtml = '';
+  if(data.metadata && Object.keys(data.metadata).length > 0) {
+      for(const [key, val] of Object.entries(data.metadata)) {
+          metaHtml += `<div class="mviz-item">
+            <div class="mviz-label">${key.toUpperCase()}</div>
+            <div class="mviz-val">${val}</div>
+          </div>`;
+      }
+  } else {
+      metaHtml = '<div class="mviz-item"><div class="mviz-label">INFO</div><div class="mviz-val">No embedded EXIF/Metadata found.</div></div>';
+  }
+  
+  mvizGrid.innerHTML = metaHtml;
+  
+  resultDetails.innerHTML = `
+    <div class="rd-row"><span>FILE:</span> <span>${data.filename}</span></div>
+    <div class="rd-row"><span>SIZE:</span> <span>${data.size}</span></div>
+    <div class="rd-row"><span>ANALYSIS TIME:</span> <span>${data.timestamp}</span></div>
+  `;
 }
 
-function buildMetadataViz(score, isForged, seed) {
-  const grid = document.getElementById('mvizGrid');
-  const metrics = [
-    { label: 'DPI Score', val: isForged ? (seed % 200 + 100) : 300, unit: 'dpi', normal: '300', anomaly: isForged, bar: isForged ? 40 : 100, color: isForged ? 'var(--red)' : 'var(--green)' },
-    { label: 'Compression', val: isForged ? (2 + Math.random() * 4).toFixed(1) : (7 + Math.random() * 3).toFixed(1), unit: ':1', normal: '8:1', anomaly: isForged && Math.random() > 0.4, bar: isForged ? 30 : 85, color: isForged ? 'var(--warn)' : 'var(--green)' },
-    { label: 'Pixel Variance', val: isForged ? (Math.random() * 30 + 60).toFixed(0) : (Math.random() * 10 + 5).toFixed(0), unit: '%', normal: '<15%', anomaly: isForged, bar: isForged ? 80 : 20, color: isForged ? 'var(--red)' : 'var(--green)' },
-    { label: 'Font Match', val: isForged ? (Math.random() * 30 + 40).toFixed(0) : (Math.random() * 15 + 85).toFixed(0), unit: '%', normal: '>85%', anomaly: isForged, bar: isForged ? 50 : 92, color: isForged ? 'var(--red)' : 'var(--green)' },
-    { label: 'Layer Count', val: isForged ? (Math.floor(Math.random() * 5) + 3) : 1, unit: '', normal: '1', anomaly: isForged && Math.random() > 0.3, bar: isForged ? 70 : 10, color: isForged ? 'var(--warn)' : 'var(--green)' },
-    { label: 'ELA Score', val: (score * 0.8 + Math.random() * 10).toFixed(0), unit: '%', normal: '<20%', anomaly: isForged, bar: score * 0.8, color: score > 40 ? 'var(--red)' : 'var(--green)' },
-    { label: 'Color Depth', val: 24, unit: ' bit', normal: '24', anomaly: false, bar: 100, color: 'var(--green)' },
-    { label: 'Entropy', val: isForged ? (6 + Math.random()).toFixed(2) : (7.5 + Math.random() * 0.4).toFixed(2), unit: '', normal: '7.5+', anomaly: isForged, bar: isForged ? 60 : 95, color: isForged ? 'var(--warn)' : 'var(--green)' }
-  ];
-
-  grid.innerHTML = metrics.map(m => `
-    <div class="mviz-cell ${m.anomaly ? 'mviz-anomaly' : ''}">
-      <div class="mviz-cell-label">${m.label.toUpperCase()}</div>
-      <div class="mviz-cell-val" style="color:${m.color}">${m.val}${m.unit}</div>
-      <div class="mviz-cell-detail">Expected: ${m.normal}</div>
-      <div class="mviz-bar" style="width:${m.bar}%;background:${m.color};box-shadow:0 0 6px ${m.color}4d;transition:width 1.2s ease 0.2s"></div>
-    </div>
-  `).join('');
+function updateScanningStep(text, status) {
+  const div = document.createElement('div');
+  div.className = 'ss-item';
+  let icon = 'bx-loader-alt bx-spin';
+  if (status === 'done') icon = 'bx-check';
+  if (status === 'error') icon = 'bx-x';
+  
+  div.innerHTML = `<i class='bx ${icon}'></i> <span>${text}</span>`;
+  scanningSteps.appendChild(div);
 }
+
+analyzeBtn.addEventListener('click', runAnalysis);

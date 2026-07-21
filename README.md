@@ -1,79 +1,83 @@
-# JusticeFlowX 🛡️
+<div align="center">
+  <img src="https://raw.githubusercontent.com/nirmay1-creator/justiceflowx/main/frontend/assets/images/WhatsApp%20Image%202026-01-07%20at%209.59.21%20PM.jpeg" width="120" alt="JusticeFlowX Logo">
+  
+  # ⚖️ JusticeFlowX
+  
+  **Advanced Digital Forensics & Cyber-Investigative Verification System**
+  
+  [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+  [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+  [![HTML/CSS/JS](https://img.shields.io/badge/Frontend-Neo--Cyber-00d4ff?style=for-the-badge&logo=html5)](https://developer.mozilla.org/)
 
-   **JusticeFlowX** is a cutting-edge **Biometric Authentication and Identity Verification System** designed for futuristic, high-security law enforcement and forensic applications. It features a highly interactive and immersive dashboard that integrates various modules to authenticate identities and analyze criminal records using biometrics, network intelligence, and document forensics.
+  ---
+</div>
 
----
+## 🌐 Overview
 
-## 🌟 Key Features
+**JusticeFlowX** is a next-generation investigative suite and digital forensics dashboard designed for modern law enforcement, cyber security teams, and intelligence analysts. Featuring an incredibly immersive neo-cyber, glassmorphic UI, JusticeFlowX brings disparate investigation tools into a single, cohesive, high-tech command center.
 
-The system offers four primary methods of identity verification and investigation:
+From cryptographically securing the chain of custody to real-time network packet inspection and biometric authentication, JusticeFlowX makes handling critical digital infrastructure seamless and highly secure.
 
-1. **Fingerprint Scan 🖐️**
-   - **How it works:** Verifies identity via simulated ridge pattern analysis.
-   - **Backend:** Powered by a dedicated Flask API (`Backend server.py`) running on port `5000` with endpoints to look up, add, and list fingerprint records.
-   
-2. **Facial Recognition 👤**
-   - **How it works:** Analyzes facial geometry, image quality (brightness, contrast, sharpness), and matches faces using OpenCV and frontend descriptors.
-   - **Backend:** Managed by a separate Flask API (`app.py`) running on port `8675` interfacing with a local JSON-based criminal database (`criminal_db.json`).
+## ✨ Core Modules
 
-3. **Document Forensics 📄**
-   - **How it works:** AI-powered analysis designed to detect forged IDs using deep scans for metadata inconsistencies, ink patterns, and serial verification.
+- **📡 Infrastructure Control Center (System Health):** 100% real-time polling of host hardware (CPU, RAM, Disk I/O, Network Throughput) via a live FastAPI backend. Features an interactive "Threat Mode" that instantly secures infrastructure and isolates critical networks.
+- **🧬 Biometric Authentication:** Immersive facial recognition and fingerprint scanning overlays required for accessing restricted case files.
+- **🔗 Chain of Custody & Evidence Management:** A cryptographically secured, immutable ledger to track evidence handovers, ensuring 100% integrity of digital and physical assets.
+- **🌐 Network Forensics:** Advanced real-time packet inspection (PCAP parsing), malware detection, and AI-driven threat intelligence analysis.
+- **📄 Document Forensics:** AI-powered forensic analysis to detect forged IDs, metadata tampering, ink pattern discrepancies, and serial verification.
+- **⚖️ Legal Education AI:** An integrated AI legal educator designed to decipher severe crimes, penalties, and legal definitions in plain English.
+- **🗃️ Criminal DB & Case Control:** Centralized management of criminal profiles, case reports, and investigative notes.
 
-4. **Network Detection 🌐**
-   - **How it works:** A three-layer intelligence system focusing on social graph analysis, location contradiction detection, and hidden criminal identity exposure.
+## 🚀 Tech Stack
 
-### 🎨 Immersive UI/UX
-- **Sci-Fi Aesthetics:** The frontend features scanline overlays, hex-grid canvases, data stream animations, glowing cards, and a real-time status bar indicating DB Sync, CPU usage, and Threat Level.
-- **Comprehensive Dashboard:** Easy navigation through modules like Criminal DB, Case Control, Evidence Management, and System Health.
+### **Backend**
+- **FastAPI**: High-performance asynchronous REST API.
+- **Psutil**: For live, bare-metal hardware metric extraction.
+- **Pyshark**: Real-time PCAP parsing and network stream analysis.
+- **SQLAlchemy / PostgreSQL**: For robust storage of case reports and evidence hashes.
+- **Uvicorn**: Lightning-fast ASGI server.
 
----
+### **Frontend**
+- **Vanilla JS & HTML5**: Zero-bloat, lightning-fast interactivity.
+- **Advanced CSS3**: Custom glassmorphism, neo-cyber color palettes, glowing scanlines, CRT noise overlays, and CSS Grid layouts.
+- **Boxicons**: Crisp, scalable iconography.
 
-## 🛠️ Technology Stack
-
-- **Frontend:** HTML5, CSS3 (Vanilla), JavaScript, Boxicons for iconography.
-- **Backend:** Python, Flask, Flask-CORS.
-- **Computer Vision:** OpenCV (`cv2`), NumPy for facial recognition and image analysis.
-- **Data Storage:** In-memory Python dictionaries and JSON files (`criminal_db.json`, `cases.json`, `data.json`).
-
----
-
-## 🚀 Setup & Installation
+## 🛠️ Getting Started
 
 ### Prerequisites
-- Python 3.8+
+- Python 3.10+
 - `pip` package manager
+- (Optional) PostgreSQL for the full database experience
 
-### 1. Install Dependencies
-```bash
-pip install flask flask-cors opencv-python numpy
-```
+### Installation
 
-### 2. Run the Backends
-JusticeFlowX currently operates on a dual-backend architecture. You need to run both scripts in separate terminal windows.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/nirmay1-creator/justiceflowx.git
+   cd justiceflowx
+   ```
 
-**Fingerprint API (Port 5000):**
-```bash
-python "Backend server.py"
-```
+2. **Setup the Python Backend Environment**
+   ```bash
+   cd backend
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
-**Facial Recognition API (Port 8675):**
-```bash
-python app.py
-```
+3. **Start the API Server**
+   ```bash
+   uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+   ```
 
-### 3. Launch the Application
-Simply open `index.html` in any modern web browser to access the JusticeFlowX Dashboard. Ensure that JavaScript is enabled for full functionality.
+4. **Launch the Frontend**
+   Simply open `frontend/index.html` in your web browser, or serve it using a local development server (e.g., VS Code Live Server).
 
----
+## 🛡️ "Threat Mode" Simulation
+The Infrastructure Control Center features a highly stylized **Threat Mode**. When activated, the API simulates a massive cyber attack, dynamically altering hardware metrics (CPU spikes), flashing red alarms, and dumping critical breach alerts into the live terminal feed. 
 
-## 📈 Room for Improvements
+## 🤝 Contributing
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/nirmay1-creator/justiceflowx/issues) if you want to contribute.
 
-While JusticeFlowX presents a stunning proof-of-concept and a functional prototype, here are several areas for architectural and feature enhancements:
-
-1. **Backend Consolidation:** Merge `app.py` and `Backend server.py` into a unified API (e.g., using Flask Blueprints or FastAPI) to reduce complexity and port management.
-2. **Database Migration:** Replace the in-memory data structures and static JSON files with a robust relational (PostgreSQL) or NoSQL (MongoDB) database to ensure data persistence, scalability, and integrity.
-3. **Advanced AI Integration:** 
-   - Upgrade the facial recognition engine from basic OpenCV Haar Cascades to deep-learning models like `FaceNet`, `DeepFace`, or `dlib` for actual biometric matching rather than relying on randomized mock scores.
-4. **Security & Authentication:** Implement real JWT (JSON Web Tokens) or OAuth2 authentication to secure the API endpoints. Biometric/criminal data is highly sensitive and requires strict role-based access control (RBAC).
-5. **Containerization:** Add a `Dockerfile` and `docker-compose.yml` to bundle the frontend, backend(s), and a database into a single deployable environment.
-6. **Error Handling & Logging:** Replace basic `print()` statements and Flask `abort()` calls with a structured logging framework (like Python's `logging` module) to keep track of system audits and errors effectively.
+## 📝 License
+Distributed under the MIT License. See `LICENSE` for more information.

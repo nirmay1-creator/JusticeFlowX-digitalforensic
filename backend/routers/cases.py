@@ -57,11 +57,17 @@ async def upload_pcap(
     if not db_case:
         raise HTTPException(status_code=404, detail="Case not found")
 
+    import tempfile
+    from werkzeug.utils import secure_filename
+
     if not file.filename.endswith(('.pcap', '.pcapng')):
         raise HTTPException(status_code=400, detail="Only .pcap or .pcapng files are allowed")
 
-    # Save to a temporary file for pyshark to read
-    temp_filepath = f"/tmp/{uuid.uuid4()}_{file.filename}"
+    # Secure temporary file creation to prevent Path Traversal
+    safe_filename = secure_filename(file.filename)
+    fd, temp_filepath = tempfile.mkstemp(suffix=f"_{safe_filename}")
+    os.close(fd) # Close the file descriptor, we will use the path
+
     
     try:
         content = await file.read()

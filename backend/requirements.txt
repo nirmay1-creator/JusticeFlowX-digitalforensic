@@ -10,3 +10,6 @@ python-multipart>=0.0.6
 pyshark>=0.6.0
 httpx==0.28.1
 PyPDF2>=3.0.0
+reportlab
+python-magic-bin
+pefile

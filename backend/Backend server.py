@@ -22,10 +22,33 @@ ENDPOINTS:
 
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from datetime import datetime
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # Allow requests from browser (cross-origin)
+
+# Configure allowed origins from .env, fallback to localhost
+allowed_origins = os.getenv("CORS_ORIGINS", "http://localhost").split(",")
+CORS(app, resources={r"/api/*": {"origins": allowed_origins}})
+
+# Rate Limiting
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
+)
+
+# Global Error Handler to prevent Information Leakage
+@app.errorhandler(Exception)
+def handle_exception(e):
+    print(f"Internal Server Error: {repr(e)}")
+    return jsonify({"error": "An internal server error occurred."}), 500
 
 # ----------------------------------------------------------------
 # IN-MEMORY DATABASE
@@ -218,4 +241,5 @@ if __name__ == "__main__":
     print("  Running on http://localhost:5000")
     print("  Set CONFIG.USE_BACKEND = true in finger2.js")
     print("=" * 50)
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    debug_mode = os.getenv("DEBUG", "False").lower() in ("true", "1", "t")
+    app.run(debug=debug_mode, host="0.0.0.0", port=5000)

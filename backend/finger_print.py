@@ -61,5 +61,11 @@ def scan():
 
 # ------------------ Run Server ------------------
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    debug_mode = os.getenv("DEBUG", "False").lower() in ("true", "1", "t")
+    app.run(debug=debug_mode)

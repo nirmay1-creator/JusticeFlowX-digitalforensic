@@ -1,13 +1,8 @@
 /* =============================================
-   SYSTEM HEALTH PAGE JS
+   SYSTEM HEALTH PAGE JS (REAL BACKEND)
    ============================================= */
 
-let systemOn = true;
-let threatMode = false;
-let startTime = Date.now();
-
-function rnd(min, max){ return Math.random()*(max-min)+min; }
-function ri(min, max){ return Math.floor(rnd(min,max)); }
+const API_URL = "http://localhost:8001/api/system";
 
 function setMeter(id, pct){
   const el = document.getElementById(id);
@@ -26,109 +21,122 @@ function colorVal(id, val, warnAt=60, alertAt=80){
   el.className = "health-card-value" + (val>=alertAt?" alert":val>=warnAt?" warn":" ok");
 }
 
-function updateMetrics(){
-  if(!systemOn) return;
-
-  // CPU
-  const cpu=ri(18,88);
-  setVal("cpuDisplay",cpu,"%"); setMeter("cpuMeterFill",cpu); colorVal("cpuDisplay",cpu);
-  setVal("cpuVal",cpu,"%");
-  setVal("cpuThreads",ri(8,32));
-  setVal("cpuClock",(rnd(2.4,5.2)).toFixed(1),"GHz");
-  setVal("cpuTemp",ri(38,82),"°C");
-  setVal("cpuLoad",(rnd(0.3,3.5)).toFixed(2));
-
-  // Memory
-  const memUsed=ri(8,28); const memTotal=32;
-  const memPct=Math.round(memUsed/memTotal*100);
-  setVal("memDisplay",memPct,"%"); setMeter("memMeterFill",memPct); colorVal("memDisplay",memPct,55,75);
-  setVal("memUsed",memUsed,"GB"); setVal("memFree",(memTotal-memUsed)+"GB");
-  setVal("memCached",ri(2,8),"GB"); setVal("memSwap",ri(0,4),"GB");
-
-  // Disk
-  const disk=ri(15,75);
-  setVal("diskDisplay",disk,"%"); setMeter("diskMeterFill",disk); colorVal("diskDisplay",disk,60,80);
-  setVal("diskRead",ri(80,550),"MB/s"); setVal("diskWrite",ri(60,400),"MB/s");
-  setVal("diskFree",ri(4,18),"TB"); setVal("diskIOPS",ri(200,4000));
-
-  // Network
-  const netPct=ri(20,85);
-  setMeter("netMeterFill",netPct);
-  setVal("netUp",(rnd(10,400)).toFixed(1),"Mbps");
-  setVal("netDown",(rnd(50,900)).toFixed(1),"Mbps");
-  setVal("netLatency",ri(1,12),"ms");
-  const upHours=Math.floor((Date.now()-startTime)/3600000);
-  const upMins=Math.floor(((Date.now()-startTime)%3600000)/60000);
-  setVal("netUptime",upHours+"h "+upMins+"m");
-
-  // DB
-  setVal("dbQuery",ri(1,12)+"ms");
-  setVal("dbSync",new Date().toTimeString().slice(0,8));
-  const nodes=threatMode?ri(10,14):14;
-  setVal("dbNodes",nodes+"/14");
-
-  // Security
-  if(!threatMode){
-    document.getElementById("secDisplay").textContent="SECURE";
-    document.getElementById("secDisplay").className="health-card-value ok";
-    document.getElementById("threatDot").className="sec-dot ok";
-    document.getElementById("threatLevel").textContent="LOW";
-    document.getElementById("threatLevel").className="sec-status ok";
+async function fetchStatus() {
+  try {
+    const res = await fetch(`${API_URL}/status`);
+    const data = await res.json();
+    updateMetrics(data);
+  } catch (err) {
+    console.error("Failed to fetch system status from backend", err);
   }
 }
 
-function toggleThreat(){
-  threatMode=!threatMode;
-  const btn=document.getElementById("threatBtn");
-  const status=document.getElementById("threatStatus");
-  const sec=document.getElementById("secDisplay");
-  const dot=document.getElementById("threatDot");
-  const lvl=document.getElementById("threatLevel");
-
-  if(threatMode){
-    document.body.style.setProperty("--border","rgba(255,43,94,0.3)");
-    btn.textContent="⚠ DEACTIVATE THREAT MODE";
-    status.textContent="⚠ THREAT MODE ACTIVE";
-    status.style.color="var(--red)";
-    sec.textContent="THREAT DETECTED";
-    sec.className="health-card-value alert";
-    dot.className="sec-dot bad";
-    lvl.textContent="HIGH"; lvl.className="sec-status bad";
-    // Red overlay pulse
-    document.body.style.boxShadow="inset 0 0 0 3px rgba(255,43,94,0.5)";
-  } else {
-    document.body.style.removeProperty("--border");
-    btn.innerHTML=`<i class='bx bx-alarm'></i> THREAT MODE`;
-    status.textContent="";
-    document.body.style.boxShadow="";
-    updateMetrics();
-  }
-}
-
-function toggleSystem(){
-  systemOn=!systemOn;
+function updateMetrics(data){
   const btn=document.getElementById("powerBtn");
   const label=document.getElementById("sysStatusLabel");
-  if(!systemOn){
+
+  if(!data.power){
     btn.innerHTML=`<i class='bx bx-power-off'></i> POWER ON`;
     label.textContent="OFFLINE";
     label.style.color="var(--red)";
+    
     // Zero out all meters
     ["cpuMeterFill","memMeterFill","diskMeterFill","netMeterFill","dbMeterFill"].forEach(id=>setMeter(id,0));
     ["cpuDisplay","memDisplay","diskDisplay"].forEach(id=>setVal(id,"0%"));
     setVal("netDisplay","OFFLINE"); setVal("dbDisplay","OFFLINE");
     setVal("secDisplay","OFFLINE");
+    return;
+  }
+  
+  btn.innerHTML=`<i class='bx bx-power-off'></i> SHUTDOWN`;
+  label.textContent="SYSTEMS ONLINE";
+  label.style.color="var(--green)";
+
+  const hw = data.metrics.hardware;
+
+  // CPU
+  const cpu = Math.round(hw.cpu.usage);
+  setVal("cpuDisplay",cpu,"%"); setMeter("cpuMeterFill",cpu); colorVal("cpuDisplay",cpu);
+  setVal("cpuVal",cpu,"%");
+  setVal("cpuThreads",hw.cpu.threads);
+  setVal("cpuClock",hw.cpu.clock,"GHz");
+  setVal("cpuTemp",hw.cpu.temp,"°C");
+  setVal("cpuLoad",hw.cpu.load_avg);
+
+  // Memory
+  const memPct = Math.round(hw.memory.percent);
+  setVal("memDisplay",memPct,"%"); setMeter("memMeterFill",memPct); colorVal("memDisplay",memPct,60,85);
+  setVal("memUsed",hw.memory.used_gb,"GB"); 
+  setVal("memFree",hw.memory.free_gb,"GB");
+  setVal("memCached",hw.memory.cached_gb,"GB"); 
+  setVal("memSwap",hw.memory.swap_gb,"GB");
+
+  // Disk
+  const disk = Math.round(hw.disk.percent);
+  setVal("diskDisplay",disk,"%"); setMeter("diskMeterFill",disk); colorVal("diskDisplay",disk,75,90);
+  setVal("diskRead",hw.disk.read_mbs,"MB/s"); 
+  setVal("diskWrite",hw.disk.write_mbs,"MB/s");
+  setVal("diskFree",hw.disk.free_tb,"TB"); 
+  setVal("diskIOPS",hw.disk.iops);
+
+  // Network
+  const netPct = Math.min(100, Math.round((hw.network.download_mbps / 1000) * 100)); // Simulated capacity
+  setMeter("netMeterFill",netPct);
+  setVal("netUp",hw.network.upload_mbps,"Mbps");
+  setVal("netDown",hw.network.download_mbps,"Mbps");
+  setVal("netLatency",hw.network.latency,"ms");
+  setVal("netUptime",hw.network.uptime_str);
+
+  // DB
+  setVal("dbQuery", Math.floor(Math.random() * 12 + 1) + "ms"); // fake DB latency
+  setVal("dbSync",new Date().toTimeString().slice(0,8));
+  const nodes = data.threat_mode ? Math.floor(Math.random()*4+10) : 14;
+  setVal("dbNodes",nodes+"/14");
+
+  // Security
+  const threatBtn = document.getElementById("threatBtn");
+  const sec = document.getElementById("secDisplay");
+  const dot = document.getElementById("threatDot");
+  const lvl = document.getElementById("threatLevel");
+
+  if(data.threat_mode){
+    document.body.style.setProperty("--border","rgba(255,43,94,0.3)");
+    threatBtn.textContent="⚠ DEACTIVATE THREAT MODE";
+    sec.textContent="THREAT DETECTED";
+    sec.className="health-card-value alert";
+    dot.className="sec-dot bad";
+    lvl.textContent="HIGH"; lvl.className="sec-status bad";
+    document.body.style.boxShadow="inset 0 0 0 3px rgba(255,43,94,0.5)";
   } else {
-    btn.innerHTML=`<i class='bx bx-power-off'></i> SHUTDOWN`;
-    label.textContent="SYSTEMS ONLINE";
-    label.style.color="var(--green)";
-    updateMetrics();
+    document.body.style.removeProperty("--border");
+    threatBtn.innerHTML=`<i class='bx bx-alarm'></i> THREAT MODE`;
+    document.body.style.boxShadow="";
+    
+    sec.textContent="SECURE";
+    sec.className="health-card-value ok";
+    dot.className="sec-dot ok";
+    lvl.textContent="LOW";
+    lvl.className="sec-status ok";
   }
 }
 
+async function toggleThreat(){
+  await fetch(`${API_URL}/toggle_threat`, { method: "POST" });
+  fetchStatus();
+}
+
+async function toggleSystem(){
+  await fetch(`${API_URL}/toggle_power`, { method: "POST" });
+  fetchStatus();
+}
+
+// Bind buttons
+document.getElementById("threatBtn").onclick = toggleThreat;
+document.getElementById("powerBtn").onclick = toggleSystem;
+
 document.addEventListener("DOMContentLoaded",()=>{
   commonInit(()=>{
-    updateMetrics();
-    setInterval(updateMetrics, 2200);
+    fetchStatus();
+    setInterval(fetchStatus, 2000);
   });
 });
