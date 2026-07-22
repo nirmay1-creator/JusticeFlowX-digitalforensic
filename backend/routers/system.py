@@ -14,24 +14,24 @@ class GlobalState:
         self.start_time = time.time()
         
         self.normal_logs = [
-            "🟢 Camera C-34 tracking subject ID 89421",
-            "🟡 Drone D2 scanning Sector 7B",
-            "🟢 Facial match completed (Accuracy: 98.3%)",
-            "🔵 Fingerprint verification successful",
-            "🟢 Criminal database synced",
-            "🟡 Server backup in progress",
-            "🟢 AI threat model updated",
-            "🟢 Perimeter sensors recalibrated"
+            "🟢 PCAP stream parsed successfully",
+            "🟡 Heuristic scanner running on EV-4022",
+            "🟢 Signature database synced (24,190 rules)",
+            "🔵 Deep packet inspection module standby",
+            "🟢 Malware sandbox environment reset",
+            "🟡 Hash verification in progress (SHA-256)",
+            "🟢 Threat Intel feeds updated",
+            "🟢 Chain of Custody ledger validated"
         ]
         
         self.threat_logs = [
-            "🔴 Unauthorized access attempt blocked",
-            "🔴 Drone D4 intercepted rogue signal",
-            "🔴 MULTIPLE LOGIN FAILURES - SECTOR 9",
-            "🔴 Thermal scan detected anomaly in Zone C",
-            "🟡 Network latency spike detected",
-            "🔴 Potential tampering with CCTV node 42",
-            "🔴 CRITICAL: Firewall breach attempt mitigated"
+            "🔴 Suspicious payload detected in memory dump",
+            "🔴 YARA rule match: Trojan.Win32.Generic",
+            "🔴 ANOMALY: Outbound C2 beacon identified",
+            "🔴 Ransomware signature detected in Sector B",
+            "🟡 Entropy spike in executable segment",
+            "🔴 Data exfiltration attempt blocked (Port 443)",
+            "🔴 CRITICAL: Kernel rootkit behavior identified"
         ]
 
 state = GlobalState()
@@ -141,11 +141,44 @@ def get_system_logs():
     if not state.power:
         return {"logs": []}
         
-    # Generate 1 new log on each fetch
+    # Attempt to grab real network and process data to make it authentic
+    try:
+        conns = [c for c in psutil.net_connections(kind='inet') if c.status == 'ESTABLISHED' and c.raddr]
+    except:
+        conns = []
+        
     source = state.threat_logs if state.threat_mode else state.normal_logs
+    
+    # Randomly pick the type of log to generate
+    rand_choice = random.randint(1, 10)
+    
+    if rand_choice <= 3 and conns:
+        # Show real active connection
+        conn = random.choice(conns)
+        r_ip, r_port = conn.raddr.ip, conn.raddr.port
+        icon = "🟢" if r_port in (80, 443) else "🟡"
+        try:
+            p_name = psutil.Process(conn.pid).name() if conn.pid else "system"
+        except:
+            p_name = "unknown"
+        message = f"{icon} LIVE TRAFFIC: {p_name} ({conn.laddr.port} -> {r_ip}:{r_port})"
+        
+    elif rand_choice <= 6:
+        # Show real active process scan
+        try:
+            procs = sorted(psutil.process_iter(['name', 'cpu_percent']), key=lambda p: p.info['cpu_percent'] or 0, reverse=True)[:5]
+            top_p = random.choice(procs[:3])
+            icon = "🔴" if (top_p.info['cpu_percent'] or 0) > 40 else "🟡"
+            message = f"{icon} MEMORY SCAN: {top_p.info['name']} (CPU: {top_p.info['cpu_percent'] or 0}%)"
+        except:
+            message = random.choice(source)
+    else:
+        # Show themed DFIR log
+        message = random.choice(source)
+        
     new_log = {
         "timestamp": datetime.now().strftime("%H:%M:%S"),
-        "message": random.choice(source)
+        "message": message
     }
     
     state.log_history.insert(0, new_log)

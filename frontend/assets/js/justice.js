@@ -709,47 +709,53 @@ function startTerminal() {
   const termBody = document.getElementById("terminalBody");
   const termTime = document.getElementById("termTime");
   if (!termBody) return;
-  const logs = [
-    { text: "Fingerprint module ping — 2ms", type: "" },
-    { text: "ALERT: Drone sector 7B activated", type: "alert" },
-    { text: "Facial DB sync complete (14,217)", type: "ok" },
-    { text: "Firewall scan — no anomalies", type: "ok" },
-    { text: "ALERT: Unauthorized access blocked", type: "alert" },
-    { text: "AI threat detection update pushed", type: "" },
-    { text: "Biometric reader — standby mode", type: "" },
-    { text: "WARN: Node 4C response degraded", type: "warn" },
-    { text: "Encryption handshake verified", type: "ok" },
-    { text: "Surveillance feed reconnected", type: "ok" },
-    { text: "Case DB query completed (0.4ms)", type: "" },
-    { text: "WARN: CPU spike — 78% peak", type: "warn" },
-    { text: "Memory pool optimized", type: "ok" },
-    { text: "Auth attempt from 192.168.1.44 — denied", type: "alert" },
-    { text: "Neural Net analyzing heuristic patterns", type: "" },
-    { text: "WARN: SSL certificate expiring in 12h", type: "warn" },
-    { text: "Packet interceptor active on eth0", type: "ok" },
-    { text: "ALERT: SQL Injection signature matched", type: "alert" }
-  ];
-  
-  setInterval(() => {
-    const { text, type } = logs[Math.floor(Math.random() * logs.length)];
-    const div = document.createElement("div");
-    if (type) div.classList.add(type);
-    termBody.appendChild(div);
-    
-    if (termBody.children.length > 25) termBody.removeChild(termBody.firstChild);
-    
-    let charIdx = 0;
-    const typeInterval = setInterval(() => {
-      if (charIdx < text.length) {
-        div.textContent += text.charAt(charIdx);
-        charIdx++;
-        termBody.scrollTop = termBody.scrollHeight + 100;
-      } else {
-        clearInterval(typeInterval);
+
+  let lastLogMsg = "";
+
+  async function fetchLog() {
+    try {
+      const res = await fetch("http://localhost:8001/api/system/logs");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.logs && data.logs.length > 0) {
+        const latest = data.logs[0];
+        
+        // Prevent duplicate logs in case backend didn't update
+        if (latest.message === lastLogMsg) return;
+        lastLogMsg = latest.message;
+
+        const div = document.createElement("div");
+        
+        let typeClass = "";
+        if (latest.message.includes("🔴")) typeClass = "alert";
+        else if (latest.message.includes("🟡")) typeClass = "warn";
+        else if (latest.message.includes("🟢") || latest.message.includes("🔵")) typeClass = "ok";
+        
+        if (typeClass) div.classList.add(typeClass);
+        termBody.appendChild(div);
+        
+        if (termBody.children.length > 25) termBody.removeChild(termBody.firstChild);
+
+        let charIdx = 0;
+        const text = `[${latest.timestamp}] ${latest.message}`;
+        const typeInterval = setInterval(() => {
+          if (charIdx < text.length) {
+            div.textContent += text.charAt(charIdx);
+            charIdx++;
+            termBody.scrollTop = termBody.scrollHeight + 100;
+          } else {
+            clearInterval(typeInterval);
+          }
+        }, 15);
       }
-    }, 15);
-    
-  }, 2200);
+    } catch (err) {
+      console.error("Terminal fetch error:", err);
+    }
+  }
+
+  fetchLog();
+  setInterval(fetchLog, 2200);
+
   setInterval(() => { if (termTime) termTime.textContent = new Date().toTimeString().slice(0, 8); }, 1000);
 }
 

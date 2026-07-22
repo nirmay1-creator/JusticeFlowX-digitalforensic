@@ -80,7 +80,7 @@ const ThreatHunterApp = () => {
 
     try {
       // Adjust the URL if your backend runs on a different port
-      const response = await fetch("http://localhost:8000/api/v1/threat-hunter/analyze", {
+      const response = await fetch("http://localhost:8001/api/v1/threat-hunter/analyze", {
         method: "POST",
         body: formData,
       });

@@ -349,7 +349,7 @@
         const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s
 
         try {
-          const response = await fetch("http://127.0.0.1:8000/api/v1/threat-hunter/analyze", {
+          const response = await fetch("http://127.0.0.1:8001/api/v1/threat-hunter/analyze", {
             method: "POST",
             body: formData,
             signal: controller.signal,

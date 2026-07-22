@@ -3,33 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JusticeFlowX - System Access</title>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>JusticeFlowX — Secure Access</title>
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     :root {
-      --bg-dark: #020813;
-      --bg-card: rgba(4, 16, 34, 0.6);
+      --bg: #030b14;
+      --surface: #0a1628;
+      --border: rgba(0, 245, 255, 0.12);
       --cyan: #00f5ff;
-      --cyan-dim: rgba(0, 245, 255, 0.15);
-      --purple: #a200ff;
+      --green: #00ff88;
+      --purple: #7b2fff;
       --red: #ff2b5e;
-      --text-main: #e2f1ff;
-      --text-dim: #8b9bb4;
-      --border: rgba(0, 245, 255, 0.2);
-      --border-bright: rgba(0, 245, 255, 0.5);
+      --text: #e0eaf4;
+      --text-dim: #5a7a94;
       --font-mono: 'Share Tech Mono', monospace;
-      --font-head: 'Orbitron', sans-serif;
-      --font-body: 'Rajdhani', sans-serif;
+      --font-sans: 'Inter', sans-serif;
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    
     body {
-      background: var(--bg-dark);
-      color: var(--text-main);
-      font-family: var(--font-body);
       min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -37,232 +35,811 @@
       position: relative;
     }
 
-    /* Background Effects */
+    /* ===== BACKGROUND ===== */
     .bg-grid {
-      position: absolute; inset: 0;
-      background-image: 
-        linear-gradient(rgba(0, 245, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 245, 255, 0.05) 1px, transparent 1px);
-      background-size: 40px 40px;
-      z-index: 0;
-      transform: perspective(500px) rotateX(60deg) translateY(-100px) scale(3);
-      animation: gridMove 20s linear infinite;
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
     }
-    @keyframes gridMove { 0%{transform:perspective(500px) rotateX(60deg) translateY(0) scale(3);} 100%{transform:perspective(500px) rotateX(60deg) translateY(40px) scale(3);} }
-
-    .glow-orb {
-      position: absolute;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(0,245,255,0.1) 0%, transparent 70%);
-      border-radius: 50%;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 0;
-      pointer-events: none;
+    .bg-gradient {
+      position: fixed; inset: 0; z-index: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(0,245,255,0.06) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 50%, rgba(123,47,255,0.06) 0%, transparent 60%);
+    }
+    canvas#particleCanvas {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
     }
 
-    /* Auth Container */
+    /* ===== MAIN CONTAINER ===== */
     .auth-container {
       position: relative;
-      z-index: 10;
-      width: 100%;
-      max-width: 440px;
-      padding: 40px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-bright);
-      border-radius: 20px;
-      backdrop-filter: blur(20px);
-      box-shadow: 
-        0 20px 50px rgba(0,0,0,0.5),
-        inset 0 0 20px var(--cyan-dim),
-        0 0 30px rgba(0, 245, 255, 0.1);
+      width: 780px;
+      max-width: 95vw;
+      height: 560px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
       overflow: hidden;
-    }
-    .auth-container::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-    }
-
-    .brand-header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    .brand-header h1 {
-      font-family: var(--font-head);
-      font-size: 24px;
-      color: #fff;
-      letter-spacing: 3px;
-      text-shadow: 0 0 10px var(--cyan);
-    }
-    .brand-header p {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--cyan);
-      margin-top: 5px;
-      letter-spacing: 2px;
+      z-index: 10;
+      box-shadow: 0 0 60px rgba(0,245,255,0.06), 0 25px 80px rgba(0,0,0,0.6);
+      display: flex;
     }
 
-    /* Forms */
-    .auth-form {
+    /* ===== FORM PANELS (Left & Right halves) ===== */
+    .forms-wrapper {
+      position: absolute;
+      top: 0; left: 0;
+      width: 200%;
+      height: 100%;
+      display: flex;
+      transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    .forms-wrapper.login-mode {
+      transform: translateX(-50%);
+    }
+
+    .form-panel {
+      width: 50%;
+      height: 100%;
+      display: flex;
+    }
+
+    .form-side {
+      width: 50%;
+      height: 100%;
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      transition: opacity 0.3s ease, transform 0.3s ease;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
     }
-    .auth-form.hidden {
-      display: none;
-      opacity: 0;
+
+    .art-side {
+      width: 50%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ===== OVERLAY PANEL (sliding decorative panel) ===== */
+    .overlay-panel {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 50%;
+      height: 100%;
+      z-index: 100;
+      transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1);
+      overflow: hidden;
+    }
+    .overlay-panel.login-mode {
+      transform: translateX(-100%);
+    }
+
+    .overlay-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #050e1a 0%, #0a1a30 50%, #0d1f35 100%);
+      border-left: 1px solid var(--border);
+    }
+    .overlay-panel.login-mode .overlay-bg {
+      border-left: none;
+      border-right: 1px solid var(--border);
+    }
+
+    .overlay-content {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      text-align: center;
+    }
+    #overlayRegister, #overlayLogin {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* SVG decoration in overlay */
+    .overlay-svg-wrap {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      margin: 0 auto 30px auto;
+    }
+    .overlay-svg-wrap svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; margin: 0; }
+
+    .overlay-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid;
+      animation: spinSlow 12s linear infinite;
+    }
+    .overlay-ring.r1 { inset: -10px; border-color: rgba(0,245,255,0.15); animation-duration: 10s; }
+    .overlay-ring.r2 { inset: -25px; border-color: rgba(123,47,255,0.1); animation-direction: reverse; animation-duration: 15s; }
+    .overlay-ring.r3 { inset: -40px; border-color: rgba(0,255,136,0.08); animation-duration: 20s; }
+
+    @keyframes spinSlow { to { transform: rotate(360deg); } }
+
+    .overlay-dots {
+      position: absolute;
+      inset: -40px;
+      animation: spinSlow 25s linear infinite reverse;
+    }
+    .overlay-dots span {
+      position: absolute;
+      width: 4px; height: 4px;
+      background: var(--cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--cyan);
+      opacity: 0.6;
+    }
+    .overlay-dots span:nth-child(1) { top: 0; left: 50%; }
+    .overlay-dots span:nth-child(2) { top: 50%; right: 0; }
+    .overlay-dots span:nth-child(3) { bottom: 0; left: 50%; }
+    .overlay-dots span:nth-child(4) { top: 50%; left: 0; }
+    .overlay-dots span:nth-child(5) { top: 15%; right: 15%; background: var(--purple); box-shadow: 0 0 6px var(--purple); }
+    .overlay-dots span:nth-child(6) { bottom: 15%; left: 15%; background: var(--green); box-shadow: 0 0 6px var(--green); }
+
+    .overlay-title {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      letter-spacing: 3px;
+      color: var(--cyan);
+      text-shadow: 0 0 20px rgba(0,245,255,0.3);
+      margin-bottom: 12px;
+    }
+
+    .overlay-desc {
+      color: var(--text-dim);
+      font-size: 13px;
+      line-height: 1.7;
+      max-width: 280px;
+      margin-bottom: 30px;
+    }
+
+    .overlay-switch-btn {
+      padding: 12px 32px;
+      border: 1px solid var(--cyan);
+      background: transparent;
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.3s;
+      text-transform: uppercase;
+    }
+    .overlay-switch-btn:hover {
+      background: rgba(0,245,255,0.1);
+      box-shadow: 0 0 20px rgba(0,245,255,0.2);
+      transform: translateY(-2px);
+    }
+
+    /* ===== FORM STYLES ===== */
+    .form-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .form-logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .form-logo-icon i { font-size: 22px; color: #fff; }
+    .form-logo-text {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: var(--text);
+    }
+
+    .form-subtitle {
+      color: var(--text-dim);
+      font-size: 12px;
+      letter-spacing: 1px;
+      margin-bottom: 30px;
+    }
+
+    .form-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text);
     }
 
     .input-group {
-      position: relative;
-    }
-    .input-group i {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--cyan);
-      font-size: 18px;
-    }
-    .auth-input {
       width: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px 16px 14px 45px;
-      color: #fff;
-      font-family: var(--font-mono);
-      font-size: 14px;
-      transition: all 0.3s ease;
-      outline: none;
-    }
-    .auth-input:focus {
-      border-color: var(--cyan);
-      box-shadow: 0 0 15px var(--cyan-dim);
-    }
-
-    .auth-btn {
-      background: linear-gradient(90deg, rgba(0,245,255,0.1), rgba(0,245,255,0.2));
-      border: 1px solid var(--cyan);
-      border-radius: 8px;
-      color: var(--cyan);
-      font-family: var(--font-head);
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      padding: 14px;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: all 0.3s ease;
+      max-width: 320px;
+      margin-bottom: 18px;
       position: relative;
-      overflow: hidden;
     }
-    .auth-btn:hover {
-      background: var(--cyan);
-      color: #000;
-      box-shadow: 0 0 20px var(--cyan);
-    }
-    .auth-btn::before {
-      content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-      transition: left 0.5s ease;
-    }
-    .auth-btn:hover::before { left: 100%; }
-
-    .switch-mode {
-      text-align: center;
-      margin-top: 25px;
-      font-family: var(--font-body);
-      font-size: 15px;
+    .input-group label {
+      font-size: 11px;
+      letter-spacing: 1.5px;
       color: var(--text-dim);
+      font-family: var(--font-mono);
+      display: block;
+      margin-bottom: 6px;
+      text-transform: uppercase;
     }
-    .switch-mode a {
-      color: var(--cyan);
-      text-decoration: none;
-      font-weight: 600;
-      cursor: pointer;
+    .input-group .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-group .input-wrap i {
+      position: absolute;
+      left: 14px;
+      font-size: 18px;
+      color: var(--text-dim);
       transition: color 0.3s;
     }
-    .switch-mode a:hover {
-      color: #fff;
-      text-shadow: 0 0 8px var(--cyan);
+    .input-group input, .input-group select {
+      width: 100%;
+      padding: 12px 14px 12px 44px;
+      background: rgba(0,10,20,0.6);
+      border: 1px solid rgba(0,245,255,0.12);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: var(--font-sans);
+      outline: none;
+      transition: all 0.3s;
+    }
+    .input-group select {
+      padding-left: 44px;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235a7a94'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 18px;
+    }
+    .input-group select option {
+      background: #0a1628;
+      color: var(--text);
+    }
+    .input-group input:focus, .input-group select:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 12px rgba(0,245,255,0.1);
+    }
+    .input-group input:focus + i,
+    .input-group input:focus ~ i {
+      color: var(--cyan);
     }
 
-    /* Alerts */
-    .alert-box {
-      display: none;
-      padding: 12px;
+    .submit-btn {
+      width: 100%;
+      max-width: 320px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      border: none;
       border-radius: 6px;
       font-family: var(--font-mono);
-      font-size: 12px;
-      text-align: center;
-      margin-bottom: 20px;
+      font-size: 14px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+      margin-top: 8px;
     }
-    .alert-box.error {
-      display: block;
-      background: rgba(255, 43, 94, 0.1);
-      border: 1px solid var(--red);
+    .submit-btn.register-btn {
+      background: linear-gradient(135deg, var(--purple), #a855f7);
+      color: #fff;
+    }
+    .submit-btn.login-btn {
+      background: linear-gradient(135deg, var(--purple), #a855f7);
+      color: #fff;
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,245,255,0.2);
+    }
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+    .submit-btn::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -60%;
+      width: 220%;
+      height: 200%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transform: rotate(25deg);
+      transition: left 0.5s;
+    }
+    .submit-btn:hover::after {
+      left: 120%;
+    }
+
+    .error-msg {
       color: var(--red);
+      font-size: 12px;
+      font-family: var(--font-mono);
+      margin-top: 10px;
+      min-height: 18px;
+      letter-spacing: 0.5px;
+      text-align: center;
+      width: 100%;
+      max-width: 320px;
     }
-    .alert-box.success {
-      display: block;
-      background: rgba(0, 255, 136, 0.1);
-      border: 1px solid #00ff88;
-      color: #00ff88;
+
+    .success-msg {
+      color: var(--green);
+      font-size: 12px;
+      font-family: var(--font-mono);
+      margin-top: 10px;
+      min-height: 18px;
+      letter-spacing: 0.5px;
+      text-align: center;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    /* Shield SVG */
+    .shield-svg { filter: drop-shadow(0 0 20px rgba(0,245,255,0.3)); }
+    .shield-svg .shield-body { fill: none; stroke: var(--cyan); stroke-width: 1.5; opacity: 0.8; }
+    .shield-svg .shield-inner { fill: rgba(0,245,255,0.05); stroke: var(--cyan); stroke-width: 0.5; opacity: 0.5; }
+    .shield-svg .shield-check { fill: none; stroke: var(--green); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round;
+      stroke-dasharray: 30; stroke-dashoffset: 30; animation: drawCheck 1.5s ease forwards 0.5s; }
+    .shield-svg .shield-glow { fill: var(--cyan); opacity: 0; animation: pulseGlow 3s ease-in-out infinite; }
+    .shield-svg .circuit-line { fill: none; stroke: rgba(0,245,255,0.3); stroke-width: 0.7;
+      stroke-dasharray: 4 4; animation: dashFlow 3s linear infinite; }
+
+    @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+    @keyframes pulseGlow { 0%, 100% { opacity: 0; } 50% { opacity: 0.15; } }
+    @keyframes dashFlow { to { stroke-dashoffset: -16; } }
+
+    /* Lock SVG */
+    .lock-svg { filter: drop-shadow(0 0 20px rgba(123,47,255,0.3)); }
+    .lock-svg .lock-body { fill: rgba(123,47,255,0.08); stroke: var(--purple); stroke-width: 1.5; }
+    .lock-svg .lock-shackle { fill: none; stroke: var(--purple); stroke-width: 2; stroke-linecap: round; }
+    .lock-svg .lock-keyhole { fill: var(--purple); opacity: 0.8; }
+    .lock-svg .lock-ray { fill: none; stroke: rgba(123,47,255,0.3); stroke-width: 0.5; opacity: 0;
+      animation: rayPulse 2s ease-in-out infinite; }
+    .lock-svg .lock-ray:nth-child(2) { animation-delay: 0.5s; }
+    .lock-svg .lock-ray:nth-child(3) { animation-delay: 1s; }
+    .lock-svg .scan-line { fill: none; stroke: var(--purple); stroke-width: 1; opacity: 0.6;
+      animation: scanUp 2s ease-in-out infinite alternate; }
+
+    @keyframes rayPulse { 0%, 100% { opacity: 0; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.1); } }
+    @keyframes scanUp { from { transform: translateY(10px); opacity: 0.3; } to { transform: translateY(-10px); opacity: 0.8; } }
+
+    /* ===== LOADING SPINNER ===== */
+    .btn-spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .auth-container { height: auto; min-height: 100vh; border-radius: 0; flex-direction: column; }
+      .overlay-panel { display: none; }
+      .form-side { width: 100%; padding: 30px 20px; }
+      .forms-wrapper { width: 100%; flex-direction: column; }
+      .forms-wrapper.login-mode { transform: translateY(-50%); }
+      .form-panel { width: 100%; }
+      .art-side { display: none; }
+      .mobile-switch { display: block !important; }
+    }
+
+    .mobile-switch {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+    .mobile-switch a {
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    /* Scanline overlay */
+    .scanline {
+      position: fixed; inset: 0; z-index: 1;
+      background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
-
   <div class="bg-grid"></div>
-  <div class="glow-orb"></div>
+  <div class="bg-gradient"></div>
+  <canvas id="particleCanvas"></canvas>
+  <div class="scanline"></div>
 
-  <div class="auth-container">
-    <div class="brand-header">
-      <h1>JUSTICEFLOW<span style="color:var(--cyan)">X</span></h1>
-      <p>SECURE TERMINAL ACCESS</p>
+  <div class="auth-container" id="authContainer">
+
+    <!-- ======= REGISTER FORM (left half of panel 1) ======= -->
+    <div class="forms-wrapper" id="formsWrapper">
+
+      <!-- Panel 1: Register Form + art -->
+      <div class="form-panel">
+        <div class="form-side" id="registerForm">
+          <div class="form-logo">
+            <div class="form-logo-icon"><i class='bx bx-shield-quarter'></i></div>
+            <span class="form-logo-text">JusticeFlowX</span>
+          </div>
+          <p class="form-subtitle">DIGITAL FORENSICS PLATFORM</p>
+          <h2 class="form-title">Create Account</h2>
+          <p class="form-subtitle" style="margin-bottom:20px">Register to access all modules</p>
+
+          <div class="input-group">
+            <label>Agent ID</label>
+            <div class="input-wrap">
+              <input type="text" id="regUsername" placeholder="Enter username" autocomplete="off">
+              <i class='bx bx-user'></i>
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Password</label>
+            <div class="input-wrap">
+              <input type="password" id="regPassword" placeholder="Min 6 characters" autocomplete="new-password">
+              <i class='bx bx-lock-alt'></i>
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Role</label>
+            <div class="input-wrap">
+              <select id="regRole">
+                <option value="Investigator">Investigator</option>
+                <option value="Analyst">Analyst</option>
+                <option value="Admin">Admin</option>
+              </select>
+              <i class='bx bx-badge-check'></i>
+            </div>
+          </div>
+          <button class="submit-btn register-btn" id="regBtn">
+            <span id="regBtnText">REGISTER</span>
+          </button>
+          <div class="error-msg" id="regError"></div>
+          <div class="success-msg" id="regSuccess"></div>
+
+          <div class="mobile-switch">
+            <a onclick="toggleMode()">Already have an account? LOG IN</a>
+          </div>
+        </div>
+
+        <!-- Art side (behind overlay on register view) -->
+        <div class="art-side"></div>
+      </div>
+
+      <!-- Panel 2: art + Login Form -->
+      <div class="form-panel">
+        <div class="art-side"></div>
+        <div class="form-side" id="loginForm">
+          <div class="form-logo">
+            <div class="form-logo-icon" style="background: linear-gradient(135deg, var(--purple), #a855f7);">
+              <i class='bx bx-lock-open-alt'></i>
+            </div>
+            <span class="form-logo-text">JusticeFlowX</span>
+          </div>
+          <p class="form-subtitle">SECURE AUTHENTICATION</p>
+          <h2 class="form-title">Welcome Back</h2>
+          <p class="form-subtitle" style="margin-bottom:20px">Enter your credentials to proceed</p>
+
+          <div class="input-group">
+            <label>Agent ID</label>
+            <div class="input-wrap">
+              <input type="text" id="loginUsername" placeholder="Enter username" autocomplete="off">
+              <i class='bx bx-user'></i>
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Password</label>
+            <div class="input-wrap">
+              <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password">
+              <i class='bx bx-lock-alt'></i>
+            </div>
+          </div>
+          <button class="submit-btn login-btn" id="loginBtn">
+            <span id="loginBtnText">AUTHORIZE</span>
+          </button>
+          <div class="error-msg" id="loginError"></div>
+
+          <div class="mobile-switch">
+            <a onclick="toggleMode()">Need an account? REGISTER</a>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div id="alertBox" class="alert-box"></div>
+    <!-- ======= OVERLAY PANEL (slides left/right) ======= -->
+    <div class="overlay-panel" id="overlayPanel">
+      <div class="overlay-bg"></div>
+      <div class="overlay-content" id="overlayContent">
 
-    <!-- Login Form -->
-    <form id="loginForm" class="auth-form">
-      <div class="input-group">
-        <i class='bx bx-user'></i>
-        <input type="text" id="loginUsername" class="auth-input" placeholder="Operator ID" required>
-      </div>
-      <div class="input-group">
-        <i class='bx bx-lock-alt'></i>
-        <input type="password" id="loginPassword" class="auth-input" placeholder="Passkey" required>
-      </div>
-      <button type="submit" class="auth-btn">INITIALIZE UPLINK</button>
-      <div class="switch-mode">
-        Unregistered operative? <a id="showRegister">Request Access</a>
-      </div>
-    </form>
+        <!-- Register-mode overlay (shown when register form is visible) -->
+        <div id="overlayRegister">
+          <div class="overlay-svg-wrap">
+            <div class="overlay-ring r1"></div>
+            <div class="overlay-ring r2"></div>
+            <div class="overlay-ring r3"></div>
+            <div class="overlay-dots">
+              <span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <svg viewBox="-10 0 140 140" class="shield-svg" style="transform: translateX(6px);">
+              <!-- Shield outline -->
+              <path class="shield-body" d="M60 10 L105 30 L105 75 C105 105 60 130 60 130 C60 130 15 105 15 75 L15 30 Z"/>
+              <path class="shield-inner" d="M60 22 L95 38 L95 72 C95 96 60 118 60 118 C60 118 25 96 25 72 L25 38 Z"/>
+              <!-- Check mark -->
+              <polyline class="shield-check" points="40,72 55,87 82,55"/>
+              <!-- Glow center -->
+              <circle class="shield-glow" cx="60" cy="70" r="25"/>
+              <!-- Circuit lines -->
+              <line class="circuit-line" x1="15" y1="55" x2="0" y2="55"/>
+              <line class="circuit-line" x1="105" y1="55" x2="120" y2="55"/>
+              <line class="circuit-line" x1="60" y1="10" x2="60" y2="0"/>
+              <line class="circuit-line" x1="30" y1="115" x2="20" y2="130"/>
+              <line class="circuit-line" x1="90" y1="115" x2="100" y2="130"/>
+            </svg>
+          </div>
+          <h3 class="overlay-title">ALREADY REGISTERED?</h3>
+          <p class="overlay-desc">Access the forensic platform with your existing credentials. All modules unlocked after authentication.</p>
+          <button class="overlay-switch-btn" onclick="toggleMode()">LOG IN</button>
+        </div>
 
-    <!-- Register Form -->
-    <form id="registerForm" class="auth-form hidden">
-      <div class="input-group">
-        <i class='bx bx-user-plus'></i>
-        <input type="text" id="regUsername" class="auth-input" placeholder="New Operator ID" required>
+        <!-- Login-mode overlay (shown when login form is visible) -->
+        <div id="overlayLogin" style="display:none">
+          <div class="overlay-svg-wrap">
+            <div class="overlay-ring r1" style="border-color: rgba(123,47,255,0.2);"></div>
+            <div class="overlay-ring r2" style="border-color: rgba(168,85,247,0.12);"></div>
+            <div class="overlay-ring r3" style="border-color: rgba(123,47,255,0.06);"></div>
+            <div class="overlay-dots">
+              <span style="background:var(--purple);box-shadow:0 0 6px var(--purple)"></span>
+              <span style="background:var(--purple);box-shadow:0 0 6px var(--purple)"></span>
+              <span style="background:var(--purple);box-shadow:0 0 6px var(--purple)"></span>
+              <span style="background:var(--purple);box-shadow:0 0 6px var(--purple)"></span>
+              <span style="background:var(--cyan);box-shadow:0 0 6px var(--cyan)"></span>
+              <span style="background:var(--green);box-shadow:0 0 6px var(--green)"></span>
+            </div>
+            <svg viewBox="-10 0 140 140" class="lock-svg" style="transform: translateX(6px);">
+              <!-- Lock body -->
+              <rect class="lock-body" x="25" y="65" width="70" height="55" rx="8"/>
+              <!-- Shackle -->
+              <path class="lock-shackle" d="M40 65 L40 45 C40 28 80 28 80 45 L80 65"/>
+              <!-- Keyhole -->
+              <circle class="lock-keyhole" cx="60" cy="88" r="8"/>
+              <rect class="lock-keyhole" x="57" y="88" width="6" height="14" rx="2"/>
+              <!-- Rays -->
+              <circle class="lock-ray" cx="60" cy="85" r="22" stroke-dasharray="4 4"/>
+              <circle class="lock-ray" cx="60" cy="85" r="30" stroke-dasharray="2 6"/>
+              <circle class="lock-ray" cx="60" cy="85" r="38" stroke-dasharray="1 8"/>
+              <!-- Scan line -->
+              <line class="scan-line" x1="20" y1="90" x2="100" y2="90"/>
+              <!-- Circuit lines -->
+              <line class="circuit-line" x1="25" y1="90" x2="5" y2="90" style="stroke:rgba(123,47,255,0.3)"/>
+              <line class="circuit-line" x1="95" y1="90" x2="115" y2="90" style="stroke:rgba(123,47,255,0.3)"/>
+            </svg>
+          </div>
+          <h3 class="overlay-title" style="color:var(--purple);text-shadow:0 0 20px rgba(123,47,255,0.3)">NEW AGENT?</h3>
+          <p class="overlay-desc">Register a new account to gain access to all digital forensics modules.</p>
+          <button class="overlay-switch-btn" onclick="toggleMode()" style="border-color:var(--purple);color:var(--purple);">REGISTER</button>
+        </div>
+
       </div>
-      <div class="input-group">
-        <i class='bx bx-lock-alt'></i>
-        <input type="password" id="regPassword" class="auth-input" placeholder="Secure Passkey" required>
-      </div>
-      <div class="input-group">
-        <i class='bx bx-shield-quarter'></i>
-        <input type="password" id="regConfirmPassword" class="auth-input" placeholder="Confirm Passkey" required>
-      </div>
-      <button type="submit" class="auth-btn">REGISTER CLEARANCE</button>
-      <div class="switch-mode">
-        Existing clearance? <a id="showLogin">Initialize Uplink</a>
-      </div>
-    </form>
+    </div>
+
   </div>
 
-  <script src="assets/js/auth.js"></script>
+  <script>
+    const API_BASE = 'http://localhost:8001';
+    let isLoginMode = false;
+
+    // Check if already logged in
+    (function checkSession() {
+      const token = localStorage.getItem('justiceToken');
+      if (token) {
+        window.location.href = 'index.html';
+      }
+    })();
+
+    function toggleMode() {
+      isLoginMode = !isLoginMode;
+      const wrapper = document.getElementById('formsWrapper');
+      const overlay = document.getElementById('overlayPanel');
+      const overlayRegister = document.getElementById('overlayRegister');
+      const overlayLogin = document.getElementById('overlayLogin');
+
+      if (isLoginMode) {
+        wrapper.classList.add('login-mode');
+        overlay.classList.add('login-mode');
+        // Crossfade overlay content
+        overlayRegister.style.opacity = '0';
+        setTimeout(() => {
+          overlayRegister.style.display = 'none';
+          overlayLogin.style.display = 'flex';
+          overlayLogin.style.opacity = '0';
+          setTimeout(() => overlayLogin.style.opacity = '1', 50);
+        }, 350);
+      } else {
+        wrapper.classList.remove('login-mode');
+        overlay.classList.remove('login-mode');
+        overlayLogin.style.opacity = '0';
+        setTimeout(() => {
+          overlayLogin.style.display = 'none';
+          overlayRegister.style.display = 'flex';
+          overlayRegister.style.opacity = '0';
+          setTimeout(() => overlayRegister.style.opacity = '1', 50);
+        }, 350);
+      }
+      // Clear errors
+      document.getElementById('regError').textContent = '';
+      document.getElementById('regSuccess').textContent = '';
+      document.getElementById('loginError').textContent = '';
+    }
+
+    // Add transition to overlay content divs
+    document.getElementById('overlayRegister').style.transition = 'opacity 0.35s ease';
+    document.getElementById('overlayLogin').style.transition = 'opacity 0.35s ease';
+
+    // ===== REGISTER =====
+    document.getElementById('regBtn').addEventListener('click', async () => {
+      const username = document.getElementById('regUsername').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const role = document.getElementById('regRole').value;
+      const errEl = document.getElementById('regError');
+      const successEl = document.getElementById('regSuccess');
+      const btnText = document.getElementById('regBtnText');
+
+      errEl.textContent = '';
+      successEl.textContent = '';
+
+      if (!username || username.length < 3) { errEl.textContent = '⚠ USERNAME MUST BE AT LEAST 3 CHARACTERS'; return; }
+      if (!password || password.length < 6) { errEl.textContent = '⚠ PASSWORD MUST BE AT LEAST 6 CHARACTERS'; return; }
+
+      btnText.innerHTML = '<span class="btn-spinner"></span>REGISTERING...';
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, role })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = '⚠ ' + (data.detail || 'REGISTRATION FAILED').toUpperCase();
+        } else {
+          successEl.textContent = '✓ AGENT REGISTERED — SWITCHING TO LOGIN...';
+          setTimeout(() => toggleMode(), 1500);
+        }
+      } catch (e) {
+        errEl.textContent = '⚠ COULD NOT REACH BACKEND SERVER';
+      }
+      btnText.textContent = 'REGISTER';
+    });
+
+    // ===== LOGIN =====
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const errEl = document.getElementById('loginError');
+      const btnText = document.getElementById('loginBtnText');
+
+      errEl.textContent = '';
+
+      if (!username) { errEl.textContent = '⚠ ENTER YOUR AGENT ID'; return; }
+      if (!password) { errEl.textContent = '⚠ ENTER YOUR PASSWORD'; return; }
+
+      btnText.innerHTML = '<span class="btn-spinner"></span>AUTHORIZING...';
+      try {
+        const formData = new URLSearchParams();
+        formData.append('username', username);
+        formData.append('password', password);
+        
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: formData
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = '⚠ ' + (data.detail || 'AUTHENTICATION FAILED').toUpperCase();
+          btnText.textContent = 'AUTHORIZE';
+        } else {
+          localStorage.setItem('justiceToken', data.access_token);
+          localStorage.setItem('jfx_user', data.username);
+          localStorage.setItem('jfx_role', data.role);
+          btnText.textContent = '✓ ACCESS GRANTED';
+          setTimeout(() => { window.location.href = 'index.html'; }, 800);
+        }
+      } catch (e) {
+        errEl.textContent = '⚠ COULD NOT REACH BACKEND SERVER';
+        btnText.textContent = 'AUTHORIZE';
+      }
+    });
+
+    // Enter key support
+    document.getElementById('regPassword').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('regBtn').click(); });
+    document.getElementById('loginPassword').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginBtn').click(); });
+
+    // ===== PARTICLE CANVAS =====
+    (function initParticles() {
+      const canvas = document.getElementById('particleCanvas');
+      const ctx = canvas.getContext('2d');
+      function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      resize(); window.addEventListener('resize', resize);
+
+      const particles = [];
+      const colors = ['rgba(0,245,255,', 'rgba(123,47,255,', 'rgba(0,255,136,'];
+      for (let i = 0; i < 60; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.3,
+          vy: (Math.random() - 0.5) * 0.3,
+          size: Math.random() * 2 + 0.5,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          alpha: Math.random() * 0.4 + 0.1
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0) p.x = canvas.width;
+          if (p.x > canvas.width) p.x = 0;
+          if (p.y < 0) p.y = canvas.height;
+          if (p.y > canvas.height) p.y = 0;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = p.color + p.alpha + ')';
+          ctx.fill();
+        });
+
+        // Draw connections
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 120) {
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(0,245,255,${0.06 * (1 - dist / 120)})`;
+              ctx.lineWidth = 0.5;
+              ctx.stroke();
+            }
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+  </script>
 </body>
 </html>
