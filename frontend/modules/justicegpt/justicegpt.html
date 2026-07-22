@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JusticeGPT - Digital Forensics AI</title>
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../assets/css/justice.css">
+  <link rel="stylesheet" href="justicegpt.css">
+</head>
+<body id="jgpt-body">
+
+  <div class="scanline-overlay"></div>
+  <div class="noise-overlay"></div>
+  <canvas id="jgptCanvas"></canvas>
+
+  <nav class="navbar" style="border-bottom: 1px solid rgba(0, 245, 255, 0.2);">
+    <div class="nav-left">
+      <div class="brand-block">
+        <span class="brand" data-text="JusticeFlowX">JusticeFlowX</span>
+        <span class="brand-sub"><span class="brand-sub-dot"></span> JusticeGPT Core</span>
+      </div>
+    </div>
+    <div class="nav-center">
+      <a href="../../index.html" class="nav-link">
+        <i class='bx bx-grid-alt'></i><span>Dashboard</span>
+      </a>
+      <a href="justicegpt.html" class="nav-link active">
+        <i class='bx bx-brain'></i><span>JusticeGPT</span>
+      </a>
+    </div>
+    <div class="nav-right">
+      <div class="clock-display" id="clockDisplay">00:00:00</div>
+    </div>
+  </nav>
+
+  <div class="jgpt-layout">
+    <!-- LEFT SIDEBAR: MODES & HISTORY -->
+    <div class="jgpt-sidebar-left glass-panel">
+      
+      <div class="panel-section">
+        <div class="panel-header">
+          <i class='bx bx-slider-alt'></i> AI MODES
+        </div>
+        <div class="mode-selector">
+          <button class="mode-btn active" data-mode="general">
+            <i class='bx bx-bot'></i> General AI
+          </button>
+          <button class="mode-btn" data-mode="cyber">
+            <i class='bx bx-shield-quarter'></i> Cyber Analyst
+          </button>
+          <button class="mode-btn" data-mode="forensics">
+            <i class='bx bx-search-alt'></i> Digital Forensics
+          </button>
+          <button class="mode-btn" data-mode="malware">
+            <i class='bx bx-bug'></i> Malware Analyst
+          </button>
+          <button class="mode-btn" data-mode="incident">
+            <i class='bx bx-first-aid'></i> Incident Response
+          </button>
+        </div>
+      </div>
+
+      <div class="panel-section history-section">
+        <div class="panel-header">
+          <i class='bx bx-history'></i> INVESTIGATION HISTORY
+        </div>
+        <div class="history-list" id="chatHistoryList">
+          <!-- Populated dynamically -->
+          <div class="history-item active">
+            <i class='bx bx-message-square-detail'></i> New Investigation
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CENTER: CHAT INTERFACE & UPLOAD -->
+    <div class="jgpt-main glass-panel">
+      
+      <div class="chat-container" id="chatContainer">
+        
+        <div class="welcome-screen" id="welcomeScreen">
+          <div class="ai-core-anim">
+            <div class="core-ring r1"></div>
+            <div class="core-ring r2"></div>
+            <div class="core-ring r3"></div>
+            <i class='bx bx-brain core-icon'></i>
+          </div>
+          <h2>JusticeGPT</h2>
+          <p>Cybersecurity & Digital Forensics Assistant</p>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+          <!-- Messages will appear here -->
+        </div>
+
+        <!-- File Upload Preview Area -->
+        <div class="file-preview-area hidden" id="filePreviewArea">
+          <div class="file-preview-card">
+            <i class='bx bx-file' id="previewIcon"></i>
+            <div class="file-preview-info">
+              <span class="file-preview-name" id="previewName">filename.pdf</span>
+              <span class="file-preview-size" id="previewSize">1.2 MB</span>
+            </div>
+            <button class="remove-file-btn" id="removeFileBtn"><i class='bx bx-x'></i></button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="chat-input-area">
+        <div class="input-wrapper">
+          <label for="fileUpload" class="upload-btn">
+            <i class='bx bx-paperclip'></i>
+          </label>
+          <input type="file" id="fileUpload" class="hidden-input" accept=".pdf,.png,.jpg,.jpeg,.txt,.pcap,.pcapng,.log,.py,.js,.c,.cpp">
+          
+          <textarea id="chatInput" placeholder="Ask JusticeGPT or upload evidence for analysis..." rows="1"></textarea>
+          
+          <button class="voice-btn" id="voiceBtn" title="Voice Input (Coming Soon)">
+            <i class='bx bx-microphone'></i>
+          </button>
+          <button class="send-btn" id="sendBtn">
+            <i class='bx bx-send'></i>
+          </button>
+        </div>
+        <div class="upload-dropzone hidden" id="uploadDropzone">
+          <i class='bx bx-cloud-upload'></i> Drop evidence file here for analysis
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- RIGHT SIDEBAR: INTELLIGENCE PANEL -->
+    <div class="jgpt-sidebar-right glass-panel">
+      
+      <div class="panel-section">
+        <div class="panel-header">
+          <i class='bx bx-radar'></i> AI INTELLIGENCE
+        </div>
+        <div class="intel-stats">
+          <div class="stat-row">
+            <span class="stat-lbl">Status</span>
+            <span class="stat-val ok-text"><span class="blink-dot"></span> ONLINE</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-lbl">Model</span>
+            <span class="stat-val">JusticeGPT Core</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-lbl">Confidence</span>
+            <span class="stat-val cyan-text" id="confidenceScore">96%</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-lbl">Files Analyzed</span>
+            <span class="stat-val" id="filesAnalyzedCount">245+</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-lbl">Threat Detection</span>
+            <span class="stat-val warn-text">ACTIVE</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-header">
+          <i class='bx bx-wrench'></i> FORENSIC ACTIONS
+        </div>
+        <div class="quick-actions">
+          <button class="action-btn" data-action="analyze_evidence"><i class='bx bx-search-alt'></i> Analyze Evidence</button>
+          <button class="action-btn" data-action="extract_ioc"><i class='bx bx-target-lock'></i> Extract Indicators</button>
+          <button class="action-btn" data-action="build_timeline"><i class='bx bx-time-five'></i> Build Timeline</button>
+          <button class="action-btn" data-action="explain_artifact"><i class='bx bx-bulb'></i> Explain Artifact</button>
+          <button class="action-btn" data-action="generate_report"><i class='bx bx-file'></i> Generate Report</button>
+        </div>
+      </div>
+
+      <!-- File Details Widget (Appears after upload) -->
+      <div class="panel-section hidden" id="fileDetailsWidget">
+        <div class="panel-header">
+          <i class='bx bx-info-circle'></i> EVIDENCE DETAILS
+        </div>
+        <div class="intel-stats" style="font-size: 11px;">
+          <div class="stat-row">
+            <span class="stat-lbl">Hash (MD5)</span>
+            <span class="stat-val" id="detHash">---</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-lbl">Type</span>
+            <span class="stat-val" id="detType">---</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-lbl">Threat Level</span>
+            <span class="stat-val" id="detThreat">---</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="../../assets/js/shared.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="justicegpt.js?v=2.1"></script>
+</body>
+</html>

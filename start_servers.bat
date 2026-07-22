@@ -1,7 +1,7 @@
 @echo off
 echo Starting JusticeFlowX Backend Servers...
 
-set PYTHON_BIN="c:\Users\Nirmay Rinesh\Desktop\justiceflowx\backend\venv\Scripts\python.exe"
+set PYTHON_BIN=.\venv\Scripts\python.exe
 set CWD="c:\Users\Nirmay Rinesh\Desktop\justiceflowx\backend"
 
 cd /d %CWD%

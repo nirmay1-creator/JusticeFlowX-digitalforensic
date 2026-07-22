@@ -55,7 +55,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from routers import auth, cases, law, threat_intel, system, threat_hunter
+from routers import auth, cases, law, threat_intel, system, threat_hunter, justicegpt
 
 # Include Routers
 app.include_router(auth.router)
@@ -64,6 +64,7 @@ app.include_router(law.router)
 app.include_router(threat_intel.router)
 app.include_router(system.router, prefix="/api/system", tags=["System"])
 app.include_router(threat_hunter.router)
+app.include_router(justicegpt.router)
 
 # --- GLOBAL ROUTES ---
 

@@ -71,3 +71,32 @@ class ThreatIntelCache(Base):
     overall_score = Column(Integer, nullable=False, default=0)
     raw_data = Column(JSON, nullable=True)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+class JusticeGPTChatSession(Base):
+    __tablename__ = "justicegpt_chat_sessions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    session_uuid = Column(String(36), unique=True, index=True, nullable=False)
+    mode = Column(String(50), nullable=False, default="general")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+class JusticeGPTChatMessage(Base):
+    __tablename__ = "justicegpt_chat_messages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    session_uuid = Column(String(36), ForeignKey("justicegpt_chat_sessions.session_uuid", ondelete="CASCADE"), nullable=False)
+    role = Column(String(20), nullable=False) # "user" or "ai"
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+class JusticeGPTFileAnalysis(Base):
+    __tablename__ = "justicegpt_file_analysis"
+
+    id = Column(Integer, primary_key=True, index=True)
+    session_uuid = Column(String(36), ForeignKey("justicegpt_chat_sessions.session_uuid", ondelete="CASCADE"), nullable=False)
+    filename = Column(String(255), nullable=False)
+    file_hash = Column(String(64), nullable=True) # MD5 or SHA256
+    file_type = Column(String(50), nullable=True)
+    analysis_results = Column(JSON, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

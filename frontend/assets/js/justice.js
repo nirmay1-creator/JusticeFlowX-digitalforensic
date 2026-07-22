@@ -1269,6 +1269,119 @@ function showThreatHunterOverlay(onComplete) {
   requestAnimationFrame(updateProgress);
 }
 
+/* ----------- TYPE 10: JUSTICEGPT — Neural Core Sync ----------- */
+function showJusticeGPTOverlay(onComplete) {
+  const overlay = document.createElement("div");
+  overlay.className = "scan-overlay-full";
+  overlay.innerHTML = `
+    <div class="scan-animation-wrap">
+      <div class="scan-title-overlay" style="color:#00f5ff">NEURAL CORE SYNCHRONIZATION</div>
+      <div style="position:relative;width:240px;height:240px;margin:10px 0;display:flex;align-items:center;justify-content:center;">
+        <canvas id="brainCanvas" width="240" height="240" style="position:absolute;inset:0;"></canvas>
+        <i class='bx bx-brain' style="font-size:72px;color:#00f5ff;filter:drop-shadow(0 0 16px #00f5ff);position:absolute;z-index:10;animation:pulseBrain 1s ease-in-out infinite alternate;"></i>
+      </div>
+      <div class="scan-progress-label" id="scanLabel" style="color:#00f5ff">Initializing LLM Core...</div>
+      <div class="scan-bar-wrap" style="margin-top:10px;"><div class="scan-bar-fill" id="scanBarFill" style="background:linear-gradient(90deg,#00f5ff,#0066ff)"></div></div>
+    </div>
+    <style>
+      @keyframes pulseBrain { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.15); opacity: 1; filter: drop-shadow(0 0 24px #00f5ff); } }
+    </style>
+  `;
+  document.body.appendChild(overlay);
+
+  const bc = overlay.querySelector("#brainCanvas");
+  const ctx = bc.getContext("2d");
+  let frameCount = 0;
+
+  // Neural nodes
+  const nodes = [];
+  for (let i = 0; i < 40; i++) {
+    nodes.push({
+      x: 120 + (Math.random() - 0.5) * 200,
+      y: 120 + (Math.random() - 0.5) * 200,
+      r: Math.random() * 2 + 1,
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.02 + Math.random() * 0.03,
+      cx: 120, cy: 120
+    });
+  }
+
+  function drawBrainNet() {
+    ctx.clearRect(0, 0, 240, 240);
+    frameCount++;
+
+    // Draw orbiting rings
+    ctx.save();
+    ctx.translate(120, 120);
+    ctx.rotate(frameCount * 0.01);
+    ctx.beginPath();
+    ctx.arc(0, 0, 80, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(0, 245, 255, 0.1)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    ctx.rotate(-frameCount * 0.02);
+    ctx.beginPath();
+    ctx.arc(0, 0, 100, 0, Math.PI * 1.5);
+    ctx.strokeStyle = "rgba(0, 245, 255, 0.2)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+
+    // Draw neural connections
+    ctx.strokeStyle = "rgba(0, 245, 255, 0.15)";
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        if (dx * dx + dy * dy < 3000) {
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Draw nodes
+    nodes.forEach(n => {
+      n.phase += n.speed;
+      // Orbit slowly
+      n.x = n.cx + (n.x - n.cx) * Math.cos(n.speed*0.1) - (n.y - n.cy) * Math.sin(n.speed*0.1);
+      n.y = n.cy + (n.x - n.cx) * Math.sin(n.speed*0.1) + (n.y - n.cy) * Math.cos(n.speed*0.1);
+      
+      const pulse = 0.4 + 0.6 * Math.sin(n.phase);
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0, 245, 255, ${pulse})`;
+      ctx.fill();
+    });
+  }
+
+  const animInterval = setInterval(drawBrainNet, 40);
+  const fill = overlay.querySelector("#scanBarFill");
+  const lbl = overlay.querySelector("#scanLabel");
+  const steps = ["Allocating Tensor Cores...", "Loading Security Protocols...", "Activating JusticeGPT..."];
+  const total = 2800;
+  const start = performance.now();
+
+  function updateProgress(now) {
+    const elapsed = now - start;
+    const pct = Math.min((elapsed / total) * 100, 100);
+    fill.style.width = pct + "%";
+    lbl.textContent = steps[pct < 33 ? 0 : pct < 66 ? 1 : 2];
+    if (elapsed < total) { 
+      requestAnimationFrame(updateProgress); 
+    } else {
+      clearInterval(animInterval);
+      overlay.remove(); 
+      onComplete();
+    }
+  }
+  requestAnimationFrame(updateProgress);
+}
+
 function initScanButtons() {
   document.querySelectorAll(".scan-btn").forEach(btn => {
     btn.addEventListener("click", e => {
@@ -1290,6 +1403,7 @@ function initScanButtons() {
         case "threat_intel": showThreatIntelOverlay(afterScan); break;
         case "law": showLawOverlay(afterScan); break;
         case "ai_threat": showThreatHunterOverlay(afterScan); break;
+        case "justicegpt": showJusticeGPTOverlay(afterScan); break;
         default:         showFingerprintOverlay(afterScan); break;
       }
     });
