@@ -1,6 +1,6 @@
 /* =============================================
 
-   JUSTICEFX – SHARED JS UTILITIES
+   JUSTICEFLOWX V3.0 – SHARED JS UTILITIES
    ============================================= */
 
 /* ── Clock ─────────────────────────────────── */
@@ -24,10 +24,26 @@ function startCpuMeter() {
 }
 
 /* ── Marquee ────────────────────────────────── */
-function startMarquee() {
+async function startMarquee() {
   const el = document.getElementById("marqueeText");
   if (!el) return;
-  el.textContent = "⬢ JUSTICEFX BIOMETRIC AUTHENTICATION LAYER 2 ACTIVE  ◆  DATABASE NODES 14/14 CONNECTED  ◆  LAST BREACH ATTEMPT: 72H AGO — NEUTRALIZED  ◆  NEXT AUDIT: 06:00 UTC  ◆  ALL SUBSYSTEMS NOMINAL  ◆  CRIMINAL RECORDS: 14,217  ◆  FACIAL MATCH ACCURACY: 99.7%";
+  
+  async function updateMarquee() {
+    try {
+      const res = await fetch("http://localhost:8001/api/system/status");
+      if(!res.ok) return;
+      const data = await res.json();
+      if(data && data.metrics && data.metrics.hardware) {
+        const hw = data.metrics.hardware;
+        el.textContent = `⬢ JUSTICEFX PACKET ANALYZER ACTIVE  ◆  SYSTEM UPTIME: ${hw.network.uptime_str}  ◆  CPU LOAD: ${hw.cpu.usage}%  ◆  RAM USAGE: ${hw.memory.used_gb} GB / ${hw.memory.percent}%  ◆  NETWORK RX: ${hw.network.download_mbps} Mbps / TX: ${hw.network.upload_mbps} Mbps  ◆  ALL SUBSYSTEMS NOMINAL`;
+      }
+    } catch(err) {
+      console.error("Marquee fetch error", err);
+    }
+  }
+  
+  updateMarquee();
+  setInterval(updateMarquee, 10000);
 }
 
 /* ── Menu Dropdown ──────────────────────────── */
@@ -134,7 +150,7 @@ function startTerminal() {
     {t:"Firewall scan — no anomalies",c:"ok"},
     {t:"ALERT: Unauthorized access blocked",c:"alert"},
     {t:"AI threat detection update pushed",c:""},
-    {t:"Biometric reader — standby mode",c:""},
+    {t:"Forensic analysis engine — standby mode",c:""},
     {t:"WARN: Node 4C response degraded",c:"warn"},
     {t:"Encryption handshake verified",c:"ok"},
     {t:"Surveillance feed reconnected",c:"ok"},
@@ -176,8 +192,8 @@ function animateStats() {
 function runBootSequence(onComplete) {
   const ov=document.createElement("div"); ov.id="bootOverlay";
   ov.innerHTML=`
-    <div class="boot-logo">JusticeFlowX</div>
-    <div class="boot-sub">BIOMETRIC VERIFICATION SYSTEM v2.4</div>
+    <div class="boot-logo">JusticeFlowX v3.0</div>
+    <div class="boot-sub">DIGITAL FORENSICS SYSTEM 3.0</div>
     <div class="boot-bar-wrap"><div class="boot-bar-fill" id="bpf"></div></div>
     <div id="bootLog"></div>
   `;
@@ -186,7 +202,7 @@ function runBootSequence(onComplete) {
   const fill=ov.querySelector("#bpf");
   const msgs=[
     {t:"Kernel handshake complete",c:"ok"},
-    {t:"Initializing biometric subsystem...",c:""},
+    {t:"Initializing digital forensics subsystem...",c:""},
     {t:"Fingerprint module — ONLINE",c:"ok"},
     {t:"Facial recognition engine — ONLINE",c:"ok"},
     {t:"Syncing criminal database [14,217 records]...",c:""},

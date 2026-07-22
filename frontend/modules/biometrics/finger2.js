@@ -1,5 +1,5 @@
 /* ================================================================
-   JusticeFlowX — finger2.js
+   JusticeFlowX v3.0 — finger2.js
    Fingerprint Verification Module
    - WebAuthn hardware fingerprint reader support
    - Local fallback database
@@ -583,11 +583,11 @@ async function startWebAuthn() {
 
     const publicKeyCredentialCreationOptions = {
       challenge,
-      rp: { name: "JusticeFlowX", id: window.location.hostname || "localhost" },
+      rp: { name: "JusticeFlowX v3.0", id: window.location.hostname || "localhost" },
       user: {
         id: new Uint8Array(16),
         name: "officer@justicefx",
-        displayName: "JusticeFlowX Officer",
+        displayName: "JusticeFlowX v3.0 Officer",
       },
       pubKeyCredParams: [{ alg: -7, type: "public-key" }],
       authenticatorSelection: {
@@ -705,7 +705,7 @@ function sleep(ms) {
    INIT
    ---------------------------------------------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("[JusticeFlowX] finger2.js — Biometric Module Loading");
+  console.log("[JusticeFlowX v3.0] finger2.js — Biometric Module Loading");
 
   initHexCanvas();
   initDataStreams();
@@ -724,5 +724,5 @@ document.addEventListener("DOMContentLoaded", () => {
   addLog("Backend: " + (CONFIG.USE_BACKEND ? "enabled" : "local DB mode"));
   addLog("Awaiting fingerprint input...");
 
-  console.log("[JusticeFlowX] Biometric module ready.");
+  console.log("[JusticeFlowX v3.0] Biometric module ready.");
 });

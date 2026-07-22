@@ -204,7 +204,7 @@ function drawMicroprintCanvases(isForged) {
       ctx.font = '4px monospace';
       ctx.fillStyle = 'rgba(0,245,255,0.5)';
       for (let row = 0; row < 14; row++) {
-        const text = 'AUTHENTIC DOCUMENT REPUBLIC OF INDIA JUSTICEFX ';
+        const text = 'AUTHENTIC DOCUMENT REPUBLIC OF INDIA JUSTICEFLOWX V3.0 ';
         ctx.fillText(text.repeat(3), 2, 6 + row * 5.5);
       }
       // Magnification grid

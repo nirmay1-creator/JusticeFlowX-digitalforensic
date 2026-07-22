@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JusticeFlowX — Case & Evidence Control</title>
+<title>JusticeFlowX v3.0 — Case & Evidence Control</title>
 <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -612,7 +612,7 @@ input[type=file] { cursor: pointer; }
 <nav class="navbar">
   <div class="nav-left">
     <div style="display:flex;flex-direction:column;gap:1px;">
-      <span class="brand">JusticeFlowX</span>
+      <span class="brand">JusticeFlowX v3.0</span>
       <span class="brand-sub">CASE & EVIDENCE CONTROL v3.1</span>
     </div>
   </div>
@@ -892,7 +892,7 @@ input[type=file] { cursor: pointer; }
     <div class="c-tl"></div><div class="c-tr"></div><div class="c-bl"></div><div class="c-br"></div>
     <div class="panel-head">
       <div class="panel-icon purple"><i class='bx bx-brain'></i></div>
-      <div><div class="panel-title">AI Integrity Analysis</div><div class="panel-title-sub">JUSTICEFX NEURAL ENGINE v2.4</div></div>
+      <div><div class="panel-title">AI Integrity Analysis</div><div class="panel-title-sub">JUSTICEFLOWX V3.0 NEURAL ENGINE v2.4</div></div>
       <div class="panel-badge" id="aiBadge">STANDBY</div>
     </div>
 
@@ -976,7 +976,7 @@ input[type=file] { cursor: pointer; }
   <div class="status-bar-item"><i class='bx bx-shield-quarter'></i> Vault: <span class="ok">SEALED</span></div>
   <div class="status-bar-item"><i class='bx bx-lock'></i> Encryption: <span class="ok">AES-256</span></div>
   <div class="status-bar-item marquee-wrap">
-    <span class="marquee-text">⬢ JUSTICEFX CASE MANAGEMENT ACTIVE  ◆  ALL STATIONS ONLINE 14/14  ◆  EVIDENCE CHAIN SECURED  ◆  BIOMETRIC LOCK ENGAGED  ◆  NEXT AUDIT: 06:00 UTC  ◆  PUNE DISTRICT JURISDICTION ACTIVE</span>
+    <span class="marquee-text">⬢ JUSTICEFLOWX V3.0 CASE MANAGEMENT ACTIVE  ◆  ALL STATIONS ONLINE 14/14  ◆  EVIDENCE CHAIN SECURED  ◆  BIOMETRIC LOCK ENGAGED  ◆  NEXT AUDIT: 06:00 UTC  ◆  PUNE DISTRICT JURISDICTION ACTIVE</span>
   </div>
 </div>
 
@@ -1634,7 +1634,7 @@ function exportReport() {
   if(!currentCase) { notify('error','No Active Case','No case data to export.'); return; }
   const o = currentCase.officer ? POLICE_DB.officers.find(x=>x.id===currentCase.officer) : null;
   const st = o ? POLICE_DB.stations.find(s=>s.id===o.station) : null;
-  const data = `JUSTICEFX CASE REPORT\n${'='.repeat(50)}\nCase ID: ${currentCase.id}\nTitle: ${currentCase.title}\nDate: ${currentCase.date}\nCategory: ${currentCase.category}\nPriority: ${currentCase.priority}\nLocation: ${currentCase.location||'N/A'}\nOfficer: ${o?o.name:'Unassigned'}\nStation: ${st?st.name:'N/A'}\nSummary: ${currentCase.desc||'N/A'}\n\nEVIDENCE (${evidenceItems.length} items)\n${'-'.repeat(30)}\n${evidenceItems.map(e=>`[${e.id}] ${e.name} (${e.type}) - Hash: ${e.hash}`).join('\n')}\n\nTIMELINE (${timelineItems.length} events)\n${'-'.repeat(30)}\n${timelineItems.map(t=>`[${t.time}] ${t.action}: ${t.detail}`).join('\n')}\n\nCHAIN OF CUSTODY (${custodyItems.length} entries)\n${'-'.repeat(30)}\n${custodyItems.map(c=>`[${c.time}] ${c.name}: ${c.detail}`).join('\n')}\n\nGenerated: ${new Date().toLocaleString()} by JusticeFlowX v3.1`;
+  const data = `JUSTICEFLOWX V3.0 CASE REPORT\n${'='.repeat(50)}\nCase ID: ${currentCase.id}\nTitle: ${currentCase.title}\nDate: ${currentCase.date}\nCategory: ${currentCase.category}\nPriority: ${currentCase.priority}\nLocation: ${currentCase.location||'N/A'}\nOfficer: ${o?o.name:'Unassigned'}\nStation: ${st?st.name:'N/A'}\nSummary: ${currentCase.desc||'N/A'}\n\nEVIDENCE (${evidenceItems.length} items)\n${'-'.repeat(30)}\n${evidenceItems.map(e=>`[${e.id}] ${e.name} (${e.type}) - Hash: ${e.hash}`).join('\n')}\n\nTIMELINE (${timelineItems.length} events)\n${'-'.repeat(30)}\n${timelineItems.map(t=>`[${t.time}] ${t.action}: ${t.detail}`).join('\n')}\n\nCHAIN OF CUSTODY (${custodyItems.length} entries)\n${'-'.repeat(30)}\n${custodyItems.map(c=>`[${c.time}] ${c.name}: ${c.detail}`).join('\n')}\n\nGenerated: ${new Date().toLocaleString()} by JusticeFlowX v3.0.1`;
   const blob = new Blob([data], {type:'text/plain'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);

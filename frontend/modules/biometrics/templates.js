@@ -1,5 +1,5 @@
 /* ============================================================
-   JusticeFlowX — Facial Recognition Frontend
+   JusticeFlowX v3.0 — Facial Recognition Frontend
    Uses face-api.js for real browser-side face detection
    ============================================================ */
 
@@ -756,7 +756,7 @@ function initScanButton() {
    INIT
    ======================== */
 document.addEventListener("DOMContentLoaded", async () => {
-  console.log("[JusticeFlowX] Facial Recognition Module booting...");
+  console.log("[JusticeFlowX v3.0] Facial Recognition Module booting...");
 
   // Visual background
   initHexCanvas();

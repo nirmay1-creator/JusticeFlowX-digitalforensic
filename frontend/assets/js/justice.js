@@ -1,4 +1,4 @@
-console.log("[JusticeFlowX] System Initializing...");
+console.log("[JusticeFlowX v3.0] System Initializing...");
 
 const SYSTEM_PASSWORD = "justice123";
 
@@ -27,10 +27,26 @@ function startCpuMeter() {
 }
 
 /* ========================= MARQUEE ========================= */
-function startMarquee() {
+async function startMarquee() {
   const el = document.getElementById("marqueeText");
   if (!el) return;
-  el.textContent = "⬢ JUSTICEFX BIOMETRIC AUTHENTICATION LAYER 2 ACTIVE  ◆  DATABASE NODES 14/14 CONNECTED  ◆  LAST BREACH ATTEMPT: 72H AGO — NEUTRALIZED  ◆  NEXT AUDIT: 06:00 UTC  ◆  ALL SUBSYSTEMS NOMINAL";
+  
+  async function updateMarquee() {
+    try {
+      const res = await fetch("http://localhost:8001/api/system/status");
+      if(!res.ok) return;
+      const data = await res.json();
+      if(data && data.metrics && data.metrics.hardware) {
+        const hw = data.metrics.hardware;
+        el.textContent = `⬢ JUSTICEFX PACKET ANALYZER ACTIVE  ◆  SYSTEM UPTIME: ${hw.network.uptime_str}  ◆  CPU LOAD: ${hw.cpu.usage}%  ◆  RAM USAGE: ${hw.memory.used_gb} GB / ${hw.memory.percent}%  ◆  NETWORK RX: ${hw.network.download_mbps} Mbps / TX: ${hw.network.upload_mbps} Mbps  ◆  ALL SUBSYSTEMS NOMINAL`;
+      }
+    } catch(err) {
+      console.error("Marquee fetch error", err);
+    }
+  }
+  
+  updateMarquee();
+  setInterval(updateMarquee, 10000);
 }
 
 /* ========================= HEX CANVAS ========================= */
@@ -662,8 +678,8 @@ function runBootSequence(onComplete) {
   const bootOverlay = document.createElement("div");
   bootOverlay.id = "bootOverlay";
   bootOverlay.innerHTML = `
-    <div class="boot-logo-area">JusticeFlowX</div>
-    <div class="boot-subtitle">BIOMETRIC VERIFICATION SYSTEM v2.4</div>
+    <div class="boot-logo-area">JusticeFlowX v3.0</div>
+    <div class="boot-subtitle">DIGITAL FORENSICS SYSTEM 3.0</div>
     <div class="boot-progress-bar"><div class="boot-progress-fill" id="bootProgressFill"></div></div>
     <div id="bootLog"></div>
   `;
@@ -672,7 +688,7 @@ function runBootSequence(onComplete) {
   const progressFill = bootOverlay.querySelector("#bootProgressFill");
   const bootMessages = [
     { text: "Kernel handshake complete", type: "ok" },
-    { text: "Initializing biometric subsystem...", type: "" },
+    { text: "Initializing digital forensics subsystem...", type: "" },
     { text: "Fingerprint module — ONLINE", type: "ok" },
     { text: "Facial recognition engine — ONLINE", type: "ok" },
     { text: "Syncing criminal database [14,217 records]...", type: "" },
@@ -1300,7 +1316,7 @@ function initDeleteProfile() {
   if (!deleteBtn) return;
   deleteBtn.addEventListener("click", async e => {
     e.preventDefault();
-    if (!confirm("Are you sure you want to permanently delete your JusticeFlowX access profile? This action cannot be undone.")) return;
+    if (!confirm("Are you sure you want to permanently delete your JusticeFlowX v3.0 access profile? This action cannot be undone.")) return;
     
     const token = localStorage.getItem("justiceToken");
     try {
@@ -1333,7 +1349,7 @@ function initLogout() {
 
 /* ========================= MAIN INIT ========================= */
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("[JusticeFlowX] DOM Ready — Launching boot sequence");
+  console.log("[JusticeFlowX v3.0] DOM Ready — Launching boot sequence");
   if (!checkAuth()) return; // Stop initialization if not authenticated
 
   initHexCanvas();
@@ -1352,6 +1368,6 @@ document.addEventListener("DOMContentLoaded", () => {
     startTerminal();
     startRealTimeNotifications();
     animateStats();
-    console.log("[JusticeFlowX] All systems online.");
+    console.log("[JusticeFlowX v3.0] All systems online.");
   });
 });
