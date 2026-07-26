@@ -30,7 +30,7 @@ async function startMarquee() {
   
   async function updateMarquee() {
     try {
-      const res = await fetch("http://localhost:8001/api/system/status");
+      const res = await fetch("https://justiceflowxdigitalforensics-n7tlafs3.b4a.run/api/system/status");
       if(!res.ok) return;
       const data = await res.json();
       if(data && data.metrics && data.metrics.hardware) {

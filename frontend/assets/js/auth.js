@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8001/api';
+const API_BASE = 'https://justiceflowxdigitalforensics-n7tlafs3.b4a.run/api';
 
 document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('loginForm');

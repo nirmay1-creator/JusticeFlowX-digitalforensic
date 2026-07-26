@@ -33,7 +33,7 @@ async function startMarquee() {
   
   async function updateMarquee() {
     try {
-      const res = await fetch("http://localhost:8001/api/system/status");
+      const res = await fetch("https://justiceflowxdigitalforensics-n7tlafs3.b4a.run/api/system/status");
       if(!res.ok) return;
       const data = await res.json();
       if(data && data.metrics && data.metrics.hardware) {
@@ -730,7 +730,7 @@ function startTerminal() {
 
   async function fetchLog() {
     try {
-      const res = await fetch("http://localhost:8001/api/system/logs");
+      const res = await fetch("https://justiceflowxdigitalforensics-n7tlafs3.b4a.run/api/system/logs");
       if (!res.ok) return;
       const data = await res.json();
       if (data.logs && data.logs.length > 0) {
@@ -1434,7 +1434,7 @@ function initDeleteProfile() {
     
     const token = localStorage.getItem("justiceToken");
     try {
-      const response = await fetch("http://localhost:8000/api/auth/me", {
+      const response = await fetch("https://justiceflowxdigitalforensics-n7tlafs3.b4a.run/api/auth/me", {
         method: "DELETE",
         headers: { "Authorization": `Bearer ${token}` }
       });

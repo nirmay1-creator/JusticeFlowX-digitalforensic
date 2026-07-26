@@ -3,7 +3,7 @@
    Uses face-api.js for real browser-side face detection
    ============================================================ */
 
-const BACKEND_URL = "http://127.0.0.1:8675";
+const BACKEND_URL = "https://justiceflowxdigitalforensics-n7tlafs3.b4a.run";
 const CDN_MODEL_URL = "https://justadudewhohacks.github.io/face-api.js/models";
 
 let stream = null;

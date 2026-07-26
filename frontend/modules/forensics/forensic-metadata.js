@@ -117,7 +117,7 @@ async function runAnalysis() {
     scanningPct.textContent = '45%';
     scanningBarFill.style.width = '45%';
 
-    const response = await fetch('http://localhost:5001/api/doc/upload', {
+    const response = await fetch('https://justiceflowxdigitalforensics-n7tlafs3.b4a.run/api/doc/upload', {
       method: 'POST',
       body: formData
     });

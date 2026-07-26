@@ -107,7 +107,7 @@ async function runVerification(serial, docType) {
   const nodeEls = nodesEl.querySelectorAll('.ssa-node');
 
   try {
-      const response = await fetch('http://localhost:5001/api/doc/serial_verify', {
+      const response = await fetch('https://justiceflowxdigitalforensics-n7tlafs3.b4a.run/api/doc/serial_verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ serial, docType })
@@ -257,7 +257,7 @@ async function runBatchVerification(serials) {
   tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:16px;font-family:var(--font-mono);font-size:11px">Scanning Server Database...</td></tr>';
 
   try {
-      const response = await fetch('http://localhost:5001/api/doc/serial_batch_verify', {
+      const response = await fetch('https://justiceflowxdigitalforensics-n7tlafs3.b4a.run/api/doc/serial_batch_verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ serials, docType: selectedType })

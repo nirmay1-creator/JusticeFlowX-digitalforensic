@@ -2,7 +2,7 @@
    SYSTEM HEALTH PAGE JS (REAL BACKEND)
    ============================================= */
 
-const API_URL = "http://localhost:8001/api/system";
+const API_URL = "https://justiceflowxdigitalforensics-n7tlafs3.b4a.run/api/system";
 
 function setMeter(id, pct){
   const el = document.getElementById(id);

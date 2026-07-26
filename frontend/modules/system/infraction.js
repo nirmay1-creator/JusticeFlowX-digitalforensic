@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8001/api/system";
+const API_URL = "https://justiceflowxdigitalforensics-n7tlafs3.b4a.run/api/system";
 
 const sysBadge = document.getElementById("sysBadge");
 const sysStatusText = document.getElementById("sysStatusText");
