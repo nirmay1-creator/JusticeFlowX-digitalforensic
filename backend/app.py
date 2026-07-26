@@ -267,9 +267,9 @@ def stop_capture():
 @app.route("/api/get_packets", methods=["GET"])
 def get_packets():
     global packet_queue, capture_error
-    # Return all packets currently in the queue, then clear it
-    current_packets = packet_queue.copy()
-    packet_queue.clear()
+    # Atomically swap the list to prevent RuntimeError during iteration
+    current_packets = packet_queue
+    packet_queue = []
     
     status = "success"
     if capture_error:
