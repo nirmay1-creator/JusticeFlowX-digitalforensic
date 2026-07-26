@@ -44,7 +44,7 @@ function appendPacketRow(pkt) {
   `;
   
   packetTable.insertBefore(tr, packetTable.firstChild);
-  if (packetTable.children.length > 50) {
+  if (packetTable.children.length > 500) {
     packetTable.removeChild(packetTable.lastChild);
   }
 }
