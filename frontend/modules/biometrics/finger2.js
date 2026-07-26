@@ -10,7 +10,7 @@
    CONFIG
    ---------------------------------------------------------------- */
 const CONFIG = {
-  BACKEND_URL: "https://justiceflowxdigitalforensics-n7tlafs3.b4a.run",   // Python backend (optional)
+  BACKEND_URL: "http://localhost:5000",   // Python backend (optional)
   USE_BACKEND: false,                      // set true if backend is running
   SCAN_DURATION_MS: 3000,
   WEBAUTHN_TIMEOUT: 60000,

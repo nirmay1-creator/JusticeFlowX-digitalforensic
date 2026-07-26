@@ -21,7 +21,7 @@ scanBtn.addEventListener("click", async () => {
   loadingOverlay.style.display = "flex";
   
   try {
-    const res = await fetch("https://justiceflowxdigitalforensics-n7tlafs3.b4a.run/api/threat_intel", {
+    const res = await fetch("http://localhost:8675/api/threat_intel", {
       method: "POST",
       body: JSON.stringify({ ip: ip })
     });

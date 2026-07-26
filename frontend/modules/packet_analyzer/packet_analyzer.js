@@ -99,7 +99,7 @@ function showPacketDetails(p) {
 async function loadRealPackets() {
   loadBtn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> LOADING...";
   try {
-    const res = await fetch("https://justiceflowxdigitalforensics-n7tlafs3.b4a.run/api/packet_history");
+    const res = await fetch("http://localhost:8675/api/packet_history");
     const data = await res.json();
     packets = data.packets || [];
     renderTable();
