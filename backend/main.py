@@ -82,3 +82,13 @@ def health_check(db: Session = Depends(get_db)):
         "service": "JusticeFlowX Backend",
         "database": db_status
     }
+
+@app.get("/debug-env")
+def debug_env():
+    from database import SessionLocal
+    return {
+        "DATABASE_URL": os.getenv("DATABASE_URL"),
+        "JWT_SECRET_KEY_SET": bool(os.getenv("JWT_SECRET_KEY")),
+        "SessionLocal_Exists": bool(SessionLocal)
+    }
+
