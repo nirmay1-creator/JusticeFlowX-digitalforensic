@@ -78,3 +78,25 @@ def analyze_file_content(file_content: str, file_type: str, query: str, mode: st
         return response.text
     except Exception as e:
         return f"Error analyzing file: {str(e)}"
+
+def analyze_raw_file(file_bytes: bytes, file_type: str, query: str, mode: str) -> str:
+    if not client:
+        return "System Error: GEMINI_API_KEY is not configured in the environment."
+        
+    system_instruction = MODES_PROMPTS.get(mode, MODES_PROMPTS["general"])
+    prompt = f"Analyze this {file_type} file based on the following user query: '{query}'"
+    
+    file_part = types.Part.from_bytes(data=file_bytes, mime_type=file_type)
+    
+    try:
+        response = client.models.generate_content(
+            model="gemini-3.6-flash",
+            contents=[prompt, file_part],
+            config=types.GenerateContentConfig(
+                system_instruction=system_instruction,
+                temperature=0.1
+            )
+        )
+        return response.text
+    except Exception as e:
+        return f"Error analyzing raw file: {str(e)}"

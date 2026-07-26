@@ -160,6 +160,9 @@ async function sendMessage() {
   const text = chatInput.value.trim();
   if (!text && !uploadedFile) return;
 
+  // Capture file to a local variable so we can clear the UI immediately
+  const fileToUpload = uploadedFile;
+
   // Hide welcome screen on first message
   if (welcomeScreen && !welcomeScreen.classList.contains('hidden')) {
     welcomeScreen.classList.add('hidden');
@@ -167,31 +170,40 @@ async function sendMessage() {
 
   // Display User Message
   let userContent = text;
-  if (uploadedFile) {
+  if (fileToUpload) {
+    const escapedText = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     userContent = `<div style="display:flex; align-items:center; gap:10px; margin-bottom: 8px;">
                      <i class='bx bx-file' style="color:#00f5ff; font-size: 20px;"></i> 
-                     <strong>${uploadedFile.name}</strong>
-                   </div>` + text;
+                     <strong>${fileToUpload.name}</strong>
+                   </div><div style="white-space: pre-wrap;">${escapedText}</div>`;
   }
   
-  const userMsg = createMessageElement('user', userContent, !!uploadedFile);
+  const userMsg = createMessageElement('user', userContent, !!fileToUpload);
   chatMessages.appendChild(userMsg);
   
   chatInput.value = '';
   chatInput.style.height = 'auto';
-  scrollToBottom();
 
+  // Clear file preview IMMEDIATELY to prevent layout jumps AFTER scrolling
+  if (fileToUpload) {
+    clearFilePreview();
+  }
+
+  scrollToBottom();
   showTypingIndicator();
 
   try {
     let response;
     
-    if (uploadedFile) {
+    if (fileToUpload) {
       // Handle File Upload Analysis
       const formData = new FormData();
-      formData.append("file", uploadedFile);
+      formData.append("file", fileToUpload);
       formData.append("query", text);
       formData.append("mode", currentMode);
+      if (currentChatId) {
+        formData.append("chat_id", currentChatId);
+      }
       
       const res = await fetch(`${API_URL}/upload`, {
         method: "POST",
@@ -199,8 +211,8 @@ async function sendMessage() {
       });
       response = await res.json();
       
-      // Clear file preview
-      clearFilePreview();
+      if(response.chat_id) currentChatId = response.chat_id;
+      
       updateIntelligencePanel(response);
     } else {
       // Handle Standard Chat

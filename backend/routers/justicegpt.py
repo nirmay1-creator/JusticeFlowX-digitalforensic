@@ -7,7 +7,7 @@ import json
 
 from database import get_db
 from models import JusticeGPTChatSession, JusticeGPTChatMessage, JusticeGPTFileAnalysis
-from services.ai_service import get_ai_response, analyze_file_content
+from services.ai_service import get_ai_response, analyze_file_content, analyze_raw_file
 from services.file_analyzer import process_uploaded_file
 
 router = APIRouter(
@@ -81,12 +81,8 @@ async def upload_endpoint(
     if processed_data.get("content") and not processed_data["content"].startswith("Error"):
         ai_reply = analyze_file_content(processed_data["content"], file.content_type, query, mode)
     else:
-        # Fallback for images or unsupported files if we want to pass bytes directly to gemini vision later
-        # For now, just pass the filename and error
-        ai_reply = f"Could not parse file content. File type might be unsupported or an image. Internal status: {processed_data.get('content')}"
-        
-        # If the model is Gemini 2.5 Pro, we could theoretically send the file bytes directly.
-        # But this is a good starting point.
+        # Fallback for images or unsupported files
+        ai_reply = analyze_raw_file(file_bytes, file.content_type, query, mode)
     
     # Mock threat level for now, AI could return this in structured format ideally.
     threat_level = "UNKNOWN"
