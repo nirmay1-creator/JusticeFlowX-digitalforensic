@@ -51,7 +51,7 @@ function appendPacketRow(pkt) {
 
 async function fetchPackets() {
   try {
-    const res = await fetch("http://localhost:8675/api/get_packets");
+    const res = await fetch("http://127.0.0.1:8675/api/get_packets");
     const data = await res.json();
     
     if (data.status === "error") {
@@ -86,7 +86,7 @@ startBtn.addEventListener("click", async () => {
   const bpfFilter = document.getElementById("bpfFilter").value;
 
   try {
-    await fetch("http://localhost:8675/api/start_capture", {
+    await fetch("http://127.0.0.1:8675/api/start_capture", {
       method: "POST",
       body: JSON.stringify({ interface: iface, filter: bpfFilter })
     });
@@ -103,7 +103,7 @@ startBtn.addEventListener("click", async () => {
 
 stopBtn.addEventListener("click", async () => {
   try {
-    await fetch("http://localhost:8675/api/stop_capture", { method: "POST" });
+    await fetch("http://127.0.0.1:8675/api/stop_capture", { method: "POST" });
   } catch(e) {}
   
   stopBtn.style.display = "none";
@@ -114,7 +114,7 @@ stopBtn.addEventListener("click", async () => {
 // Check if already sniffing on page load
 async function checkStatusOnLoad() {
   try {
-    const res = await fetch("http://localhost:8675/api/status");
+    const res = await fetch("http://127.0.0.1:8675/api/status");
     const data = await res.json();
     if (data.sniffing) {
       // Backend is already running, restore UI state
