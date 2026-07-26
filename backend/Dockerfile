@@ -9,7 +9,7 @@ ENV PYTHONUNBUFFERED=1
 
 # Install system dependencies (needed for psycopg2 / PostgreSQL and tshark)
 RUN apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y gcc libpq-dev tshark \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y gcc libpq-dev tshark libmagic1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
