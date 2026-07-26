@@ -21,3 +21,4 @@ slowapi
 python-dotenv
 google-genai
 pymupdf
+python-docx
