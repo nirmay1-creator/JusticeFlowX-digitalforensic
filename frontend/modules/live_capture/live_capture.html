@@ -20,6 +20,9 @@
     .stop-btn:hover { background: rgba(255, 43, 94, 0.2); box-shadow: 0 0 15px rgba(255, 43, 94, 0.3); }
     
     .packet-table-wrapper { flex: 1; overflow-y: auto; border: 1px solid rgba(0, 245, 255, 0.1); background: rgba(0, 0, 0, 0.3); }
+    .packet-table-wrapper::-webkit-scrollbar { width: 8px; background: rgba(0, 0, 0, 0.2); }
+    .packet-table-wrapper::-webkit-scrollbar-thumb { background: rgba(0, 245, 255, 0.4); border-radius: 4px; }
+    .packet-table-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(0, 245, 255, 0.8); }
     .packet-table { width: 100%; border-collapse: collapse; font-family: 'Share Tech Mono', monospace; font-size: 12px; }
     .packet-table th { position: sticky; top: 0; background: rgba(0, 245, 255, 0.1); padding: 8px; text-align: left; color: var(--cyan); border-bottom: 1px solid rgba(0, 245, 255, 0.3); }
     .packet-table td { padding: 6px 8px; border-bottom: 1px solid rgba(0, 245, 255, 0.05); color: rgba(255, 255, 255, 0.8); }
